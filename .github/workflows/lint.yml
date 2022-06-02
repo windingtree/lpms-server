@@ -15,19 +15,19 @@ jobs:
           fetch-depth: 0
 
       - name: Set up node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # lint commit messages
-      - uses: wagoid/commitlint-github-action@v4
+      - name: Lint commit messages
+        uses: wagoid/commitlint-github-action@v4
         env:
           NODE_PATH: ${{ github.workspace }}/node_modules
 
-      - name: Run linters
+      - name: Lint code
         uses: wearerequired/lint-action@v2
         with:
           eslint: true
