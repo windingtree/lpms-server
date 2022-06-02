@@ -5,6 +5,7 @@
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
+    "start": "node dist/src/index.js",
     "protoc:libs": "cp -pR ./node_modules/@windingtree/stays-models/dist/proto/*.proto ./src/proto/",
     "protoc:local": "protoc --ts_out ./src/proto --proto_path ./src/proto ./src/proto/*.proto",
     "typechain:videre": "npx typechain --target ethers-v5 --out-dir ./typechain-videre './node_modules/@windingtree/videre-contracts/artifacts/contracts/**/*.json'",
@@ -43,6 +44,7 @@
     "response-time": "^2.3.2",
     "sublevel": "^2.4.0",
     "url": "^0.11.0",
+    "kleur": "^4.1.4",
     "web3.storage": "^4.2.0"
   },
   "devDependencies": {
@@ -61,7 +63,6 @@
     "@windingtree/videre-contracts": "^0.2.0-alpha.1",
     "chai": "^4.3.6",
     "eslint": "^8.15.0",
-    "kleur": "^4.1.4",
     "mocha": "^10.0.0",
     "nodemon": "^2.0.16",
     "supertest": "^6.2.3",
