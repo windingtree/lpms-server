@@ -1,0 +1,19 @@
+{
+  "name": "LPMS server",
+  "description": "LPMS server",
+  "repository": "https://github.com/windingtree/lpms-server",
+  "keywords": [
+    "node",
+    "express"
+  ],
+  "env": {
+    "CLIENT_URL": "<CLIENT_URL>",
+    "APP_ACCESS_TOKEN_KEY": "<APP_ACCESS_TOKEN_KEY>",
+    "APP_REFRESH_TOKEN_KEY": "<APP_REFRESH_TOKEN_KEY>",
+    "APP_WALLET_PASSPHRASE": "<WALLET_PASSPHRASE>",
+    "WEB3STORAGE_KEY": "<WEBSTORAGE_API_KEY>",
+    "APP_CHAIN_ID": "31337",
+    "APP_VERIFYING_CONTRACT": "<APP_VERIFYING_CONTRACT>",
+    "APP_PROMETHEUS_PORT":"9100"
+  }
+}
