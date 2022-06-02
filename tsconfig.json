@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es2020",
+    "target": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
@@ -20,6 +20,9 @@
     "./src",
     "./test",
     "./swagger"
+  ],
+  "exclude": [
+    "node_modules"
   ],
   "types": [
     "reflect-metadata",

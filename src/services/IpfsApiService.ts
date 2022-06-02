@@ -6,11 +6,11 @@ const { readFile } = promises;
 export default class IpfsApiService {
   private ipfsApi: Web3Storage;
 
-  static getFileFromBuffer(fileBuffer: Uint8Array, fileName: string): typeof File {
+  static getFileFromBuffer(fileBuffer: Uint8Array, fileName: string): File {
     return new File([fileBuffer], fileName);
   }
 
-  static async getFileFromMulter(file: Express.Multer.File): Promise<typeof File> {
+  static async getFileFromMulter(file: Express.Multer.File): Promise<File> {
     const fileBuffer = await readFile(file.path);
     return IpfsApiService.getFileFromBuffer(fileBuffer, file.originalname);
   }
