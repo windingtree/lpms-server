@@ -1,17 +1,13 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "lib": [
-      "es2020",
-      "esnext"
-    ],
     "target": "es2020",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
     "sourceMap": true,
-    "outDir": "dist",
+    "outDir": "./dist/cjs",
     "declaration": true,
     "baseUrl": ".",
     "experimentalDecorators": true,
@@ -21,12 +17,9 @@
     "skipLibCheck": true
   },
   "include": [
-    "src",
-    "test",
-    "swagger"
-  ],
-  "exclude": [
-    "node_modules"
+    "./src",
+    "./test",
+    "./swagger"
   ],
   "types": [
     "reflect-metadata",
