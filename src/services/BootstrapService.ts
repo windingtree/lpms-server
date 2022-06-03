@@ -35,12 +35,9 @@ export class BootstrapService {
   }
 
   private async configure(): Promise<void> {
-
-    await userService.createUser(
-      defaultManagerLogin,
-      defaultManagerPassword,
-      [AppRole.MANAGER]
-    );
+    await userService.createUser(defaultManagerLogin, defaultManagerPassword, [
+      AppRole.MANAGER
+    ]);
 
     await walletService.createNewWallet();
 

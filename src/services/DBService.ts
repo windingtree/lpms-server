@@ -14,11 +14,19 @@ import {
 import { Bytes } from 'ethers';
 import { Person } from '@windingtree/stays-models/dist/cjs/proto/person';
 
-export type LevelDefaultTyping = string | Buffer | Uint8Array
-export type DBLevel = Level<string, string | string[]>
-export type StringAbstractDB = AbstractSublevel<DBLevel, LevelDefaultTyping, string, string>;
+export type LevelDefaultTyping = string | Buffer | Uint8Array;
+export type DBLevel = Level<string, string | string[]>;
+export type StringAbstractDB = AbstractSublevel<
+  DBLevel,
+  LevelDefaultTyping,
+  string,
+  string
+>;
 export type FacilityRules = NoticeRequiredRule | DayOfWeekLOSRule;
-export type FacilityModifiers = DayOfWeekRateModifer | OccupancyRateModifier | LOSRateModifier;
+export type FacilityModifiers =
+  | DayOfWeekRateModifer
+  | OccupancyRateModifier
+  | LOSRateModifier;
 export type FacilityLevelValues = Facility | string[];
 export type FacilitySpaceLevelValues = Item | Space;
 export type FacilityItemType = 'spaces' | 'otherItems';
@@ -28,13 +36,20 @@ export default class DBService {
   protected db: DBLevel;
   protected userDB: AbstractSublevel<DBLevel, LevelDefaultTyping, string, User>;
   protected loginDB: StringAbstractDB;
-  protected tokenDB: AbstractSublevel<DBLevel, LevelDefaultTyping, string, Token>;
+  protected tokenDB: AbstractSublevel<
+    DBLevel,
+    LevelDefaultTyping,
+    string,
+    Token
+  >;
 
   private static _instance: DBService = new DBService();
 
   constructor() {
     if (DBService._instance) {
-      throw new Error("Error: Instantiation failed: Use DBService.getInstance() instead of new.");
+      throw new Error(
+        'Error: Instantiation failed: Use DBService.getInstance() instead of new.'
+      );
     }
     DBService._instance = this;
     this.db = new Level<string, string>('./database', {
@@ -42,9 +57,15 @@ export default class DBService {
       createIfMissing: true,
       errorIfExists: false
     });
-    this.userDB = this.db.sublevel<string, User>('User', { valueEncoding: 'json' });
-    this.loginDB = this.db.sublevel<string, string>('Login', { valueEncoding: 'json' });
-    this.tokenDB = this.db.sublevel<string, Token>('Token', { valueEncoding: 'json' });
+    this.userDB = this.db.sublevel<string, User>('User', {
+      valueEncoding: 'json'
+    });
+    this.loginDB = this.db.sublevel<string, string>('Login', {
+      valueEncoding: 'json'
+    });
+    this.tokenDB = this.db.sublevel<string, Token>('Token', {
+      valueEncoding: 'json'
+    });
   }
 
   public static getInstance(): DBService {
@@ -77,17 +98,20 @@ export default class DBService {
 
   public getFacilitySublevelDB(facilityId: string) {
     const prefix = 'f_';
-    return this.db.sublevel<string, FacilityLevelValues>(
-      prefix + facilityId,
-      { valueEncoding: 'json' }
-    );
+    return this.db.sublevel<string, FacilityLevelValues>(prefix + facilityId, {
+      valueEncoding: 'json'
+    });
   }
 
-  public getFacilityItemDB(facilityId: string, itemType: FacilityItemType, itemId: string) {
+  public getFacilityItemDB(
+    facilityId: string,
+    itemType: FacilityItemType,
+    itemId: string
+  ) {
     const key = `${itemType}_${itemId}`;
-    return this.getFacilitySublevelDB(facilityId).sublevel<string, FacilityItemValues>(
-      key,
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilitySublevelDB(facilityId).sublevel<
+      string,
+      FacilityItemValues
+    >(key, { valueEncoding: 'json' });
   }
 }

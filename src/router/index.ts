@@ -39,10 +39,12 @@ const router = Router();
  *      500:
  *        description: Some server error
  */
-router.post('/user/login',
+router.post(
+  '/user/login',
   body('login').isString(),
   body('password').isString(),
-  UserController.login);
+  UserController.login
+);
 
 /**
  * @swagger
@@ -97,7 +99,8 @@ router.get('/user/get-all', authMiddleware, UserController.getAll);
  *      500:
  *        description: Some server error
  */
-router.post('/user/create',
+router.post(
+  '/user/create',
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
   check('login').isString(),
@@ -106,7 +109,6 @@ router.post('/user/create',
   body('roles.*').isIn([AppRole.STAFF, AppRole.MANAGER]),
   UserController.createUser
 );
-
 
 /**
  * @swagger
@@ -141,7 +143,8 @@ router.post('/user/create',
  *      500:
  *        description: Some server error
  */
-router.put('/user/update-password',
+router.put(
+  '/user/update-password',
   authMiddleware,
   check('userId').isNumeric(),
   check('password').isString(),
@@ -184,7 +187,8 @@ router.put('/user/update-password',
  *      500:
  *        description: Some server error
  */
-router.put('/user/update-roles',
+router.put(
+  '/user/update-roles',
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
   check('userId').isNumeric(),
@@ -263,7 +267,12 @@ const upload = multer({ dest: os.tmpdir() });
  *      500:
  *        description: Some server error
  */
-router.post('/storage/file', authMiddleware, upload.single('file'), StorageController.uploadFile);
+router.post(
+  '/storage/file',
+  authMiddleware,
+  upload.single('file'),
+  StorageController.uploadFile
+);
 
 /**
  * @swagger
@@ -297,6 +306,11 @@ router.post('/storage/file', authMiddleware, upload.single('file'), StorageContr
  *      500:
  *        description: Some server error
  */
-router.post('/storage/metadata', authMiddleware, upload.single('file'), StorageController.uploadMetadata);
+router.post(
+  '/storage/metadata',
+  authMiddleware,
+  upload.single('file'),
+  StorageController.uploadMetadata
+);
 
 export default router;

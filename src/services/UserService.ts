@@ -33,7 +33,11 @@ export class UserService {
     return Array.from(users);
   }
 
-  public async createUser(login: string, password: string, roles: AppRole[]): Promise<void> {
+  public async createUser(
+    login: string,
+    password: string,
+    roles: AppRole[]
+  ): Promise<void> {
     const userExists = await this.getUserIdByLogin(login);
     if (userExists) {
       throw ApiError.BadRequest('User already exists');
@@ -42,14 +46,12 @@ export class UserService {
     const id = await this.getId();
     const rounds = 2;
     const hashedPassword = await bcrypt.hash(String(password), rounds);
-    await this.db.put(String(id),
-      {
-        id,
-        login,
-        password: hashedPassword,
-        roles
-      }
-    );
+    await this.db.put(String(id), {
+      id,
+      login,
+      password: hashedPassword,
+      roles
+    });
 
     await this.loginDB.put(login, String(id));
     await this.mainDB.put('user_db_increment', id);
@@ -61,7 +63,7 @@ export class UserService {
 
   private async getId(): Promise<number> {
     try {
-      return await this.mainDB.get('user_db_increment') + 1;
+      return (await this.mainDB.get('user_db_increment')) + 1;
     } catch (e) {
       if (e.status === 404) {
         return 1;
@@ -117,7 +119,10 @@ export class UserService {
     }
   }
 
-  public async checkCredentials(user: User, password: string): Promise<boolean> {
+  public async checkCredentials(
+    user: User,
+    password: string
+  ): Promise<boolean> {
     return await bcrypt.compare(password, user.password);
   }
 
@@ -190,7 +195,10 @@ export class UserService {
     }
   }
 
-  public async updateUserPassword(userId: number, password: string): Promise<void> {
+  public async updateUserPassword(
+    userId: number,
+    password: string
+  ): Promise<void> {
     try {
       const user = await this.getUserById(userId);
       const rounds = 2;
@@ -205,7 +213,10 @@ export class UserService {
     }
   }
 
-  public async updateUserRoles(userId: number, roles: AppRole[]): Promise<void> {
+  public async updateUserRoles(
+    userId: number,
+    roles: AppRole[]
+  ): Promise<void> {
     try {
       const user = await this.getUserById(userId);
       user.roles = roles;

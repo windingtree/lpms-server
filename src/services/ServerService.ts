@@ -2,7 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
-import morgan from "morgan";
+import morgan from 'morgan';
 import router from '../router/index';
 import { Express } from 'express-serve-static-core';
 import errorMiddleware from '../middlewares/ErrorMiddleware';
@@ -31,9 +31,10 @@ export default class ServerService {
       origin: process.env.CLIENT_URL, // @todo Add handling of origins array
       optionsSuccessStatus: 200,
       methods: 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
-      allowedHeaders: 'Origin,X-Requested-With,Content-Type,Accept,Authorization',
+      allowedHeaders:
+        'Origin,X-Requested-With,Content-Type,Accept,Authorization',
       exposedHeaders: 'Content-Range,X-Content-Range',
-      credentials: true,
+      credentials: true
     };
     this.app.use(cors(corsOptions));
 
@@ -57,15 +58,20 @@ export default class ServerService {
     this.app.use(helmet.referrerPolicy());
     this.app.use(helmet.xssFilter());
 
-    this.app.use(responseTime((request: Request, response: Response, time: number) => {
-      if (request?.route?.path) {
-        MetricsService.restResponseTimeHistogram.observe({
-          method: request.method,
-          route: request.route.path,
-          status_code: response.statusCode
-        }, time / 1000); //in seconds
-      }
-    }));
+    this.app.use(
+      responseTime((request: Request, response: Response, time: number) => {
+        if (request?.route?.path) {
+          MetricsService.restResponseTimeHistogram.observe(
+            {
+              method: request.method,
+              route: request.route.path,
+              status_code: response.statusCode
+            },
+            time / 1000
+          ); //in seconds
+        }
+      })
+    );
 
     if (debugEnabled) {
       this.app.use(morgan('dev'));
@@ -82,7 +88,9 @@ export default class ServerService {
 
   async start() {
     try {
-      this.server = this.app.listen(this.PORT, () => console.log(`Server started on PORT = ${this.PORT}`));
+      this.server = this.app.listen(this.PORT, () =>
+        console.log(`Server started on PORT = ${this.PORT}`)
+      );
     } catch (e) {
       console.error(e);
     }

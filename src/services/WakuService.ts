@@ -12,10 +12,10 @@ export class WakuService {
       return this;
     }
 
-    console.log("Connecting to Waku...");
+    console.log('Connecting to Waku...');
     const waku = await Waku.create(wakuConfig);
     await waku.waitForRemotePeer();
-    console.log("...Connected");
+    console.log('...Connected');
 
     this.waku = waku;
     return this;
@@ -30,8 +30,10 @@ export class WakuService {
       await this.connect();
     }
 
-    const msg = await WakuMessage
-      .fromBytes(protoMessageInstance.toBinary(message), topic);
+    const msg = await WakuMessage.fromBytes(
+      protoMessageInstance.toBinary(message),
+      topic
+    );
     await this.waku.relay.send(msg);
   }
 
@@ -43,7 +45,10 @@ export class WakuService {
     return protoMessageInstance.fromBinary(wakuMessage.payload);
   }
 
-  public async makeWakuObserver(messageHandler: WakuMessageHandler, topics: string[]) {
+  public async makeWakuObserver(
+    messageHandler: WakuMessageHandler,
+    topics: string[]
+  ) {
     if (!this.waku) {
       await this.connect();
     }

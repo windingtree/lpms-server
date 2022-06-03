@@ -27,10 +27,8 @@ export class StorageController {
       signer
     );
 
-    return brotliCompressSync(
-      ServiceProviderData.toBinary(signedMessage)
-    );
-  }
+    return brotliCompressSync(ServiceProviderData.toBinary(signedMessage));
+  };
 
   uploadFile = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -45,7 +43,7 @@ export class StorageController {
     } catch (e) {
       next(e);
     }
-  }
+  };
 
   uploadMetadata = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -59,23 +57,22 @@ export class StorageController {
 
       try {
         fileBuffer = brotliDecompressSync(fileBuffer);
-      } catch(_) {
+      } catch (_) {
         // data is not compressed
       }
 
       const serviceProviderData = ServiceProviderData.fromBinary(fileBuffer);
-      const serviceProviderId = utils.hexlify(serviceProviderData.serviceProvider);
+      const serviceProviderId = utils.hexlify(
+        serviceProviderData.serviceProvider
+      );
 
       // Extract ans save/update facility from metadata
-      await facilitiesService.setFacilityDbKeys(
-        serviceProviderId,
+      await facilitiesService.setFacilityDbKeys(serviceProviderId, [
         [
-          [
-            'metadata',
-            Facility.fromBinary(serviceProviderData.payload) as Facility
-          ]
+          'metadata',
+          Facility.fromBinary(serviceProviderData.payload) as Facility
         ]
-      );
+      ]);
 
       // Extract spaces from metadata
       const spaces: Record<string, [string, FacilitySpaceLevelValues][]> = {};
@@ -87,51 +84,36 @@ export class StorageController {
 
         if (type === ItemType.SPACE) {
           spaces[itemId] = [
-            [
-              'metadata_generic',
-              generic as Item
-            ],
-            [
-              'metadata',
-              (payload ? Space.fromBinary(payload) : {}) as Space
-            ]
+            ['metadata_generic', generic as Item],
+            ['metadata', (payload ? Space.fromBinary(payload) : {}) as Space]
           ];
         } else {
-          otherItems[itemId] = [
-            [
-              'metadata_generic',
-              generic as Item
-            ]
-          ];
+          otherItems[itemId] = [['metadata_generic', generic as Item]];
         }
       }
 
       // Add/update spaces to DB
       await Promise.all(
-        Object
-          .entries(spaces)
-          .map(
-            ([itemId, entries]) => facilitiesService.setItemDbKeys(
-              serviceProviderId,
-              'spaces',
-              itemId,
-              entries
-            )
+        Object.entries(spaces).map(([itemId, entries]) =>
+          facilitiesService.setItemDbKeys(
+            serviceProviderId,
+            'spaces',
+            itemId,
+            entries
           )
+        )
       );
 
       // Add/update other items to DB
       await Promise.all(
-        Object
-          .entries(otherItems)
-          .map(
-            ([itemId, entries]) => facilitiesService.setItemDbKeys(
-              serviceProviderId,
-              'otherItems',
-              itemId,
-              entries
-            )
+        Object.entries(otherItems).map(([itemId, entries]) =>
+          facilitiesService.setItemDbKeys(
+            serviceProviderId,
+            'otherItems',
+            itemId,
+            entries
           )
+        )
       );
 
       const signer = await walletService.getWalletByIndex(
@@ -154,7 +136,7 @@ export class StorageController {
     } catch (e) {
       next(e);
     }
-  }
+  };
 }
 
 export default new StorageController();

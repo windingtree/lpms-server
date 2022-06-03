@@ -6,7 +6,6 @@ import ApiError from '../exceptions/ApiError';
 import { refreshTokenMaxAge } from '../config';
 
 export class UserController {
-
   public async login(req: Request, res: Response, next: NextFunction) {
     try {
       const errors = validationResult(req);
@@ -101,7 +100,11 @@ export class UserController {
     }
   }
 
-  public async updateUserPassword(req: AuthRequest, res: Response, next: NextFunction) {
+  public async updateUserPassword(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return next(ApiError.BadRequest('Validation error', errors.array()));
@@ -123,7 +126,11 @@ export class UserController {
     }
   }
 
-  public async updateUserRoles(req: AuthRequest, res: Response, next: NextFunction) {
+  public async updateUserRoles(
+    req: AuthRequest,
+    res: Response,
+    next: NextFunction
+  ) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return next(ApiError.BadRequest('Validation error', errors.array()));
@@ -139,7 +146,6 @@ export class UserController {
     } catch (e) {
       next(e);
     }
-
   }
 }
 
