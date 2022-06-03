@@ -21,7 +21,6 @@
   "scripts": {
     "commit": "git-cz -S",
     "changelog": "conventional-changelog -p angular -r 2 -i CHANGELOG.md -s",
-    "tsc": "tsc -p tsconfig-build.json",
     "typechain:videre": "npx typechain --target ethers-v5 --out-dir ./typechain-videre './node_modules/@windingtree/videre-contracts/artifacts/contracts/**/*.json'",
     "prepublish": "yarn typechain:videre && yarn protoc:libs && yarn protoc:local",
     "dev": "cross-env NODE_ENV=development nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
@@ -29,7 +28,7 @@
     "lint:fix": "npx eslint . --ext .ts --fix",
     "test": "npx mocha -r ts-node/register test/**/*.spec.ts",
     "clean": "rm -rf dist",
-    "build": "npx clean && npx tsc -p tsconfig-build.json",
+    "build": "yarn clean && yarn tsc -p tsconfig-build.json",
     "protoc:libs": "cp -pR ./node_modules/@windingtree/stays-models/dist/proto/*.proto ./src/proto/",
     "protoc:local": "protoc --ts_out ./src/proto --proto_path ./src/proto ./src/proto/*.proto",
     "prepare": "husky install",
