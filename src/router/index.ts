@@ -2,12 +2,13 @@ import os from 'os';
 import { Router } from 'express';
 import { body, check } from 'express-validator';
 import multer from 'multer';
+import { AppRole } from '../types';
 import authMiddleware from '../middlewares/AuthMiddleware';
 import roleMiddleware from '../middlewares/RoleMiddleware';
-import UserController from '../controllers/UserController';
-import StorageController from '../controllers/StorageController';
-import { AppRole } from '../types';
-import WalletController from '../controllers/WalletController';
+import userController from '../controllers/UserController';
+import storageController from '../controllers/StorageController';
+import facilityController from '../controllers/FacilityController';
+import walletController from '../controllers/WalletController';
 
 const router = Router();
 
@@ -43,7 +44,7 @@ router.post(
   '/user/login',
   body('login').isString(),
   body('password').isString(),
-  UserController.login
+  userController.login
 );
 
 /**
@@ -58,7 +59,7 @@ router.post(
  *       401:
  *         description: User is not Auth
  */
-router.get('/user/get-all', authMiddleware, UserController.getAll);
+router.get('/user/get-all', authMiddleware, userController.getAll);
 
 /**
  * @swagger
@@ -107,7 +108,7 @@ router.post(
   check('password').isString(),
   body('roles').isArray({ min: 1 }),
   body('roles.*').isIn([AppRole.STAFF, AppRole.MANAGER]),
-  UserController.createUser
+  userController.createUser
 );
 
 /**
@@ -148,7 +149,7 @@ router.put(
   authMiddleware,
   check('userId').isNumeric(),
   check('password').isString(),
-  UserController.updateUserPassword
+  userController.updateUserPassword
 );
 
 /**
@@ -194,10 +195,10 @@ router.put(
   check('userId').isNumeric(),
   body('roles').isArray({ min: 1 }),
   body('roles.*').isIn([AppRole.STAFF, AppRole.MANAGER]),
-  UserController.updateUserRoles
+  userController.updateUserRoles
 );
 
-router.post('/user/refresh', UserController.refresh);
+router.post('/user/refresh', userController.refresh);
 
 /**
  * @swagger
@@ -217,7 +218,7 @@ router.post('/user/refresh', UserController.refresh);
  *      500:
  *        description: Some server error
  */
-router.post('/user/logout', authMiddleware, UserController.logout);
+router.post('/user/logout', authMiddleware, userController.logout);
 
 /**
  * @swagger
@@ -231,7 +232,7 @@ router.post('/user/logout', authMiddleware, UserController.logout);
  *       401:
  *         description: User is not Auth
  */
-router.get('/addresses', WalletController.getWallets);
+router.get('/addresses', walletController.getWallets);
 
 const upload = multer({ dest: os.tmpdir() });
 
@@ -271,7 +272,7 @@ router.post(
   '/storage/file',
   authMiddleware,
   upload.single('file'),
-  StorageController.uploadFile
+  storageController.uploadFile
 );
 
 /**
@@ -310,7 +311,175 @@ router.post(
   '/storage/metadata',
   authMiddleware,
   upload.single('file'),
-  StorageController.uploadMetadata
+  storageController.uploadMetadata
 );
 
 export default router;
+
+/**
+ * @swagger
+ * /facility/{facilityId}/space/{spaceId}/availability/{date}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: get availability by date
+ *     tags: [Facility service]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: spaceId
+ *         description: The facility space Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: date
+ *         description: Availability date formatted as SQL date: "yyyy-MM-dd"
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 numSpaces:
+ *                   type: number
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       500:
+ *         description: Some server error
+ */
+router.get(
+   '/facility/:facilityId/space/:spaceId/availability/:date',
+   authMiddleware,
+   facilityController.getSpaceAvailability
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/space/{spaceId}/availability/{date}:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: add availability of the space at date
+ *     tags: [Facility service]
+ *     requestBody:
+ *       required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 numSpaces:
+ *                   type: number
+ *                   description: Number of available spaces to add
+ *               required:
+ *                 - numSpaces
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: spaceId
+ *         description: The facility space Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: date
+ *         description: Availability date formatted as SQL date: "yyyy-MM-dd"
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       500:
+ *         description: Some server error
+ */
+ router.post(
+  '/facility/:facilityId/space/:spaceId/availability/:date',
+  authMiddleware,
+  facilityController.createSpaceAvailability
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/space/{spaceId}/availability/default:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: add/update default availability of the space
+ *     tags: [Facility service]
+ *     requestBody:
+ *       required: true
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 numSpaces:
+ *                   type: number
+ *                   description: Number of available spaces to add
+ *               required:
+ *                 - numSpaces
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: spaceId
+ *         required: true
+ *         description: The facility space Id
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       500:
+ *         description: Some server error
+ */
+ router.post(
+  '/facility/:facilityId/space/:spaceId/availability/default',
+  authMiddleware,
+  facilityController.createDefaultSpaceAvailability
+);

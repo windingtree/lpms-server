@@ -6,7 +6,7 @@ import DBService, {
   FacilitySpaceLevelValues
 } from './DBService';
 
-export class FacilitiesService {
+export class FacilityService {
   private dbService: DBService;
   private db: Level<string, string | string[]>;
 
@@ -126,4 +126,4 @@ export class FacilitiesService {
   }
 }
 
-export default new FacilitiesService();
+export default new FacilityService();
