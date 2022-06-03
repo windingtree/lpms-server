@@ -16,13 +16,6 @@
     "composite": true,
     "skipLibCheck": true
   },
-  "include": [
-    "./src",
-    "./test",
-    "./swagger"
-  ],
-  "types": [
-    "reflect-metadata",
-    "swagger-express-ts"
-  ]
+  "include": ["./src", "./test", "./swagger"],
+  "types": ["reflect-metadata", "swagger-express-ts"]
 }

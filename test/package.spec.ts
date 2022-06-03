@@ -24,11 +24,7 @@ describe('test', async () => {
   const anotherUserForTest = 'test_staff_for_tests';
 
   it('make manager', async () => {
-    await userService.createUser(
-      managerLogin,
-      managerPass,
-      [AppRole.MANAGER]
-    );
+    await userService.createUser(managerLogin, managerPass, [AppRole.MANAGER]);
 
     const userId = await userService.getUserIdByLogin(managerLogin);
     expect(userId).to.be.an('number');
@@ -59,7 +55,7 @@ describe('test', async () => {
 
   it('refresh token', async () => {
     function sleep(ms) {
-      return new Promise(resolve => setTimeout(resolve, ms));
+      return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
     //without sleep script is very fast and refreshed access token is equal with old
@@ -68,9 +64,7 @@ describe('test', async () => {
     const res = await requestWithSupertest
       .post('/api/user/refresh')
       .set('Accept', 'application/json')
-      .set('Cookie', [`refreshToken=${refreshToken}`])
-    ;
-
+      .set('Cookie', [`refreshToken=${refreshToken}`]);
     const oldAccessToken = accessToken;
     accessToken = res.body.accessToken;
     expect(accessToken).to.be.an('string');
@@ -87,7 +81,6 @@ describe('test', async () => {
       })
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json');
-
 
     expect(res.status).to.equal(200);
   });
@@ -113,7 +106,6 @@ describe('test', async () => {
       })
       .set('Authorization', `Bearer ${staffAccessToken}`)
       .set('Accept', 'application/json');
-
 
     expect(res.status).to.equal(403);
   });
@@ -169,7 +161,8 @@ describe('test', async () => {
     expect(res.status).to.equal(200);
   });
 
-  it('delete users', async () => { //todo think about APIs for delete users
+  it('delete users', async () => {
+    //todo think about APIs for delete users
     const id = await userService.getUserIdByLogin(managerLogin);
     const anotherUser = await userService.getUserIdByLogin(anotherUserForTest);
     await userService.deleteUser(Number(id));
@@ -180,4 +173,3 @@ describe('test', async () => {
     expect(checkId).to.be.null;
   });
 });
-
