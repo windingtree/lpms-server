@@ -8,7 +8,7 @@ export default (roles) => {
       }
       const userRoles = req.user.roles;
       let hasRole = false;
-      userRoles.forEach(role => {
+      userRoles.forEach((role) => {
         if (roles.includes(role)) {
           hasRole = true;
         }
@@ -22,4 +22,4 @@ export default (roles) => {
       return next(ApiError.AccessDenied());
     }
   };
-}
+};

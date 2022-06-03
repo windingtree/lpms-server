@@ -24,7 +24,10 @@ export class WalletService {
     const encodedWallet = await this.db.get('wallet');
 
     if (!this.wallet && typeof encodedWallet === 'string') {
-      this.wallet = await ethers.Wallet.fromEncryptedJson(encodedWallet, walletPassphrase);
+      this.wallet = await ethers.Wallet.fromEncryptedJson(
+        encodedWallet,
+        walletPassphrase
+      );
     }
 
     return this.wallet;
@@ -33,12 +36,9 @@ export class WalletService {
   public async getWalletByIndex(index: number): Promise<Wallet> {
     const wallet = await this.getWallet();
     return new Wallet(
-      utils
-        .HDNode
-        .fromMnemonic(wallet.mnemonic.phrase)
-        .derivePath(
-          `m/44'/60'/0'/0/${index}`
-        )
+      utils.HDNode.fromMnemonic(wallet.mnemonic.phrase).derivePath(
+        `m/44'/60'/0'/0/${index}`
+      )
     );
   }
 
@@ -47,9 +47,7 @@ export class WalletService {
 
     if (!this.addresses) {
       this.addresses = walletAccounts
-        .map((_, index) => hdNode.derivePath(
-          `m/44'/60'/0'/0/${index}`
-        ))
+        .map((_, index) => hdNode.derivePath(`m/44'/60'/0'/0/${index}`))
         .map((n, index) => {
           return {
             id: index,
@@ -70,7 +68,7 @@ export class WalletService {
 
   public async getWalletAccountByRole(role): Promise<string> {
     const addresses = await this.getWalletAccounts();
-    const address = addresses.find(v => v.role === role);
+    const address = addresses.find((v) => v.role === role);
 
     return address?.address || '';
   }

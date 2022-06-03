@@ -33,4 +33,4 @@ export default async (req, res, next) => {
   } catch (e) {
     return next(ApiError.UnauthorizedError());
   }
-}
+};

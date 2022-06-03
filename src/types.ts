@@ -29,15 +29,15 @@ export interface Token {
 }
 
 export interface Tokens {
-  accessToken: string,
-  refreshToken: string
+  accessToken: string;
+  refreshToken: string;
 }
 
 export const walletAccounts = [
   ServiceRole.API,
   ServiceRole.BIDDER,
   AppRole.MANAGER,
-  AppRole.STAFF,
+  AppRole.STAFF
 ];
 
 export enum walletAccountsIndexes {
@@ -48,9 +48,9 @@ export enum walletAccountsIndexes {
 }
 
 export interface walletAccount {
-  id: number,
-  address: string,
-  role: string
+  id: number;
+  address: string;
+  role: string;
 }
 
 export interface AuthRequest extends Request {

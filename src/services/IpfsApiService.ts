@@ -19,19 +19,16 @@ export default class IpfsApiService {
     this.ipfsApi = new Web3Storage({ token });
   }
 
-  public async deployFilesToIpfs(files: InstanceType<typeof File>[]): Promise<string[]> {
+  public async deployFilesToIpfs(
+    files: InstanceType<typeof File>[]
+  ): Promise<string[]> {
     return Promise.all(
-      files.map(
-        async file => {
-          const cid = this.ipfsApi.put(
-            [file],
-            {
-              wrapWithDirectory: false
-            }
-          );
-          return cid;
-        }
-      )
+      files.map(async (file) => {
+        const cid = this.ipfsApi.put([file], {
+          wrapWithDirectory: false
+        });
+        return cid;
+      })
     );
   }
 }

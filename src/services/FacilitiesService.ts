@@ -1,6 +1,10 @@
 import { Level } from 'level';
 import { Item } from '../proto/facility';
-import DBService, { FacilityItemType, FacilityLevelValues, FacilitySpaceLevelValues } from './DBService';
+import DBService, {
+  FacilityItemType,
+  FacilityLevelValues,
+  FacilitySpaceLevelValues
+} from './DBService';
 
 export class FacilitiesService {
   private dbService: DBService;
@@ -13,10 +17,9 @@ export class FacilitiesService {
 
   public async getFacilityIds(): Promise<string[]> {
     try {
-      return await this.db.get<string, string[]>(
-        'facilities',
-        { valueEncoding: 'json' }
-      );
+      return await this.db.get<string, string[]>('facilities', {
+        valueEncoding: 'json'
+      });
     } catch (e) {
       if (e.status !== 404) {
         throw e;
@@ -31,10 +34,9 @@ export class FacilitiesService {
   ): Promise<string[]> {
     try {
       const facilitySublevel = this.dbService.getFacilitySublevelDB(facilityId);
-      return await facilitySublevel.get<string, string[]>(
-        itemType,
-        { valueEncoding: 'json' }
-      );
+      return await facilitySublevel.get<string, string[]>(itemType, {
+        valueEncoding: 'json'
+      });
     } catch (e) {
       if (e.status !== 404) {
         throw e;
@@ -48,9 +50,7 @@ export class FacilitiesService {
     key: string
   ): Promise<FacilityLevelValues> {
     try {
-      return await this.dbService
-        .getFacilitySublevelDB(facilityId)
-        .get(key);
+      return await this.dbService.getFacilitySublevelDB(facilityId).get(key);
     } catch (e) {
       if (e.status === 404) {
         throw new Error(`Unable to get "${key}" of facility "${facilityId}"`);
@@ -95,9 +95,7 @@ export class FacilitiesService {
     const facilitySublevel = this.dbService.getFacilitySublevelDB(facilityId);
 
     await Promise.all(
-      entries.map(
-        ([key, value]) => facilitySublevel.put(key, value)
-      )
+      entries.map(([key, value]) => facilitySublevel.put(key, value))
     );
   }
 
@@ -113,15 +111,9 @@ export class FacilitiesService {
     if (itemIds.length > 0) {
       const spaceSet = new Set<string>(itemIds);
       spaceSet.add(itemId);
-      await facilitySublevel.put(
-        itemType,
-        Array.from(spaceSet)
-      );
+      await facilitySublevel.put(itemType, Array.from(spaceSet));
     } else {
-      await facilitySublevel.put(
-        itemType,
-        [itemId]
-      );
+      await facilitySublevel.put(itemType, [itemId]);
     }
 
     const sublevel = this.dbService.getFacilityItemDB(
@@ -130,11 +122,7 @@ export class FacilitiesService {
       itemId
     );
 
-    await Promise.all(
-      entries.map(
-        ([key, value]) => sublevel.put(key, value)
-      )
-    );
+    await Promise.all(entries.map(([key, value]) => sublevel.put(key, value)));
   }
 }
 
