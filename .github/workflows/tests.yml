@@ -28,5 +28,5 @@ jobs:
 
       - name: Run unit tests
         env:
-          PORT: ${{ secrets.PORT }}
-        run: yarn test
+          WEB3STORAGE_KEY: ${{ secrets.WEB3STORAGE_KEY }}
+        run: source .env.example && yarn test
