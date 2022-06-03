@@ -21,9 +21,6 @@
     "./test",
     "./swagger"
   ],
-  "exclude": [
-    "node_modules"
-  ],
   "types": [
     "reflect-metadata",
     "swagger-express-ts"
