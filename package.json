@@ -25,7 +25,7 @@
     "prepublish": "yarn typechain:videre && yarn protoc:libs && yarn protoc:local",
     "dev": "cross-env NODE_ENV=development nodemon --watch 'src/**/*.ts' --ignore 'src/**/*.spec.ts' --exec 'ts-node' src/index.ts",
     "lint": "npx eslint . --ext .ts",
-    "lint:fix": "npx eslint . --ext .ts --fix",
+    "lint:fix": "npx eslint . --ext .ts --fix && npx prettier --write .",
     "test": "npx mocha -r ts-node/register test/**/*.spec.ts",
     "clean": "rm -rf dist",
     "build": "yarn clean && yarn tsc -p tsconfig-build.json",
