@@ -8,11 +8,8 @@ import {
   DayOfWeekRateModifer,
   LOSRateModifier,
   NoticeRequiredRule,
-  OccupancyRateModifier,
-  Rates
+  OccupancyRateModifier
 } from '../proto/lpms';
-import { Bytes } from 'ethers';
-import { Person } from '@windingtree/stays-models/dist/cjs/proto/person';
 
 export type LevelDefaultTyping = string | Buffer | Uint8Array;
 export type DBLevel = Level<string, string | string[]>;
@@ -31,6 +28,7 @@ export type FacilityLevelValues = Facility | string[];
 export type FacilitySpaceLevelValues = Item | Space;
 export type FacilityItemType = 'spaces' | 'otherItems';
 export type FacilityItemValues = Item | FacilitySpaceLevelValues;
+export type DateType = `${number}-${number}-${number}`
 
 export default class DBService {
   protected db: DBLevel;
@@ -113,5 +111,12 @@ export default class DBService {
       string,
       FacilityItemValues
     >(key, { valueEncoding: 'json' });
+  }
+
+  public getSpaceAvailabilityDB(facilityId: string, itemId: string) {
+    return this.getFacilityItemDB(facilityId, 'spaces', itemId).sublevel<'default' | DateType, Availability>(
+      'availability',
+      { valueEncoding: 'json' }
+    );
   }
 }
