@@ -11,7 +11,7 @@ import walletService from '../services/WalletService';
 import { web3StorageKey, typedDataDomain } from '../config';
 import { walletAccountsIndexes } from '../types';
 import { Facility, Item, ItemType, Space } from '../proto/facility';
-import facilitiesService from '../services/FacilitiesService';
+import facilityService from '../services/FacilityService';
 import { FacilitySpaceLevelValues } from 'src/services/DBService';
 const { readFile } = promises;
 
@@ -67,7 +67,7 @@ export class StorageController {
       );
 
       // Extract ans save/update facility from metadata
-      await facilitiesService.setFacilityDbKeys(serviceProviderId, [
+      await facilityService.setFacilityDbKeys(serviceProviderId, [
         [
           'metadata',
           Facility.fromBinary(serviceProviderData.payload) as Facility
@@ -95,7 +95,7 @@ export class StorageController {
       // Add/update spaces to DB
       await Promise.all(
         Object.entries(spaces).map(([itemId, entries]) =>
-          facilitiesService.setItemDbKeys(
+          facilityService.setItemDbKeys(
             serviceProviderId,
             'spaces',
             itemId,
@@ -107,7 +107,7 @@ export class StorageController {
       // Add/update other items to DB
       await Promise.all(
         Object.entries(otherItems).map(([itemId, entries]) =>
-          facilitiesService.setItemDbKeys(
+          facilityService.setItemDbKeys(
             serviceProviderId,
             'otherItems',
             itemId,

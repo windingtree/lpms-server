@@ -28,7 +28,8 @@ export type FacilityLevelValues = Facility | string[];
 export type FacilitySpaceLevelValues = Item | Space;
 export type FacilityItemType = 'spaces' | 'otherItems';
 export type FacilityItemValues = Item | FacilitySpaceLevelValues;
-export type DateType = `${number}-${number}-${number}`
+export type AvailabilityDate = `${number}-${number}-${number}`;
+export type AvailabilityItemKey = 'default' | AvailabilityDate;
 
 export default class DBService {
   protected db: DBLevel;
@@ -114,7 +115,7 @@ export default class DBService {
   }
 
   public getSpaceAvailabilityDB(facilityId: string, itemId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', itemId).sublevel<'default' | DateType, Availability>(
+    return this.getFacilityItemDB(facilityId, 'spaces', itemId).sublevel<AvailabilityItemKey, Availability>(
       'availability',
       { valueEncoding: 'json' }
     );
