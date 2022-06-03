@@ -10,7 +10,7 @@ All fields, except simple arrays of a primitives (ie. `number`, `number[]` etc),
 
 Related: [story: AP reservation overview](https://github.com/windingtree/win-stays/issues/17)
 
-Identify what *queries* must be able to be answered from the database:
+Identify what _queries_ must be able to be answered from the database:
 
 1. How to get information relating to a booking?
 2. How to get what bookings are staying at an accommodation facility on a specific day?
@@ -30,7 +30,7 @@ Description: A list of facilities that are handled by this `lpms-server`.
 
 ### facilities
 
-Parent level: *root*
+Parent level: _root_
 Level: `facilityId` (dynamic)
 
 Key: `metadata`
@@ -174,7 +174,7 @@ Level: `stubs`
 
 Key: `YYYY-MM-DD` (dynamic)
 Value: `string[]`
-Description: Contains a list of all stubs, ie. `stubId` (bookings) that are on the  date YYYY-MM-DD in this `spaceId`.
+Description: Contains a list of all stubs, ie. `stubId` (bookings) that are on the date YYYY-MM-DD in this `spaceId`.
 Notes: This meets the requirement (3)
 
 Key: `YYYY-MM-DD-num_booked` (dynamic)
@@ -210,25 +210,27 @@ Description: Contains generic data for the item (name, photos, etc)
 4. Find number of spaces (rooms) booked by date: `facilityId.spaceId.stubs.YYYY-MM-DD-num_booked`.
 5. Determine if a space can be booked on a given day:
 
-    With daily availability override:
+   With daily availability override:
 
-    `Ask.numSpacesReq <= (facilityId.spaceId.availability.YYYY-MM-DD - facilityId.spaceId.YYYY-MM-DD-num_booked)`
+   `Ask.numSpacesReq <= (facilityId.spaceId.availability.YYYY-MM-DD - facilityId.spaceId.YYYY-MM-DD-num_booked)`
 
-    With no daily availability override:
+   With no daily availability override:
 
-    `Ask.numSpacesReq <= (facilityId.spaceId.availability.default - facilityId.spaceId.YYYY-MM-DD-num_booked)`
+   `Ask.numSpacesReq <= (facilityId.spaceId.availability.default - facilityId.spaceId.YYYY-MM-DD-num_booked)`
 
-    This meets the requirement of (5)
+   This meets the requirement of (5)
+
 6. Determine if a space can be booked for a date range:
 
-    ```python
-        for day in date_range:
-            # isAvailable = logic from (5) above
-            if (!isAvailable)
-                return false
-        return true
-    ```
-    This meets the requirement of (6)
+   ```python
+       for day in date_range:
+           # isAvailable = logic from (5) above
+           if (!isAvailable)
+               return false
+       return true
+   ```
+
+   This meets the requirement of (6)
 
 ### Update
 
@@ -243,40 +245,39 @@ Description: Contains generic data for the item (name, photos, etc)
 In order to generate the final `metadata` binary glob that is uploaded to `IPFS`:
 
 ```typescript
-
-let items: ServiceItemData[]
+let items: ServiceItemData[];
 
 // process all spaces
-const spaces = db.get('facilityId.spaces') // insert correct leveldb query here
+const spaces = db.get('facilityId.spaces'); // insert correct leveldb query here
 for (const space of object) {
-    // get generic metadata
-    const generic = db.get(`${facilityId}.${space}.metadata_generic`) as Item
-    const specific = db.get(`${facilityId}.${space}.metadata`) as Space
-    generic.payload = Space.toBinary(specific)
+  // get generic metadata
+  const generic = db.get(`${facilityId}.${space}.metadata_generic`) as Item;
+  const specific = db.get(`${facilityId}.${space}.metadata`) as Space;
+  generic.payload = Space.toBinary(specific);
 
-    items.push({
-        item: utils.arrayify(utils.formatBytes32String(space)),
-        payload: Item.toBinary(generic)
-    })
+  items.push({
+    item: utils.arrayify(utils.formatBytes32String(space)),
+    payload: Item.toBinary(generic)
+  });
 }
 
 // process all other items
-const otherItems = db.get('facilityId.otherItems') as Item[]
+const otherItems = db.get('facilityId.otherItems') as Item[];
 for (const item of otherItems) {
-    const otherItem = db.get(`${facilityId}.otherItems.${item}`) as Item
-    items.push({
-        item: utils.arrayify(utils.formatBytes32String(item)),
-        payload: Item.toBinary(otherItem)
-    })
+  const otherItem = db.get(`${facilityId}.otherItems.${item}`) as Item;
+  items.push({
+    item: utils.arrayify(utils.formatBytes32String(item)),
+    payload: Item.toBinary(otherItem)
+  });
 }
 
 // assemble the metadata for signing / publishing
 const serviceProviderData: ServiceProviderData = {
-    serviceProvider: utils.arrayify(utils.formatBytes32String('provider')),
-    payload: Facility.toBinary(db.get(`$facilityId.metadata`)),
-    items: items,
-    terms: []
-}
+  serviceProvider: utils.arrayify(utils.formatBytes32String('provider')),
+  payload: Facility.toBinary(db.get(`$facilityId.metadata`)),
+  items: items,
+  terms: []
+};
 ```
 
 # Todo
