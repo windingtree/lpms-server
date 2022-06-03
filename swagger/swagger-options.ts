@@ -1,29 +1,31 @@
 export const options = {
   definition: {
-    openapi: "3.0.3",
+    openapi: '3.0.3',
     info: {
-      title: "API",
-      version: "1.0.0",
-      description: "",
+      title: 'API',
+      version: '1.0.0',
+      description: ''
     },
     components: {
       securitySchemes: {
         bearerAuth: {
           type: 'http',
           scheme: 'bearer',
-          bearerFormat: 'JWT',
+          bearerFormat: 'JWT'
         }
       }
     },
-    security: [{
-      bearerAuth: []
-    }],
+    security: [
+      {
+        bearerAuth: []
+      }
+    ],
     servers: [
       {
-        url: "http://localhost:5000/api",
-        description: "local server"
-      },
-    ],
+        url: 'http://localhost:5000/api',
+        description: 'local server'
+      }
+    ]
   },
-  apis: ["./src/router/*.ts"],
+  apis: ['./src/router/*.ts']
 };
