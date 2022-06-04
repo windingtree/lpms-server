@@ -1,17 +1,32 @@
-import DBService, { AvailabilityDate, AvailabilityItemKey, FacilityItemValues, LevelDefaultTyping } from '../services/DBService';
+import DBService, {
+  AvailabilityDate,
+  AvailabilityItemKey,
+  FacilityItemValues,
+  LevelDefaultTyping
+} from '../services/DBService';
 import { AbstractLevel, AbstractSublevel } from 'abstract-level';
 import { Availability } from '../proto/lpms';
 
 export class SpaceAvailabilityRepository {
   private dbService: DBService;
-  private availableDB: AbstractSublevel<AbstractLevel<LevelDefaultTyping, string, FacilityItemValues>, LevelDefaultTyping, AvailabilityItemKey, Availability>;
+  private availableDB: AbstractSublevel<
+    AbstractLevel<LevelDefaultTyping, string, FacilityItemValues>,
+    LevelDefaultTyping,
+    AvailabilityItemKey,
+    Availability
+  >;
 
   constructor(facilityId: string, spaceId: string) {
     this.dbService = DBService.getInstance();
-    this.availableDB = this.dbService.getSpaceAvailabilityDB(facilityId, spaceId);
+    this.availableDB = this.dbService.getSpaceAvailabilityDB(
+      facilityId,
+      spaceId
+    );
   }
 
-  public async getSpaceAvailabilityNumSpaces(key: AvailabilityItemKey): Promise<number> {
+  public async getSpaceAvailabilityNumSpaces(
+    key: AvailabilityItemKey
+  ): Promise<number> {
     try {
       const availability: Availability = await this.availableDB.get(key);
       return availability.numSpaces;
