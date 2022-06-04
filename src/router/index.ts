@@ -376,16 +376,16 @@ router.get(
  *     tags: [Facility service]
  *     requestBody:
  *       required: true
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 numSpaces:
- *                   type: number
- *                   description: Number of available spaces to add
- *               required:
- *                 - numSpaces
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               numSpaces:
+ *                 type: number
+ *                 description: Number of available spaces to add
+ *             required:
+ *               - numSpaces
  *     parameters:
  *       - in: path
  *         name: facilityId
@@ -438,16 +438,16 @@ router.get(
  *     tags: [Facility service]
  *     requestBody:
  *       required: true
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 numSpaces:
- *                   type: number
- *                   description: Number of available spaces to add
- *               required:
- *                 - numSpaces
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               numSpaces:
+ *                 type: number
+ *                 description: Number of available spaces to add
+ *             required:
+ *               - numSpaces
  *     parameters:
  *       - in: path
  *         name: facilityId
