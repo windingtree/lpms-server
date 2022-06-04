@@ -11,10 +11,6 @@ export class FacilityController {
     try {
       const { facilityId, spaceId, date } = req.params;
 
-      if (!DateTime.fromSQL(date).isValid) {
-        throw ApiError.BadRequest('Invalid availability date format');
-      }
-
       const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
       const numSpaces = await repository.getSpaceAvailabilityNumSpaces(date as AvailabilityDate);
 
@@ -37,7 +33,7 @@ export class FacilityController {
       const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
       await repository.createAvailabilityByDate(
         date as AvailabilityDate,
-        numSpaces
+        Number(numSpaces)
       );
 
       return res.json({ success: true });
@@ -53,7 +49,7 @@ export class FacilityController {
       const { numSpaces } = req.body;
 
       const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
-      await repository.createDefaultAvailability(numSpaces);
+      await repository.createDefaultAvailability(Number(numSpaces));
 
       return res.json({ success: true });
     } catch (e) {
