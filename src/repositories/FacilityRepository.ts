@@ -13,10 +13,9 @@ export class FacilityRepository {
 
   public async getFacilityIds(): Promise<string[]> {
     try {
-      return await this.db.get<string, string[]>(
-        'facilities',
-        { valueEncoding: 'json' }
-      );
+      return await this.db.get<string, string[]>('facilities', {
+        valueEncoding: 'json'
+      });
     } catch (e) {
       if (e.status !== 404) {
         throw e;
@@ -25,7 +24,10 @@ export class FacilityRepository {
     return [];
   }
 
-  public async createFacility(facilityId: string, facility: Facility): Promise<void> {
+  public async createFacility(
+    facilityId: string,
+    facility: Facility
+  ): Promise<void> {
     const facilitySublevel = this.dbService.getFacilitySublevelDB(facilityId);
 
     await facilitySublevel.put('metadata', facility);

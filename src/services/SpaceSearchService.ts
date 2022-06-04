@@ -8,7 +8,8 @@ export default class SpaceSearchService {
   static dbService = DBService.getInstance();
 
   public static async check(ask: Ask, facilityId: string): Promise<Space[]> {
-    const facilityDB = SpaceSearchService.dbService.getFacilitySublevelDB(facilityId);
+    const facilityDB =
+      SpaceSearchService.dbService.getFacilitySublevelDB(facilityId);
     let spacesIds;
 
     try {
@@ -24,7 +25,11 @@ export default class SpaceSearchService {
       const set = new Set();
 
       for (const v of spacesIds) {
-        const spaceDB = SpaceSearchService.dbService.getFacilityItemDB(facilityId, 'spaces', v);
+        const spaceDB = SpaceSearchService.dbService.getFacilityItemDB(
+          facilityId,
+          'spaces',
+          v
+        );
         const space = await spaceDB.get('metadata');
         set.add({ space, id: v });
       }
@@ -40,21 +45,40 @@ export default class SpaceSearchService {
 
     for (const i of spaces) {
       const space = i.space as Space;
-      const numOfAdults = space.maxNumberOfAdultOccupantsOneof.oneofKind === 'maxNumberOfAdultOccupants'
-        ? space.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
-        : 0;
+      const numOfAdults =
+        space.maxNumberOfAdultOccupantsOneof.oneofKind ===
+        'maxNumberOfAdultOccupants'
+          ? space.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
+          : 0;
 
-      const numOfChildren = space.maxNumberOfChildOccupantsOneof.oneofKind === 'maxNumberOfChildOccupants'
-        ? space.maxNumberOfChildOccupantsOneof.maxNumberOfChildOccupants
-        : 0;
+      const numOfChildren =
+        space.maxNumberOfChildOccupantsOneof.oneofKind ===
+        'maxNumberOfChildOccupants'
+          ? space.maxNumberOfChildOccupantsOneof.maxNumberOfChildOccupants
+          : 0;
 
       //check space capacity
-      if (!SpaceSearchService.checkSuitableQuantity(numOfAdults, numOfChildren, ask.numPaxAdult, ask.numPaxChild)) {
+      if (
+        !SpaceSearchService.checkSuitableQuantity(
+          numOfAdults,
+          numOfChildren,
+          ask.numPaxAdult,
+          ask.numPaxChild
+        )
+      ) {
         continue;
       }
 
       //check dates is available
-      if (await SpaceSearchService.checkAvailableDates(i.id, facilityId, ask.checkIn, ask.checkOut, ask.numSpacesReq)) {
+      if (
+        await SpaceSearchService.checkAvailableDates(
+          i.id,
+          facilityId,
+          ask.checkIn,
+          ask.checkOut,
+          ask.numSpacesReq
+        )
+      ) {
         needed.add(space);
       }
     }
@@ -62,14 +86,19 @@ export default class SpaceSearchService {
     return Array.from(needed);
   }
 
-  private static checkSuitableQuantity(spaceGuestsCount, spaceChildrenCount, guestCount, childrenCount) {
+  private static checkSuitableQuantity(
+    spaceGuestsCount,
+    spaceChildrenCount,
+    guestCount,
+    childrenCount
+  ) {
     const guestCheck = spaceGuestsCount - guestCount;
 
     if (guestCheck < 0) {
       return false;
     }
     //if there is a place left from an adult, we give it to a child
-    const childrenCheck = (spaceChildrenCount + guestCheck) - childrenCount;
+    const childrenCheck = spaceChildrenCount + guestCheck - childrenCount;
 
     if (childrenCheck < 0) {
       return false;
@@ -83,19 +112,30 @@ export default class SpaceSearchService {
     return true;
   }
 
-  private static async checkAvailableDates(spaceId, facilityId, checkIn, checkOut, spacesRequired) {
-    const availabilityRepository = new SpaceAvailabilityRepository(facilityId, spaceId);
+  private static async checkAvailableDates(
+    spaceId,
+    facilityId,
+    checkIn,
+    checkOut,
+    spacesRequired
+  ) {
+    const availabilityRepository = new SpaceAvailabilityRepository(
+      facilityId,
+      spaceId
+    );
 
-    const defaultAvailable = await availabilityRepository.getSpaceAvailabilityNumSpaces('default');
+    const defaultAvailable =
+      await availabilityRepository.getSpaceAvailabilityNumSpaces('default');
 
     let from = DateTime.fromObject(checkIn);
     const to = DateTime.fromObject(checkOut);
 
     while (from <= to) {
       try {
-        const dailyBooks = await availabilityRepository.getSpaceAvailabilityNumSpaces(
-          from.toFormat('yyyy-MM-dd') as AvailabilityDate
-        );
+        const dailyBooks =
+          await availabilityRepository.getSpaceAvailabilityNumSpaces(
+            from.toFormat('yyyy-MM-dd') as AvailabilityDate
+          );
 
         if (defaultAvailable - dailyBooks < spacesRequired) {
           return false;

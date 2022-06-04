@@ -361,9 +361,9 @@ export default router;
  *         description: Some server error
  */
 router.get(
-   '/facility/:facilityId/space/:spaceId/availability/:date',
-   authMiddleware,
-   facilityController.getSpaceAvailability
+  '/facility/:facilityId/space/:spaceId/availability/:date',
+  authMiddleware,
+  facilityController.getSpaceAvailability
 );
 
 /**
@@ -422,7 +422,7 @@ router.get(
  *       500:
  *         description: Some server error
  */
- router.post(
+router.post(
   '/facility/:facilityId/space/:spaceId/availability/:date',
   authMiddleware,
   facilityController.createSpaceAvailability
@@ -478,7 +478,7 @@ router.get(
  *       500:
  *         description: Some server error
  */
- router.post(
+router.post(
   '/facility/:facilityId/space/:spaceId/availability',
   authMiddleware,
   facilityController.createDefaultSpaceAvailability

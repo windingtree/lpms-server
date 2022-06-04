@@ -115,9 +115,9 @@ export default class DBService {
   }
 
   public getSpaceAvailabilityDB(facilityId: string, itemId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', itemId).sublevel<AvailabilityItemKey, Availability>(
-      'availability',
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilityItemDB(facilityId, 'spaces', itemId).sublevel<
+      AvailabilityItemKey,
+      Availability
+    >('availability', { valueEncoding: 'json' });
   }
 }
