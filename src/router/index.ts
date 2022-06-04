@@ -430,7 +430,7 @@ router.get(
 
 /**
  * @swagger
- * /facility/{facilityId}/space/{spaceId}/availability/default:
+ * /facility/{facilityId}/space/{spaceId}/availability:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -479,7 +479,7 @@ router.get(
  *         description: Some server error
  */
  router.post(
-  '/facility/:facilityId/space/:spaceId/availability/default',
+  '/facility/:facilityId/space/:spaceId/availability',
   authMiddleware,
   facilityController.createDefaultSpaceAvailability
 );
