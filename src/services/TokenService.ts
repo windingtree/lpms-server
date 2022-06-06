@@ -1,20 +1,13 @@
 import jwt from 'jsonwebtoken';
-import {
-  accessTokenKey,
-  accessTokenMaxAge,
-  refreshTokenKey,
-  refreshTokenMaxAge
-} from '../config';
-import DBService from './DBService';
+import { accessTokenKey, accessTokenMaxAge, refreshTokenKey, refreshTokenMaxAge } from '../config';
 import { Tokens } from '../types';
+import tokenRepository, { TokenRepository } from '../repositories/TokenRepository';
 
 export class TokenService {
-  private dbService: DBService;
-  private db;
+  private repository: TokenRepository;
 
   constructor() {
-    this.dbService = DBService.getInstance();
-    this.db = this.dbService.getTokenDB();
+    this.repository = tokenRepository;
   }
 
   public generateTokens(payload): Tokens {
@@ -32,23 +25,12 @@ export class TokenService {
   }
 
   public async saveToken(refreshToken: string, userId: number) {
-    const tokens = await this.getUserTokens(userId);
+    const tokens = await this.repository.getUserTokens(userId);
     const verifiedTokens = this.getVerifiedUserTokens(tokens);
 
     verifiedTokens.push(refreshToken);
 
-    return await this.db.put(String(userId), verifiedTokens);
-  }
-
-  public async getUserTokens(userId: number): Promise<string[]> {
-    try {
-      return await this.db.get(String(userId));
-    } catch (e) {
-      if (e.status === 404) {
-        return [];
-      }
-      throw e;
-    }
+    return await this.repository.putUserTokens(String(userId), verifiedTokens);
   }
 
   public getVerifiedUserTokens(tokens: Array<string>): string[] {
@@ -68,15 +50,16 @@ export class TokenService {
   public async revokeToken(token: string) {
     const data = jwt.verify(token, refreshTokenKey);
     const userId = data.id;
-    const tokens = await this.getUserTokens(userId);
+    const tokens = await this.repository.getUserTokens(userId);
     const neededTokens = tokens.filter((i) => {
       return i !== token;
     });
-    return await this.db.put(String(userId), neededTokens);
+
+    return await this.repository.putUserTokens(String(userId), neededTokens);
   }
 
   public async revokeAllUserTokens(userId: number) {
-    return await this.db.del(String(userId));
+    return await this.repository.deleteUserTokens(String(userId));
   }
 
   public validateRefreshToken(refreshToken) {
@@ -99,7 +82,7 @@ export class TokenService {
     try {
       const data = jwt.verify(token, refreshTokenKey);
       const userId = data.id;
-      const tokens = await this.getUserTokens(userId);
+      const tokens = await this.repository.getUserTokens(userId);
       return tokens.includes(token);
     } catch (e) {
       return false;
