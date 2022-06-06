@@ -183,7 +183,11 @@ export default class DBService {
     >('stubs', { valueEncoding: 'json' });
   }
 
-  public getItemModifiersDB(facilityId: string, indexKey: FacilityIndexKey, itemId: string) {
+  public getItemModifiersDB(
+    facilityId: string,
+    indexKey: FacilityIndexKey,
+    itemId: string
+  ) {
     return this.getFacilityItemDB(facilityId, indexKey, itemId).sublevel<
       ModifiersKey,
       ModifiersValues

@@ -73,7 +73,9 @@ export class FacilityRepository {
       return await this.dbService.getFacilityDB(facilityId).get(key);
     } catch (e) {
       if (e.status === 404) {
-        throw ApiError.NotFound(`Unable to get "${key}" of facility "${facilityId}"`);
+        throw ApiError.NotFound(
+          `Unable to get "${key}" of facility "${facilityId}"`
+        );
       }
       throw e;
     }

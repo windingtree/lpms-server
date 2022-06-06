@@ -704,7 +704,7 @@ router.post(
  *       500:
  *         description: Some server error
  */
- router.post(
+router.post(
   '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
   authMiddleware,
   facilityController.createItemModifier
@@ -751,7 +751,7 @@ router.post(
  *       500:
  *         description: Some server error
  */
- router.delete(
+router.delete(
   '/facility/:facilityId/modifier/:modifierKey',
   authMiddleware,
   facilityController.removeModifierOfFacility
@@ -811,7 +811,7 @@ router.post(
  *       500:
  *         description: Some server error
  */
- router.delete(
+router.delete(
   '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
   authMiddleware,
   facilityController.removeModifierOfItem

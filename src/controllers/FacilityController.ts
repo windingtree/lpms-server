@@ -9,9 +9,7 @@ import { DateTime } from 'luxon';
 import ApiError from '../exceptions/ApiError';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
 import { FacilityModifierRepository } from '../repositories/FacilityModifierRepository';
-import {
-  ItemModifierRepository
-} from '../repositories/ItemModifierRegistry';
+import { ItemModifierRepository } from '../repositories/ItemModifierRegistry';
 
 export class FacilityController {
   // Returns availability of the space
@@ -194,9 +192,7 @@ export class FacilityController {
       const { facilityId, modifierKey } = req.params;
 
       const repository = new FacilityModifierRepository(facilityId);
-      await repository.delModifier(
-        modifierKey as ModifiersKey
-      );
+      await repository.delModifier(modifierKey as ModifiersKey);
 
       res.json({ success: true });
     } catch (e) {
@@ -219,9 +215,7 @@ export class FacilityController {
         itemId
       );
 
-      await repository.delModifier(
-        modifierKey as ModifiersKey
-      );
+      await repository.delModifier(modifierKey as ModifiersKey);
 
       res.json({ success: true });
     } catch (e) {
