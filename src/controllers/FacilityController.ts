@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { FormattedDate, ModifiersKey } from '../services/DBService';
+import type { FormattedDate, ModifiersKey, ModifiersValues } from '../services/DBService';
 import { DateTime } from 'luxon';
 import ApiError from '../exceptions/ApiError';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
@@ -75,7 +75,7 @@ export class FacilityController {
   };
 
   // Returns modifier of facility
-  getFacilityModifier = async (
+  getModifierOfFacility = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -95,7 +95,7 @@ export class FacilityController {
   };
 
   // Returns modifier of the item: `spaces` or `otherItems`
-  getItemModifier = async (req: Request, res: Response, next: NextFunction) => {
+  getModifierOfItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { facilityId, itemKey, itemId, modifierKey } = req.params;
       let repository: SpaceModifierRepository | OtherItemsModifierRepository;
@@ -111,9 +111,23 @@ export class FacilityController {
           throw ApiError.BadRequest('Invalid item key');
       }
 
-      const modifier = await repository.getModifier(
-        modifierKey as ModifiersKey
-      );
+      let modifier: ModifiersValues;
+
+      try {
+        modifier = await repository.getModifier(
+          modifierKey as ModifiersKey
+        );
+      } catch (e) {
+        if (e.status !== 404) {
+          throw e;
+        }
+
+        // If item does not contain such modifier then try to lookup the facility
+        const facilityRepository = new FacilityModifierRepository(facilityId);
+        modifier = await facilityRepository.getModifier(
+          modifierKey as ModifiersKey
+        );
+      }
 
       res.json(modifier);
     } catch (e) {

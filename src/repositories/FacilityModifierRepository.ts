@@ -1,4 +1,5 @@
 import { AbstractSublevel } from 'abstract-level';
+import ApiError from '../exceptions/ApiError';
 import DBService, {
   LevelDefaultTyping,
   DBLevel,
@@ -26,7 +27,7 @@ export class FacilityModifierRepository {
       return await this.db.get(key);
     } catch (e) {
       if (e.status === 404) {
-        throw new Error(`Unable to get "${key}" of modifier level"`);
+        throw ApiError.NotFound(`Unable to get "${key}" of modifier level"`);
       }
       throw e;
     }

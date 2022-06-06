@@ -14,11 +14,15 @@ export default class ApiError extends Error {
     return new ApiError(401, 'User is not authorized');
   }
 
-  static BadRequest(message, errors: ValidationError[] = []) {
+  static BadRequest(message: string, errors: ValidationError[] = []) {
     return new ApiError(400, message, errors);
   }
 
   static AccessDenied() {
     return new ApiError(403, 'Access denied');
+  }
+
+  static NotFound(message: string) {
+    return new ApiError(404, message || 'Not Found');
   }
 }
