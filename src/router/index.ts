@@ -640,3 +640,68 @@ router.post(
   authMiddleware,
   facilityController.createFacilityModifier
 );
+
+/**
+ * @swagger
+ * /facility/{facilityId}/{itemKey}/{itemId}/modifier/{modifierKey}:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: add modifier to the facility
+ *     tags: [Facility service, availability]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemKey
+ *         description: Type of item
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["spaces", "otherItems"]
+ *       - in: path
+ *         name: itemId
+ *         description: The item Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: modifierKey
+ *         description: The facility modifier key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["day_of_week", "occupancy", "length_of_stay"]
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       500:
+ *         description: Some server error
+ */
+ router.post(
+  '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
+  authMiddleware,
+  facilityController.createItemModifier
+);

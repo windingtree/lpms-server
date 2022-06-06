@@ -1,5 +1,9 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { FormattedDate, ModifiersKey, ModifiersValues } from '../services/DBService';
+import type {
+  FormattedDate,
+  ModifiersKey,
+  ModifiersValues
+} from '../services/DBService';
 import { DateTime } from 'luxon';
 import ApiError from '../exceptions/ApiError';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
@@ -95,7 +99,11 @@ export class FacilityController {
   };
 
   // Returns modifier of the item: `spaces` or `otherItems`
-  getModifierOfItem = async (req: Request, res: Response, next: NextFunction) => {
+  getModifierOfItem = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { facilityId, itemKey, itemId, modifierKey } = req.params;
       let repository: SpaceModifierRepository | OtherItemsModifierRepository;
@@ -114,9 +122,7 @@ export class FacilityController {
       let modifier: ModifiersValues;
 
       try {
-        modifier = await repository.getModifier(
-          modifierKey as ModifiersKey
-        );
+        modifier = await repository.getModifier(modifierKey as ModifiersKey);
       } catch (e) {
         if (e.status !== 404) {
           throw e;
@@ -135,7 +141,12 @@ export class FacilityController {
     }
   };
 
-  createFacilityModifier = async (req: Request, res: Response, next: NextFunction) => {
+  // Creates a modifier for the facility
+  createFacilityModifier = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { facilityId, modifierKey } = req.params;
       const modifier = req.body;
@@ -150,7 +161,40 @@ export class FacilityController {
     } catch (e) {
       next(e);
     }
-  }
+  };
+
+  // Creates a modifier for the item: spaces or otherItems
+  createItemModifier = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { facilityId, itemKey, itemId, modifierKey } = req.params;
+      const modifier = req.body;
+      let repository: SpaceModifierRepository | OtherItemsModifierRepository;
+
+      switch (itemKey) {
+        case 'spaces':
+          repository = new SpaceModifierRepository(facilityId, itemId);
+          break;
+        case 'otherItems':
+          repository = new OtherItemsModifierRepository(facilityId, itemId);
+          break;
+        default:
+          throw ApiError.BadRequest('Invalid item key');
+      }
+
+      await repository.setModifier(
+        modifierKey as ModifiersKey,
+        modifier as ModifiersValues
+      );
+
+      res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  };
 }
 
 export default new FacilityController();
