@@ -116,7 +116,7 @@ export default class SpaceSearchService {
     );
 
     const defaultAvailable =
-      await availabilityRepository.getSpaceAvailabilityNumSpaces('default');
+      await availabilityRepository.getSpaceAvailability('default');
 
     let from = DateTime.fromObject(checkIn);
     const to = DateTime.fromObject(checkOut);
@@ -124,11 +124,20 @@ export default class SpaceSearchService {
     while (from <= to) {
       try {
         const dailyBooks =
-          await availabilityRepository.getSpaceAvailabilityNumSpaces(
+          await availabilityRepository.getSpaceAvailability(
             from.toFormat('yyyy-MM-dd') as AvailabilityDate
           );
 
-        if (defaultAvailable - dailyBooks < spacesRequired) {
+        throw('To be implemented')
+        // In order to determine if there is space availability, a routine would have to:
+        // Get total number of spaces, with *per-day override* having higher priority than
+        // default. This will be the 'capacity' - ie. HOW MANY OF THOSE SPACE TYPES ARE
+        // PRESENT FOR THE POINT OF CONSIDERING IF THEY CAN BE STAYED IN.
+        // Then get the number of that space type that are booked. This means get the 
+        // facilityId.spaceId.stubs sublevel and get the YYYY-MM-DD-num_booked key
+        // this would be the number of daily booked.
+        // if the total number of spaces - booked spaces < spacesRequired, true false
+        if (defaultAvailable.numSpaces - dailyBooks.numSpaces < spacesRequired) {
           return false;
         }
       } catch (e) {
