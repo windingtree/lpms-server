@@ -9,7 +9,7 @@ import { Availability } from '../proto/lpms';
 
 export class SpaceAvailabilityRepository {
   private dbService: DBService;
-  private availableDB: AbstractSublevel<
+  private db: AbstractSublevel<
     AbstractLevel<LevelDefaultTyping, string, FacilityItemValues>,
     LevelDefaultTyping,
     DefaultOrDateItemKey,
@@ -18,45 +18,37 @@ export class SpaceAvailabilityRepository {
 
   constructor(facilityId: string, spaceId: string) {
     this.dbService = DBService.getInstance();
-    this.availableDB = this.dbService.getSpaceAvailabilityDB(
-      facilityId,
-      spaceId
-    );
+    this.db = this.dbService.getSpaceAvailabilityDB(facilityId, spaceId);
   }
 
-  public async getSpaceAvailabilityNumSpaces(
+  // --- availability getters / setters
+
+  public async getSpaceAvailability(
     key: DefaultOrDateItemKey
-  ): Promise<number> {
+  ): Promise<Availability> {
     try {
-      const availability: Availability = await this.availableDB.get(key);
-      return availability.numSpaces;
+      return await this.db.get(key);
     } catch (e) {
       if (e.status !== 404) {
         throw e;
       }
     }
 
-    return 0;
-  }
-
-  public async createDefaultAvailability(numSpaces: number): Promise<void> {
-    const availability: Availability = {
-      numSpaces
+    return {
+      numSpaces: 0
     };
-
-    await this.availableDB.put('default', availability);
   }
 
-  public async createAvailabilityByDate(
-    key: FormattedDate,
-    numSpaces = 1
+  public async setAvailabilityDefault(
+    availability: Availability
   ): Promise<void> {
-    const count = await this.getSpaceAvailabilityNumSpaces(key);
+    await this.db.put('default', availability);
+  }
 
-    const availability: Availability = {
-      numSpaces: count + numSpaces
-    };
-
-    await this.availableDB.put(key, availability);
+  public async setAvailabilityByDate(
+    key: FormattedDate,
+    availability: Availability
+  ): Promise<void> {
+    await this.db.put(key, availability);
   }
 }

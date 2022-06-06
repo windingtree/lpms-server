@@ -32,10 +32,7 @@ export type ModifiersValues =
   | DayOfWeekRateModifer
   | OccupancyRateModifier
   | LOSRateModifier;
-export type ModifiersKey =
-  | 'day_of_week'
-  | 'occupancy'
-  | 'length_of_stay'
+export type ModifiersKey = 'day_of_week' | 'occupancy' | 'length_of_stay';
 export type FacilityValues = FacilityMetadata | string[];
 export type FacilitySpaceValues = ItemMetadata | SpaceMetadata;
 export type FacilityItemType = 'spaces' | 'otherItems';
@@ -138,58 +135,57 @@ export default class DBService {
   }
 
   public getFacilityModifiersDB(facilityId: string) {
-    return this.getFacilityDB(facilityId).sublevel<ModifiersKey, ModifiersValues>(
-      'modifiers',
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilityDB(facilityId).sublevel<
+      ModifiersKey,
+      ModifiersValues
+    >('modifiers', { valueEncoding: 'json' });
   }
 
   public getFacilityStubsDB(facilityId: string) {
-    return this.getFacilityDB(facilityId).sublevel<FacilityStubKey, FacilityStubValues>(
-      'stubs',
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilityDB(facilityId).sublevel<
+      FacilityStubKey,
+      FacilityStubValues
+    >('stubs', { valueEncoding: 'json' });
   }
 
   public getFacilityPiiDB(facilityId: string) {
-    return this.getFacilityDB(facilityId).sublevel<string, Person>(
-      'pii',
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilityDB(facilityId).sublevel<string, Person>('pii', {
+      valueEncoding: 'json'
+    });
   }
 
   public getSpaceAvailabilityDB(facilityId: string, itemId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', itemId).sublevel<DefaultOrDateItemKey, Availability>(
-      'availability',
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilityItemDB(facilityId, 'spaces', itemId).sublevel<
+      DefaultOrDateItemKey,
+      Availability
+    >('availability', { valueEncoding: 'json' });
   }
 
   public getSpaceRatesDB(facilityId: string, spaceId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<DefaultOrDateItemKey, Rates>(
-      'rates',
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<
+      DefaultOrDateItemKey,
+      Rates
+    >('rates', { valueEncoding: 'json' });
   }
 
   public getSpaceRulesDB(facilityId: string, spaceId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<RulesItemKey, Rules>(
-      'rules',
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<
+      RulesItemKey,
+      Rules
+    >('rules', { valueEncoding: 'json' });
   }
 
   public getSpaceModifiersDB(facilityId: string, spaceId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<ModifiersKey, ModifiersValues>(
-      'modifiers',
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<
+      ModifiersKey,
+      ModifiersValues
+    >('modifiers', { valueEncoding: 'json' });
   }
 
   public getSpaceStubsDB(facilityId: string, spaceId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<SpaceStubKey, SpaceStubValues>(
-      'stubs',
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<
+      SpaceStubKey,
+      SpaceStubValues
+    >('stubs', { valueEncoding: 'json' });
   }
 }

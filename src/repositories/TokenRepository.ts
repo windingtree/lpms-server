@@ -20,14 +20,14 @@ export class TokenRepository {
     }
   }
 
-  public async putUserTokens(
+  public async setUserTokens(
     userId: string,
     verifiedTokens: string[]
   ): Promise<void> {
     await this.db.put(userId, verifiedTokens);
   }
 
-  public async deleteUserTokens(userId: string): Promise<void> {
+  public async delUserTokens(userId: string): Promise<void> {
     await this.db.del(String(userId));
   }
 }

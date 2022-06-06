@@ -84,11 +84,11 @@ export class StorageController {
 
         if (type === ItemType.SPACE) {
           spaces[itemId] = [
-            ['metadata_generic', generic as Item],
-            ['metadata', (payload ? Space.fromBinary(payload) : {}) as Space]
+            ['metadata', generic as Item],
+            ['metadata_impl', (payload ? Space.fromBinary(payload) : {}) as Space]
           ];
         } else {
-          otherItems[itemId] = [['metadata_generic', generic as Item]];
+          otherItems[itemId] = [['metadata', generic as Item]];
         }
       }
 

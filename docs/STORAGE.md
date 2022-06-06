@@ -102,11 +102,11 @@ Notes: This meets the requirement (2)
 Parent level: `facilityId` (dynamic)
 Level: `spaceId` (dynamic)
 
-Key: `metadata_generic`
+Key: `metadata`
 Value: `videre.stays.lpms.facility.Item`
 Description: Contains generic data for each item (name, photos etc)
 
-Key: `metadata`
+Key: `metadata_impl`
 Value: `videre.stays.lpms.facility.Space`
 Description: Contains specific metadata for Spaces (views, sleeping arrangements etc).
 
@@ -185,11 +185,24 @@ Notes: This meets the requirement (4)
 #### otherItems
 
 Parent level: `facilityId` (dynamic)
-Level: `otherItems`
+Level: `otherItemdId` (dynamic)
 
-Key: `itemId` (dynamic)
+Key: `metadata` (dynamic)
 Value: `videre.stays.lpms.facility.Item`
 Description: Contains generic data for the item (name, photos, etc)
+
+##### rates
+
+Parent level: `facilityId.otherItemdId` (dynamic)
+Level: `rates`
+
+Key: `default`
+Value: `videre.stays.lpms.Rates`
+Description: Contains the `Rates` message protobuf describing the rate for this item.
+
+Key: `YYYY-MM-DD` (dynamic)
+Value: `videre.stays.lpms.Rates`
+Description: Contains the `Rates` message protobuf for a per-day override of rates.
 
 # CRUD
 
@@ -251,8 +264,8 @@ let items: ServiceItemData[];
 const spaces = db.get('facilityId.spaces'); // insert correct leveldb query here
 for (const space of object) {
   // get generic metadata
-  const generic = db.get(`${facilityId}.${space}.metadata_generic`) as Item;
-  const specific = db.get(`${facilityId}.${space}.metadata`) as Space;
+  const generic = db.get(`${facilityId}.${space}.metadata`) as Item;
+  const specific = db.get(`${facilityId}.${space}.metadata_impl`) as Space;
   generic.payload = Space.toBinary(specific);
 
   items.push({
@@ -264,7 +277,7 @@ for (const space of object) {
 // process all other items
 const otherItems = db.get('facilityId.otherItems') as Item[];
 for (const item of otherItems) {
-  const otherItem = db.get(`${facilityId}.otherItems.${item}`) as Item;
+  const otherItem = db.get(`${facilityId}.${item}.metadata`) as Item;
   items.push({
     item: utils.arrayify(utils.formatBytes32String(item)),
     payload: Item.toBinary(otherItem)

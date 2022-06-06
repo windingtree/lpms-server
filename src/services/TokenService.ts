@@ -37,7 +37,7 @@ export class TokenService {
 
     verifiedTokens.push(refreshToken);
 
-    return await this.repository.putUserTokens(String(userId), verifiedTokens);
+    return await this.repository.setUserTokens(String(userId), verifiedTokens);
   }
 
   public getVerifiedUserTokens(tokens: Array<string>): string[] {
@@ -62,11 +62,11 @@ export class TokenService {
       return i !== token;
     });
 
-    return await this.repository.putUserTokens(String(userId), neededTokens);
+    return await this.repository.setUserTokens(String(userId), neededTokens);
   }
 
   public async revokeAllUserTokens(userId: number) {
-    return await this.repository.deleteUserTokens(String(userId));
+    return await this.repository.delUserTokens(String(userId));
   }
 
   public validateRefreshToken(refreshToken) {
