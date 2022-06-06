@@ -1,4 +1,8 @@
-import DBService, { FacilityItemType, FacilityLevelValues, FacilitySpaceLevelValues } from '../services/DBService';
+import DBService, {
+  FacilityItemType,
+  FacilityValues,
+  FacilitySpaceValues
+} from '../services/DBService';
 import { Level } from 'level';
 import { Item } from '../proto/facility';
 
@@ -10,6 +14,8 @@ export class FacilityRepository {
     this.dbService = DBService.getInstance();
     this.db = DBService.getInstance().getDB();
   }
+
+  // --- facility index management
 
   public async getFacilityIds(): Promise<string[]> {
     try {
@@ -24,51 +30,45 @@ export class FacilityRepository {
     return [];
   }
 
-  public async createFacilityIndex(facilityId: string) {
-    const facilitiesIds = await this.getFacilityIds();
+  public async addFacilityToIndex(facilityId: string) {
+    const facilityIds = await this.getFacilityIds();
 
-    if (facilitiesIds.length > 0) {
-      const idsSet = new Set<string>(facilitiesIds);
-      idsSet.add(facilityId);
-      await this.db.put('facilities', Array.from(idsSet));
+    if (facilityIds.length > 0) {
+      const ids = new Set<string>(facilityIds);
+      ids.add(facilityId);
+      await this.db.put('facilities', Array.from(ids));
     } else {
       await this.db.put('facilities', [facilityId]);
     }
   }
 
-  public async getItemIds(
-    facilityId: string,
-    itemType: FacilityItemType
-  ): Promise<string[]> {
-    try {
-      const facilitySublevel = this.dbService.getFacilitySublevelDB(facilityId);
-      return await facilitySublevel.get<string, string[]>(itemType, {
-        valueEncoding: 'json'
-      });
-    } catch (e) {
-      if (e.status !== 404) {
-        throw e;
+  public async delFacilityFromIndex(facilityId: string) {
+    const facilityIds = await this.getFacilityIds();
+
+    if (facilityIds.length > 0) {
+      const ids = new Set<string>(facilityIds);
+      if (ids.delete(facilityId)) {
+        await this.db.put('facilities', Array.from(ids));
       }
     }
-    return [];
   }
 
-  public async createFacilityItem(
+  // --- facility level getters / setters
+
+  public async setFacilityKey(
     facilityId: string,
     key: string,
-    value: FacilityLevelValues
+    value: FacilityValues
   ): Promise<void> {
-    const facilitySublevel = this.dbService.getFacilitySublevelDB(facilityId);
-
-    await facilitySublevel.put(key, value);
+    await this.dbService.getFacilityDB(facilityId).put(key, value);
   }
 
-  public async getFacilityDbKey(
+  public async getFacilityKey(
     facilityId: string,
     key: string
-  ): Promise<FacilityLevelValues> {
+  ): Promise<FacilityValues> {
     try {
-      return await this.dbService.getFacilitySublevelDB(facilityId).get(key);
+      return await this.dbService.getFacilityDB(facilityId).get(key);
     } catch (e) {
       if (e.status === 404) {
         throw new Error(`Unable to get "${key}" of facility "${facilityId}"`);
@@ -77,57 +77,94 @@ export class FacilityRepository {
     }
   }
 
-  public async getSpaceDbKey(
+  // --- items (space and otherItems) index management
+
+  public async getItemIds(
     facilityId: string,
-    spaceId: string,
-    key: string
-  ): Promise<FacilitySpaceLevelValues> {
+    itemType: FacilityItemType
+  ): Promise<string[]> {
     try {
       return await this.dbService
-        .getFacilityItemDB(facilityId, 'spaces', spaceId)
+        .getFacilityDB(facilityId)
+        .get<string, string[]>(itemType, {
+          valueEncoding: 'json'
+        });
+    } catch (e) {
+      if (e.status !== 404) {
+        throw e;
+      }
+    }
+    return [];
+  }
+
+  public async addItemToIndex(
+    facilityId: string,
+    itemType: FacilityItemType,
+    itemId: string
+  ): Promise<void> {
+    const itemIds = await this.getItemIds(facilityId, itemType);
+    const db = this.dbService.getFacilityDB(facilityId);
+
+    if (itemIds.length > 0) {
+      const ids = new Set<string>(itemIds);
+      ids.add(itemId);
+      await db.put(itemType, Array.from(ids));
+    } else {
+      await db.put(itemType, [itemId]);
+    }
+  }
+
+  public async delItemFromIndex(
+    facilityId: string,
+    itemType: FacilityItemType,
+    itemId: string
+  ): Promise<void> {
+    const itemIds = await this.getItemIds(facilityId, itemType);
+
+    if (itemIds.length > 0) {
+      const ids = new Set<string>(itemIds);
+      if (ids.delete(itemId)) {
+        await this.db.put(itemType, Array.from(ids));
+      }
+    }
+  }
+
+  // --- item level (space and otherItems) getters / setters
+
+  public async setItemKey(
+    facilityId: string,
+    itemType: FacilityItemType,
+    itemId: string,
+    key: string,
+    value: Item | FacilitySpaceValues
+  ): Promise<void> {
+   await this.dbService.getFacilityItemDB(
+      facilityId,
+      itemType,
+      itemId
+    ).put(key, value);
+  }
+
+  public async getItemKey(
+    facilityId: string,
+    itemType: FacilityItemType,
+    itemId: string,
+    key: string
+  ): Promise<Item | FacilitySpaceValues> {
+    try {
+      return await this.dbService
+        .getFacilityItemDB(facilityId, itemType, itemId)
         .get(key);
     } catch (e) {
       if (e.status === 404) {
         throw new Error(
-          `Unable to get "${key}" of space "${spaceId}" of facility "${facilityId}"`
+          `Unable to get "${key}" of item "${itemId}" of facility "${facilityId}"`
         );
       }
       throw e;
     }
   }
 
-  public async createSpaceIndex(
-    facilityId: string,
-    itemType: FacilityItemType,
-    itemId: string
-  ): Promise<void> {
-    const itemIds = await this.getItemIds(facilityId, itemType);
-    const facilitySublevel = this.dbService.getFacilitySublevelDB(facilityId);
-
-    if (itemIds.length > 0) {
-      const spaceSet = new Set<string>(itemIds);
-      spaceSet.add(itemId);
-      await facilitySublevel.put(itemType, Array.from(spaceSet));
-    } else {
-      await facilitySublevel.put(itemType, [itemId]);
-    }
-  }
-
-  public async createSpaceItem(
-    facilityId: string,
-    itemType: FacilityItemType,
-    itemId: string,
-    key: string,
-    value: Item | FacilitySpaceLevelValues
-  ): Promise<void> {
-    const sublevel = this.dbService.getFacilityItemDB(
-      facilityId,
-      itemType,
-      itemId
-    );
-
-    await sublevel.put(key, value);
-  }
 }
 
 export default new FacilityRepository();

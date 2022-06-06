@@ -43,12 +43,7 @@ export class UserService {
     const id = await this.mainRepository.getId();
     const rounds = 2;
     const hashedPassword = await bcrypt.hash(String(password), rounds);
-    await this.repository.createUser(
-      id,
-      login,
-      hashedPassword,
-      roles
-    );
+    await this.repository.createUser(id, login, hashedPassword, roles);
 
     await this.mainRepository.setUserDBIncrement(String(id));
 
@@ -156,7 +151,9 @@ export class UserService {
   }
 
   private async deleteDefaultManagerAccount(): Promise<void> {
-    const managerId = await this.repository.getUserIdByLogin(defaultManagerLogin);
+    const managerId = await this.repository.getUserIdByLogin(
+      defaultManagerLogin
+    );
 
     if (managerId) {
       await this.deleteUser(managerId);

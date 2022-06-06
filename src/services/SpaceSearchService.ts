@@ -7,14 +7,15 @@ import facilityRepository from '../repositories/FacilityRepository';
 
 export default class SpaceSearchService {
   public static async check(ask: Ask, facilityId: string): Promise<Space[]> {
-    const spacesIds = await facilityRepository.getFacilityDbKey(facilityId, 'spaces');
+    const spacesIds = await facilityRepository.getFacilityKey(facilityId, 'spaces');
 
     if (Array.isArray(spacesIds)) {
       const set = new Set();
 
       for (const v of spacesIds) {
-        const space = await facilityRepository.getSpaceDbKey(
+        const space = await facilityRepository.getItemKey(
           facilityId,
+          'spaces',
           v,
           'metadata'
         );
