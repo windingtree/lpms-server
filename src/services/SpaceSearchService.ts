@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import { Ask } from 'src/proto/ask';
 import { Space } from '../proto/facility';
-import { AvailabilityDate } from './DBService';
+import { FormattedDate } from './DBService';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
 import facilityRepository from '../repositories/FacilityRepository';
 
@@ -125,7 +125,7 @@ export default class SpaceSearchService {
       try {
         const dailyBooks =
           await availabilityRepository.getSpaceAvailability(
-            from.toFormat('yyyy-MM-dd') as AvailabilityDate
+            from.toFormat('yyyy-MM-dd') as FormattedDate
           );
 
         throw('To be implemented')
