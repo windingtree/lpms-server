@@ -12,8 +12,11 @@ import {
   DayOfWeekRateModifer,
   LOSRateModifier,
   NoticeRequiredRule,
-  OccupancyRateModifier
+  OccupancyRateModifier,
+  Rates
 } from '../proto/lpms';
+import { Stub } from '../proto/stub';
+import { Person } from '../proto/person';
 
 export type LevelDefaultTyping = string | Buffer | Uint8Array;
 export type DBLevel = Level<string, string | string[]>;
@@ -23,17 +26,26 @@ export type StringAbstractDB = AbstractSublevel<
   string,
   string
 >;
-export type FacilityRules = NoticeRequiredRule | DayOfWeekLOSRule;
-export type FacilityModifiers =
+export type Rules = NoticeRequiredRule | DayOfWeekLOSRule;
+export type RulesItemKey = 'notice_required' | 'length_of_stay';
+export type ModifiersValues =
   | DayOfWeekRateModifer
   | OccupancyRateModifier
   | LOSRateModifier;
+export type ModifiersKey =
+  | 'day_of_week'
+  | 'occupancy'
+  | 'length_of_stay'
 export type FacilityValues = FacilityMetadata | string[];
 export type FacilitySpaceValues = ItemMetadata | SpaceMetadata;
 export type FacilityItemType = 'spaces' | 'otherItems';
 export type FacilityItemValues = ItemMetadata | FacilitySpaceValues;
-export type AvailabilityDate = `${number}-${number}-${number}`;
-export type AvailabilityItemKey = 'default' | AvailabilityDate;
+export type FormattedDate = `${number}-${number}-${number}`;
+export type DefaultOrDateItemKey = 'default' | FormattedDate;
+export type FacilityStubKey = string | FormattedDate;
+export type FacilityStubValues = string[] | Stub;
+export type SpaceStubKey = FormattedDate | `${FormattedDate}-num_booked`;
+export type SpaceStubValues = string[] | number;
 
 export default class DBService {
   protected db: DBLevel;
@@ -118,10 +130,66 @@ export default class DBService {
     );
   }
 
+  public getFacilityRulesDB(facilityId: string) {
+    return this.getFacilityDB(facilityId).sublevel<RulesItemKey, Rules>(
+      'rules',
+      { valueEncoding: 'json' }
+    );
+  }
+
+  public getFacilityModifiersDB(facilityId: string) {
+    return this.getFacilityDB(facilityId).sublevel<ModifiersKey, ModifiersValues>(
+      'modifiers',
+      { valueEncoding: 'json' }
+    );
+  }
+
+  public getFacilityStubsDB(facilityId: string) {
+    return this.getFacilityDB(facilityId).sublevel<FacilityStubKey, FacilityStubValues>(
+      'stubs',
+      { valueEncoding: 'json' }
+    );
+  }
+
+  public getFacilityPiiDB(facilityId: string) {
+    return this.getFacilityDB(facilityId).sublevel<string, Person>(
+      'pii',
+      { valueEncoding: 'json' }
+    );
+  }
+
   public getSpaceAvailabilityDB(facilityId: string, itemId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', itemId).sublevel<
-      AvailabilityItemKey,
-      Availability
-    >('availability', { valueEncoding: 'json' });
+    return this.getFacilityItemDB(facilityId, 'spaces', itemId).sublevel<DefaultOrDateItemKey, Availability>(
+      'availability',
+      { valueEncoding: 'json' }
+    );
+  }
+
+  public getSpaceRatesDB(facilityId: string, spaceId: string) {
+    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<DefaultOrDateItemKey, Rates>(
+      'rates',
+      { valueEncoding: 'json' }
+    );
+  }
+
+  public getSpaceRulesDB(facilityId: string, spaceId: string) {
+    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<RulesItemKey, Rules>(
+      'rules',
+      { valueEncoding: 'json' }
+    );
+  }
+
+  public getSpaceModifiersDB(facilityId: string, spaceId: string) {
+    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<ModifiersKey, ModifiersValues>(
+      'modifiers',
+      { valueEncoding: 'json' }
+    );
+  }
+
+  public getSpaceStubsDB(facilityId: string, spaceId: string) {
+    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<SpaceStubKey, SpaceStubValues>(
+      'stubs',
+      { valueEncoding: 'json' }
+    );
   }
 }

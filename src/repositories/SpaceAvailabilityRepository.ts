@@ -1,6 +1,6 @@
 import DBService, {
-  AvailabilityDate,
-  AvailabilityItemKey,
+  FormattedDate,
+  DefaultOrDateItemKey,
   FacilityItemValues,
   LevelDefaultTyping
 } from '../services/DBService';
@@ -12,7 +12,7 @@ export class SpaceAvailabilityRepository {
   private availableDB: AbstractSublevel<
     AbstractLevel<LevelDefaultTyping, string, FacilityItemValues>,
     LevelDefaultTyping,
-    AvailabilityItemKey,
+    DefaultOrDateItemKey,
     Availability
   >;
 
@@ -25,7 +25,7 @@ export class SpaceAvailabilityRepository {
   }
 
   public async getSpaceAvailabilityNumSpaces(
-    key: AvailabilityItemKey
+    key: DefaultOrDateItemKey
   ): Promise<number> {
     try {
       const availability: Availability = await this.availableDB.get(key);
@@ -48,7 +48,7 @@ export class SpaceAvailabilityRepository {
   }
 
   public async createAvailabilityByDate(
-    key: AvailabilityDate,
+    key: FormattedDate,
     numSpaces = 1
   ): Promise<void> {
     const count = await this.getSpaceAvailabilityNumSpaces(key);
