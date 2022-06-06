@@ -38,13 +38,7 @@ export class FacilityService {
 
     await Promise.all(
       entries.map(([key, value]) =>
-        this.repository.setItemKey(
-          facilityId,
-          itemType,
-          itemId,
-          key,
-          value
-        )
+        this.repository.setItemKey(facilityId, itemType, itemId, key, value)
       )
     );
   }

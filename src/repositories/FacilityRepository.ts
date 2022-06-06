@@ -138,11 +138,9 @@ export class FacilityRepository {
     key: string,
     value: Item | FacilitySpaceValues
   ): Promise<void> {
-   await this.dbService.getFacilityItemDB(
-      facilityId,
-      itemType,
-      itemId
-    ).put(key, value);
+    await this.dbService
+      .getFacilityItemDB(facilityId, itemType, itemId)
+      .put(key, value);
   }
 
   public async getItemKey(
@@ -164,7 +162,6 @@ export class FacilityRepository {
       throw e;
     }
   }
-
 }
 
 export default new FacilityRepository();
