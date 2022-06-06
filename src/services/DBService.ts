@@ -16,7 +16,6 @@ import {
   Rates,
   StubStorage
 } from '../proto/lpms';
-import { Stub } from '../proto/stub';
 import { Person } from '../proto/person';
 
 export type LevelDefaultTyping = string | Buffer | Uint8Array;
@@ -177,17 +176,17 @@ export default class DBService {
     >('rules', { valueEncoding: 'json' });
   }
 
-  public getSpaceModifiersDB(facilityId: string, spaceId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<
-      ModifiersKey,
-      ModifiersValues
-    >('modifiers', { valueEncoding: 'json' });
-  }
-
   public getSpaceStubsDB(facilityId: string, spaceId: string) {
     return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<
       SpaceStubKey,
       SpaceStubValues
     >('stubs', { valueEncoding: 'json' });
+  }
+
+  public getItemModifiersDB(facilityId: string, indexKey: FacilityIndexKey, itemId: string) {
+    return this.getFacilityItemDB(facilityId, indexKey, itemId).sublevel<
+      ModifiersKey,
+      ModifiersValues
+    >('modifiers', { valueEncoding: 'json' });
   }
 }

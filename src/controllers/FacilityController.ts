@@ -1,8 +1,13 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { FormattedDate } from '../services/DBService';
+import type { FormattedDate, ModifiersKey } from '../services/DBService';
 import { DateTime } from 'luxon';
 import ApiError from '../exceptions/ApiError';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
+import { FacilityModifierRepository } from '../repositories/FacilityModifierRepository';
+import {
+  SpaceModifierRepository,
+  OtherItemsModifierRepository
+} from '../repositories/ItemModifierRegistry';
 
 export class FacilityController {
   // Returns availability of the space
@@ -64,6 +69,53 @@ export class FacilityController {
       await repository.setAvailabilityDefault({ numSpaces: Number(numSpaces) });
 
       return res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  // Returns modifier of facility
+  getFacilityModifier = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { facilityId, modifierKey } = req.params;
+
+      const repository = new FacilityModifierRepository(facilityId);
+      const modifier = await repository.getModifier(
+        modifierKey as ModifiersKey
+      );
+
+      res.json(modifier);
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  // Returns modifier of the item: `spaces` or `otherItems`
+  getItemModifier = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { facilityId, itemKey, itemId, modifierKey } = req.params;
+      let repository: SpaceModifierRepository | OtherItemsModifierRepository;
+
+      switch (itemKey) {
+        case 'spaces':
+          repository = new SpaceModifierRepository(facilityId, itemId);
+          break;
+        case 'otherItems':
+          repository = new OtherItemsModifierRepository(facilityId, itemId);
+          break;
+        default:
+          throw ApiError.BadRequest('Invalid item key');
+      }
+
+      const modifier = await repository.getModifier(
+        modifierKey as ModifiersKey
+      );
+
+      res.json(modifier);
     } catch (e) {
       next(e);
     }
