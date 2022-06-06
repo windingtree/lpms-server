@@ -18,10 +18,7 @@ export class SpaceAvailabilityRepository {
 
   constructor(facilityId: string, spaceId: string) {
     this.dbService = DBService.getInstance();
-    this.db = this.dbService.getSpaceAvailabilityDB(
-      facilityId,
-      spaceId
-    );
+    this.db = this.dbService.getSpaceAvailabilityDB(facilityId, spaceId);
   }
 
   // --- availability getters / setters
@@ -39,10 +36,12 @@ export class SpaceAvailabilityRepository {
 
     return {
       numSpaces: 0
-    }
+    };
   }
 
-  public async setAvailabilityDefault(availability: Availability): Promise<void> {
+  public async setAvailabilityDefault(
+    availability: Availability
+  ): Promise<void> {
     await this.db.put('default', availability);
   }
 
