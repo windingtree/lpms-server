@@ -264,8 +264,8 @@ let items: ServiceItemData[];
 const spaces = db.get('facilityId.spaces'); // insert correct leveldb query here
 for (const space of object) {
   // get generic metadata
-  const generic = db.get(`${facilityId}.${space}.metadata_generic`) as Item;
-  const specific = db.get(`${facilityId}.${space}.metadata`) as Space;
+  const generic = db.get(`${facilityId}.${space}.metadata`) as Item;
+  const specific = db.get(`${facilityId}.${space}.metadata_impl`) as Space;
   generic.payload = Space.toBinary(specific);
 
   items.push({
@@ -277,7 +277,7 @@ for (const space of object) {
 // process all other items
 const otherItems = db.get('facilityId.otherItems') as Item[];
 for (const item of otherItems) {
-  const otherItem = db.get(`${facilityId}.otherItems.${item}`) as Item;
+  const otherItem = db.get(`${facilityId}.${item}.metadata`) as Item;
   items.push({
     item: utils.arrayify(utils.formatBytes32String(item)),
     payload: Item.toBinary(otherItem)
