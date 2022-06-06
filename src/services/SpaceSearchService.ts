@@ -1,36 +1,23 @@
 import { DateTime } from 'luxon';
 import { Ask } from 'src/proto/ask';
 import { Space } from '../proto/facility';
-import DBService, { AvailabilityDate } from './DBService';
+import { AvailabilityDate } from './DBService';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
+import facilityRepository from '../repositories/FacilityRepository';
 
 export default class SpaceSearchService {
-  static dbService = DBService.getInstance();
-
   public static async check(ask: Ask, facilityId: string): Promise<Space[]> {
-    const facilityDB =
-      SpaceSearchService.dbService.getFacilitySublevelDB(facilityId);
-    let spacesIds;
-
-    try {
-      spacesIds = await facilityDB.get('spaces');
-    } catch (e) {
-      if (e.status !== 404) {
-        throw e;
-      }
-      return []; //todo throw error?
-    }
+    const spacesIds = await facilityRepository.getFacilityDbKey(facilityId, 'spaces');
 
     if (Array.isArray(spacesIds)) {
       const set = new Set();
 
       for (const v of spacesIds) {
-        const spaceDB = SpaceSearchService.dbService.getFacilityItemDB(
+        const space = await facilityRepository.getSpaceDbKey(
           facilityId,
-          'spaces',
-          v
+          v,
+          'metadata'
         );
-        const space = await spaceDB.get('metadata');
         set.add({ space, id: v });
       }
 
