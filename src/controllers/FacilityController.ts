@@ -134,6 +134,23 @@ export class FacilityController {
       next(e);
     }
   };
+
+  createFacilityModifier = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { facilityId, modifierKey } = req.params;
+      const modifier = req.body;
+
+      const repository = new FacilityModifierRepository(facilityId);
+      await repository.setModifier(
+        modifierKey as ModifiersKey,
+        modifier as ModifiersValues
+      );
+
+      res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export default new FacilityController();
