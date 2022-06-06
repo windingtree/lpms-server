@@ -8,6 +8,7 @@ import DBService, {
 } from '../services/DBService';
 import { AbstractSublevel } from 'abstract-level';
 import { StubStorage } from '../proto/lpms';
+import ApiError from '../exceptions/ApiError';
 
 export class StubRepository {
   private dbService: DBService;
@@ -30,7 +31,7 @@ export class StubRepository {
       return await this.db.get(key);
     } catch (e) {
       if (e.status === 404) {
-        throw new Error(`Unable to get "${key}" of stub level"`);
+        throw ApiError.NotFound(`Unable to get "${key}" of stub level"`);
       }
       throw e;
     }
