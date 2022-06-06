@@ -2,7 +2,8 @@ import { Item } from '../proto/facility';
 import {
   FacilityIndexKey,
   FacilityValues,
-  FacilitySpaceValues
+  FacilitySpaceValues,
+  FacilityKey
 } from './DBService';
 import facilityRepository, {
   FacilityRepository
@@ -17,7 +18,7 @@ export class FacilityService {
 
   public async setFacilityDbKeys(
     facilityId: string,
-    entries: [string, FacilityValues][]
+    entries: [FacilityIndexKey | FacilityKey, FacilityValues][]
   ): Promise<void> {
     await this.repository.addFacilityToIndex(facilityId);
 
