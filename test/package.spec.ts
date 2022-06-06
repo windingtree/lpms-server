@@ -3,6 +3,7 @@ import supertest from 'supertest';
 import ServerService from '../src/services/ServerService';
 import { AppRole } from '../src/types';
 import userService from '../src/services/UserService';
+import userRepository from '../src/repositories/UserRepository';
 
 describe('test', async () => {
   const appService = await new ServerService(3005);
@@ -26,7 +27,7 @@ describe('test', async () => {
   it('make manager', async () => {
     await userService.createUser(managerLogin, managerPass, [AppRole.MANAGER]);
 
-    const userId = await userService.getUserIdByLogin(managerLogin);
+    const userId = await userRepository.getUserIdByLogin(managerLogin);
     expect(userId).to.be.an('number');
   });
 
@@ -163,13 +164,13 @@ describe('test', async () => {
 
   it('delete users', async () => {
     //todo think about APIs for delete users
-    const id = await userService.getUserIdByLogin(managerLogin);
-    const anotherUser = await userService.getUserIdByLogin(anotherUserForTest);
+    const id = await userRepository.getUserIdByLogin(managerLogin);
+    const anotherUser = await userRepository.getUserIdByLogin(anotherUserForTest);
     await userService.deleteUser(Number(id));
     await userService.deleteUser(Number(staffUserId));
     await userService.deleteUser(Number(anotherUser));
 
-    const checkId = await userService.getUserIdByLogin(managerLogin);
+    const checkId = await userRepository.getUserIdByLogin(managerLogin);
     expect(checkId).to.be.null;
   });
 });
