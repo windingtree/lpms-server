@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import type {
+  FacilityIndexKey,
   FormattedDate,
   ModifiersKey,
   ModifiersValues
@@ -9,8 +10,7 @@ import ApiError from '../exceptions/ApiError';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
 import { FacilityModifierRepository } from '../repositories/FacilityModifierRepository';
 import {
-  SpaceModifierRepository,
-  OtherItemsModifierRepository
+  ItemModifierRepository
 } from '../repositories/ItemModifierRegistry';
 
 export class FacilityController {
@@ -106,18 +106,12 @@ export class FacilityController {
   ) => {
     try {
       const { facilityId, itemKey, itemId, modifierKey } = req.params;
-      let repository: SpaceModifierRepository | OtherItemsModifierRepository;
 
-      switch (itemKey) {
-        case 'spaces':
-          repository = new SpaceModifierRepository(facilityId, itemId);
-          break;
-        case 'otherItems':
-          repository = new OtherItemsModifierRepository(facilityId, itemId);
-          break;
-        default:
-          throw ApiError.BadRequest('Invalid item key');
-      }
+      const repository = new ItemModifierRepository(
+        facilityId,
+        itemKey as FacilityIndexKey,
+        itemId
+      );
 
       let modifier: ModifiersValues;
 
@@ -172,18 +166,12 @@ export class FacilityController {
     try {
       const { facilityId, itemKey, itemId, modifierKey } = req.params;
       const modifier = req.body;
-      let repository: SpaceModifierRepository | OtherItemsModifierRepository;
 
-      switch (itemKey) {
-        case 'spaces':
-          repository = new SpaceModifierRepository(facilityId, itemId);
-          break;
-        case 'otherItems':
-          repository = new OtherItemsModifierRepository(facilityId, itemId);
-          break;
-        default:
-          throw ApiError.BadRequest('Invalid item key');
-      }
+      const repository = new ItemModifierRepository(
+        facilityId,
+        itemKey as FacilityIndexKey,
+        itemId
+      );
 
       await repository.setModifier(
         modifierKey as ModifiersKey,
@@ -224,18 +212,12 @@ export class FacilityController {
   ) => {
     try {
       const { facilityId, itemKey, itemId, modifierKey } = req.params;
-      let repository: SpaceModifierRepository | OtherItemsModifierRepository;
 
-      switch (itemKey) {
-        case 'spaces':
-          repository = new SpaceModifierRepository(facilityId, itemId);
-          break;
-        case 'otherItems':
-          repository = new OtherItemsModifierRepository(facilityId, itemId);
-          break;
-        default:
-          throw ApiError.BadRequest('Invalid item key');
-      }
+      const repository = new ItemModifierRepository(
+        facilityId,
+        itemKey as FacilityIndexKey,
+        itemId
+      );
 
       await repository.delModifier(
         modifierKey as ModifiersKey
