@@ -195,6 +195,57 @@ export class FacilityController {
       next(e);
     }
   };
+
+  // Removes a modifier from the facility
+  removeModifierOfFacility = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { facilityId, modifierKey } = req.params;
+
+      const repository = new FacilityModifierRepository(facilityId);
+      await repository.delModifier(
+        modifierKey as ModifiersKey
+      );
+
+      res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  // Removes modifier of the item: `spaces` or `otherItems`
+  removeModifierOfItem = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { facilityId, itemKey, itemId, modifierKey } = req.params;
+      let repository: SpaceModifierRepository | OtherItemsModifierRepository;
+
+      switch (itemKey) {
+        case 'spaces':
+          repository = new SpaceModifierRepository(facilityId, itemId);
+          break;
+        case 'otherItems':
+          repository = new OtherItemsModifierRepository(facilityId, itemId);
+          break;
+        default:
+          throw ApiError.BadRequest('Invalid item key');
+      }
+
+      await repository.delModifier(
+        modifierKey as ModifiersKey
+      );
+
+      res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  };
 }
 
 export default new FacilityController();

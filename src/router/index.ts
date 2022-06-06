@@ -596,7 +596,7 @@ router.get(
  *     security:
  *       - bearerAuth: []
  *     summary: add modifier to the facility
- *     tags: [Facility service, availability]
+ *     tags: [Facility service, modifiers]
  *     requestBody:
  *       required: true
  *       content:
@@ -632,6 +632,8 @@ router.get(
  *         description: User is not Auth
  *       403:
  *         description: Access denied
+ *       404:
+ *         description: Not Found
  *       500:
  *         description: Some server error
  */
@@ -648,7 +650,7 @@ router.post(
  *     security:
  *       - bearerAuth: []
  *     summary: add modifier to the facility
- *     tags: [Facility service, availability]
+ *     tags: [Facility service, modifiers]
  *     requestBody:
  *       required: true
  *       content:
@@ -697,6 +699,8 @@ router.post(
  *         description: User is not Auth
  *       403:
  *         description: Access denied
+ *       404:
+ *         description: Not Found
  *       500:
  *         description: Some server error
  */
@@ -704,4 +708,111 @@ router.post(
   '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
   authMiddleware,
   facilityController.createItemModifier
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/modifier/{modifierKey}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: remove modifier from the facility
+ *     tags: [Facility service, modifiers]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: modifierKey
+ *         description: The facility modifier key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["day_of_week", "occupancy", "length_of_stay"]
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+ router.delete(
+  '/facility/:facilityId/modifier/:modifierKey',
+  authMiddleware,
+  facilityController.removeModifierOfFacility
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/{itemKey}/{itemId}/modifier/{modifierKey}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: remove modifier of the item kind of space or otherItems
+ *     tags: [Facility service, modifiers]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemKey
+ *         description: Type of item
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["spaces", "otherItems"]
+ *       - in: path
+ *         name: itemId
+ *         description: The item Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: modifierKey
+ *         description: The facility modifier key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["day_of_week", "occupancy", "length_of_stay"]
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+ router.delete(
+  '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
+  authMiddleware,
+  facilityController.removeModifierOfItem
 );
