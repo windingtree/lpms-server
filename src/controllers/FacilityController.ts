@@ -1,5 +1,5 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { AvailabilityDate } from '../services/DBService';
+import type { FormattedDate } from '../services/DBService';
 import { DateTime } from 'luxon';
 import ApiError from '../exceptions/ApiError';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
@@ -16,7 +16,7 @@ export class FacilityController {
 
       const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
       const numSpaces = await repository.getSpaceAvailabilityNumSpaces(
-        date as AvailabilityDate
+        date as FormattedDate
       );
 
       return res.json({ numSpaces });
@@ -41,7 +41,7 @@ export class FacilityController {
 
       const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
       await repository.createAvailabilityByDate(
-        date as AvailabilityDate,
+        date as FormattedDate,
         Number(numSpaces)
       );
 
