@@ -1,6 +1,6 @@
 import DBService, {
-  AvailabilityDate,
-  AvailabilityItemKey,
+  FormattedDate,
+  DefaultOrDateItemKey,
   FacilityItemValues,
   LevelDefaultTyping
 } from '../services/DBService';
@@ -12,7 +12,7 @@ export class SpaceAvailabilityRepository {
   private db: AbstractSublevel<
     AbstractLevel<LevelDefaultTyping, string, FacilityItemValues>,
     LevelDefaultTyping,
-    AvailabilityItemKey,
+    DefaultOrDateItemKey,
     Availability
   >;
 
@@ -27,7 +27,7 @@ export class SpaceAvailabilityRepository {
   // --- availability getters / setters
 
   public async getSpaceAvailability(
-    key: AvailabilityItemKey
+    key: DefaultOrDateItemKey
   ): Promise<Availability> {
     try {
       return await this.db.get(key);
@@ -47,7 +47,7 @@ export class SpaceAvailabilityRepository {
   }
 
   public async setAvailabilityByDate(
-    key: AvailabilityDate,
+    key: FormattedDate,
     availability: Availability
   ): Promise<void> {
     await this.db.put(key, availability);
