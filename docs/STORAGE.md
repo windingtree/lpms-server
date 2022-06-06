@@ -102,11 +102,11 @@ Notes: This meets the requirement (2)
 Parent level: `facilityId` (dynamic)
 Level: `spaceId` (dynamic)
 
-Key: `metadata_generic`
+Key: `metadata`
 Value: `videre.stays.lpms.facility.Item`
 Description: Contains generic data for each item (name, photos etc)
 
-Key: `metadata`
+Key: `metadata_impl`
 Value: `videre.stays.lpms.facility.Space`
 Description: Contains specific metadata for Spaces (views, sleeping arrangements etc).
 
@@ -185,11 +185,24 @@ Notes: This meets the requirement (4)
 #### otherItems
 
 Parent level: `facilityId` (dynamic)
-Level: `otherItems`
+Level: `otherItemdId` (dynamic)
 
-Key: `itemId` (dynamic)
+Key: `metadata` (dynamic)
 Value: `videre.stays.lpms.facility.Item`
 Description: Contains generic data for the item (name, photos, etc)
+
+##### rates
+
+Parent level: `facilityId.otherItemdId` (dynamic)
+Level: `rates`
+
+Key: `default`
+Value: `videre.stays.lpms.Rates`
+Description: Contains the `Rates` message protobuf describing the rate for this item.
+
+Key: `YYYY-MM-DD` (dynamic)
+Value: `videre.stays.lpms.Rates`
+Description: Contains the `Rates` message protobuf for a per-day override of rates.
 
 # CRUD
 
