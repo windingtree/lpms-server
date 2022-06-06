@@ -7,7 +7,12 @@ export class UserRepository {
   private dbService: DBService;
   private db: Level<string, string | string[]>;
   private userDB: AbstractSublevel<DBLevel, LevelDefaultTyping, string, User>;
-  private loginDB: AbstractSublevel<DBLevel, LevelDefaultTyping, string, string>;
+  private loginDB: AbstractSublevel<
+    DBLevel,
+    LevelDefaultTyping,
+    string,
+    string
+  >;
 
   constructor() {
     this.dbService = DBService.getInstance();
@@ -15,7 +20,6 @@ export class UserRepository {
     this.userDB = DBService.getInstance().getUserDB();
     this.loginDB = this.dbService.getLoginDB();
   }
-
 
   public async getAllUsers(): Promise<User[]> {
     return await this.userDB.values().all();

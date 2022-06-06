@@ -1,7 +1,11 @@
 import { AbstractSublevel } from 'abstract-level';
 import { Level } from 'level';
 import { Token, User } from '../types';
-import { Facility, Item, Space } from '../proto/facility';
+import {
+  Facility as FacilityMetadata,
+  Item as ItemMetadata,
+  Space as SpaceMetadata
+} from '../proto/facility';
 import {
   Availability,
   DayOfWeekLOSRule,
@@ -24,10 +28,10 @@ export type FacilityModifiers =
   | DayOfWeekRateModifer
   | OccupancyRateModifier
   | LOSRateModifier;
-export type FacilityLevelValues = Facility | string[];
-export type FacilitySpaceLevelValues = Item | Space;
+export type FacilityValues = FacilityMetadata | string[];
+export type FacilitySpaceValues = ItemMetadata | SpaceMetadata;
 export type FacilityItemType = 'spaces' | 'otherItems';
-export type FacilityItemValues = Item | FacilitySpaceLevelValues;
+export type FacilityItemValues = ItemMetadata | FacilitySpaceValues;
 export type AvailabilityDate = `${number}-${number}-${number}`;
 export type AvailabilityItemKey = 'default' | AvailabilityDate;
 
@@ -95,9 +99,9 @@ export default class DBService {
     return this.db;
   }
 
-  public getFacilitySublevelDB(facilityId: string) {
+  public getFacilityDB(facilityId: string) {
     const prefix = 'f_';
-    return this.db.sublevel<string, FacilityLevelValues>(prefix + facilityId, {
+    return this.db.sublevel<string, FacilityValues>(prefix + facilityId, {
       valueEncoding: 'json'
     });
   }
@@ -108,10 +112,10 @@ export default class DBService {
     itemId: string
   ) {
     const key = `${itemType}_${itemId}`;
-    return this.getFacilitySublevelDB(facilityId).sublevel<
-      string,
-      FacilityItemValues
-    >(key, { valueEncoding: 'json' });
+    return this.getFacilityDB(facilityId).sublevel<string, FacilityItemValues>(
+      key,
+      { valueEncoding: 'json' }
+    );
   }
 
   public getSpaceAvailabilityDB(facilityId: string, itemId: string) {

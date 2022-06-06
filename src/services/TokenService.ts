@@ -1,7 +1,14 @@
 import jwt from 'jsonwebtoken';
-import { accessTokenKey, accessTokenMaxAge, refreshTokenKey, refreshTokenMaxAge } from '../config';
+import {
+  accessTokenKey,
+  accessTokenMaxAge,
+  refreshTokenKey,
+  refreshTokenMaxAge
+} from '../config';
 import { Tokens } from '../types';
-import tokenRepository, { TokenRepository } from '../repositories/TokenRepository';
+import tokenRepository, {
+  TokenRepository
+} from '../repositories/TokenRepository';
 
 export class TokenService {
   private repository: TokenRepository;

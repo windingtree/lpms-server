@@ -165,7 +165,9 @@ describe('test', async () => {
   it('delete users', async () => {
     //todo think about APIs for delete users
     const id = await userRepository.getUserIdByLogin(managerLogin);
-    const anotherUser = await userRepository.getUserIdByLogin(anotherUserForTest);
+    const anotherUser = await userRepository.getUserIdByLogin(
+      anotherUserForTest
+    );
     await userService.deleteUser(Number(id));
     await userService.deleteUser(Number(staffUserId));
     await userService.deleteUser(Number(anotherUser));

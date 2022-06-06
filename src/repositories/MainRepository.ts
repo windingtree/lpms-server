@@ -12,7 +12,7 @@ export class MainRepository {
 
   public async getId(): Promise<number> {
     try {
-      return (Number(await this.db.get('user_db_increment'))) + 1;
+      return Number(await this.db.get('user_db_increment')) + 1;
     } catch (e) {
       if (e.status === 404) {
         return 1;
