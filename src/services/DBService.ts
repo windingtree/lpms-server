@@ -13,7 +13,8 @@ import {
   LOSRateModifier,
   NoticeRequiredRule,
   OccupancyRateModifier,
-  Rates
+  Rates,
+  StubStorage
 } from '../proto/lpms';
 import { Stub } from '../proto/stub';
 import { Person } from '../proto/person';
@@ -33,14 +34,15 @@ export type ModifiersValues =
   | OccupancyRateModifier
   | LOSRateModifier;
 export type ModifiersKey = 'day_of_week' | 'occupancy' | 'length_of_stay';
+export type FacilityKey = 'metadata';
+export type FacilityIndexKey = 'stubs' | 'spaces' | 'otherItems';
 export type FacilityValues = FacilityMetadata | string[];
 export type FacilitySpaceValues = ItemMetadata | SpaceMetadata;
-export type FacilityItemType = 'spaces' | 'otherItems';
 export type FacilityItemValues = ItemMetadata | FacilitySpaceValues;
 export type FormattedDate = `${number}-${number}-${number}`;
 export type DefaultOrDateItemKey = 'default' | FormattedDate;
 export type FacilityStubKey = string | FormattedDate;
-export type FacilityStubValues = string[] | Stub;
+export type FacilityStubValues = string[] | StubStorage;
 export type SpaceStubKey = FormattedDate | `${FormattedDate}-num_booked`;
 export type SpaceStubValues = string[] | number;
 
@@ -117,7 +119,7 @@ export default class DBService {
 
   public getFacilityItemDB(
     facilityId: string,
-    itemType: FacilityItemType,
+    itemType: FacilityIndexKey,
     itemId: string
   ) {
     const key = `${itemType}_${itemId}`;
