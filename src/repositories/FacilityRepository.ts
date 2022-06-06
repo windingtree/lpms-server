@@ -1,5 +1,6 @@
 import DBService, {
-  FacilityItemType,
+  FacilityKey,
+  FacilityIndexKey,
   FacilityValues,
   FacilitySpaceValues
 } from '../services/DBService';
@@ -17,7 +18,7 @@ export class FacilityRepository {
 
   // --- facility index management
 
-  public async getFacilityIds(): Promise<string[]> {
+  public async getAllFacilityIds(): Promise<string[]> {
     try {
       return await this.db.get<string, string[]>('facilities', {
         valueEncoding: 'json'
@@ -31,7 +32,7 @@ export class FacilityRepository {
   }
 
   public async addFacilityToIndex(facilityId: string) {
-    const facilityIds = await this.getFacilityIds();
+    const facilityIds = await this.getAllFacilityIds();
 
     if (facilityIds.length > 0) {
       const ids = new Set<string>(facilityIds);
@@ -43,7 +44,7 @@ export class FacilityRepository {
   }
 
   public async delFacilityFromIndex(facilityId: string) {
-    const facilityIds = await this.getFacilityIds();
+    const facilityIds = await this.getAllFacilityIds();
 
     if (facilityIds.length > 0) {
       const ids = new Set<string>(facilityIds);
@@ -57,7 +58,7 @@ export class FacilityRepository {
 
   public async setFacilityKey(
     facilityId: string,
-    key: string,
+    key: FacilityKey | FacilityIndexKey,
     value: FacilityValues
   ): Promise<void> {
     await this.dbService.getFacilityDB(facilityId).put(key, value);
@@ -65,7 +66,7 @@ export class FacilityRepository {
 
   public async getFacilityKey(
     facilityId: string,
-    key: string
+    key: FacilityKey | FacilityIndexKey
   ): Promise<FacilityValues> {
     try {
       return await this.dbService.getFacilityDB(facilityId).get(key);
@@ -79,14 +80,14 @@ export class FacilityRepository {
 
   // --- items (space and otherItems) index management
 
-  public async getItemIds(
+  public async getAllItemIds(
     facilityId: string,
-    itemType: FacilityItemType
+    idx: FacilityIndexKey
   ): Promise<string[]> {
     try {
       return await this.dbService
         .getFacilityDB(facilityId)
-        .get<string, string[]>(itemType, {
+        .get<string, string[]>(idx, {
           valueEncoding: 'json'
         });
     } catch (e) {
@@ -97,34 +98,34 @@ export class FacilityRepository {
     return [];
   }
 
-  public async addItemToIndex(
+  public async addToIndex(
     facilityId: string,
-    itemType: FacilityItemType,
+    idx: FacilityIndexKey,
     itemId: string
   ): Promise<void> {
-    const itemIds = await this.getItemIds(facilityId, itemType);
+    const itemIds = await this.getAllItemIds(facilityId, idx);
     const db = this.dbService.getFacilityDB(facilityId);
 
     if (itemIds.length > 0) {
       const ids = new Set<string>(itemIds);
       ids.add(itemId);
-      await db.put(itemType, Array.from(ids));
+      await db.put(idx, Array.from(ids));
     } else {
-      await db.put(itemType, [itemId]);
+      await db.put(idx, [itemId]);
     }
   }
 
-  public async delItemFromIndex(
+  public async delFromIndex(
     facilityId: string,
-    itemType: FacilityItemType,
+    idx: FacilityIndexKey,
     itemId: string
   ): Promise<void> {
-    const itemIds = await this.getItemIds(facilityId, itemType);
+    const itemIds = await this.getAllItemIds(facilityId, idx);
 
     if (itemIds.length > 0) {
       const ids = new Set<string>(itemIds);
       if (ids.delete(itemId)) {
-        await this.db.put(itemType, Array.from(ids));
+        await this.db.put(idx, Array.from(ids));
       }
     }
   }
@@ -133,25 +134,25 @@ export class FacilityRepository {
 
   public async setItemKey(
     facilityId: string,
-    itemType: FacilityItemType,
+    idx: FacilityIndexKey,
     itemId: string,
     key: string,
     value: Item | FacilitySpaceValues
   ): Promise<void> {
     await this.dbService
-      .getFacilityItemDB(facilityId, itemType, itemId)
+      .getFacilityItemDB(facilityId, idx, itemId)
       .put(key, value);
   }
 
   public async getItemKey(
     facilityId: string,
-    itemType: FacilityItemType,
+    idx: FacilityIndexKey,
     itemId: string,
     key: string
   ): Promise<Item | FacilitySpaceValues> {
     try {
       return await this.dbService
-        .getFacilityItemDB(facilityId, itemType, itemId)
+        .getFacilityItemDB(facilityId, idx, itemId)
         .get(key);
     } catch (e) {
       if (e.status === 404) {

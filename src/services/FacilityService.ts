@@ -1,6 +1,6 @@
 import { Item } from '../proto/facility';
 import {
-  FacilityItemType,
+  FacilityIndexKey,
   FacilityValues,
   FacilitySpaceValues
 } from './DBService';
@@ -30,11 +30,11 @@ export class FacilityService {
 
   public async setItemDbKeys(
     facilityId: string,
-    itemType: FacilityItemType,
+    itemType: FacilityIndexKey,
     itemId: string,
     entries: [string, Item | FacilitySpaceValues][]
   ): Promise<void> {
-    await this.repository.addItemToIndex(facilityId, itemType, itemId);
+    await this.repository.addToIndex(facilityId, itemType, itemId);
 
     await Promise.all(
       entries.map(([key, value]) =>
