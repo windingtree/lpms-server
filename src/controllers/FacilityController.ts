@@ -41,7 +41,7 @@ export class FacilityController {
 
       const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
       await repository.setAvailabilityByDate(date as FormattedDate, {
-        numSpaces: numSpaces
+        numSpaces: Number(numSpaces)
       });
 
       return res.json({ success: true });
@@ -61,7 +61,7 @@ export class FacilityController {
       const { numSpaces } = req.body;
 
       const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
-      await repository.setAvailabilityDefault({ numSpaces: numSpaces });
+      await repository.setAvailabilityDefault({ numSpaces: Number(numSpaces) });
 
       return res.json({ success: true });
     } catch (e) {
