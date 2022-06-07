@@ -9,7 +9,7 @@ import {
 import {
   Availability,
   DayOfWeekLOSRule,
-  DayOfWeekRateModifer,
+  DayOfWeekRateModifier,
   LOSRateModifier,
   NoticeRequiredRule,
   OccupancyRateModifier,
@@ -29,7 +29,7 @@ export type StringAbstractDB = AbstractSublevel<
 export type Rules = NoticeRequiredRule | DayOfWeekLOSRule;
 export type RulesItemKey = 'notice_required' | 'length_of_stay';
 export type ModifiersValues =
-  | DayOfWeekRateModifer
+  | DayOfWeekRateModifier
   | OccupancyRateModifier
   | LOSRateModifier;
 export type ModifiersKey = 'day_of_week' | 'occupancy' | 'length_of_stay';
