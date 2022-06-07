@@ -10,24 +10,9 @@ import DBService, {
   ModifiersValues
 } from '../services/DBService';
 
-export class ItemModifierRepository {
-  private dbService: DBService;
-  private db: AbstractSublevel<
-    AbstractSublevel<
-      AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
-      LevelDefaultTyping,
-      string,
-      FacilityItemValues
-    >,
-    LevelDefaultTyping,
-    ModifiersKey,
-    ModifiersValues
-  >;
-
-  constructor(facilityId: string, indexKey: FacilityIndexKey, itemId: string) {
-    this.dbService = DBService.getInstance();
-    this.db = this.dbService.getItemModifiersDB(facilityId, indexKey, itemId);
-  }
+abstract class ModifierRepository {
+  protected dbService: DBService = DBService.getInstance();
+  protected db;
 
   public async getModifier(key: ModifiersKey): Promise<ModifiersValues> {
     try {
@@ -49,6 +34,41 @@ export class ItemModifierRepository {
 
   public async delModifier(key: ModifiersKey): Promise<void> {
     await this.db.del(key);
+  }
+}
+
+export class ItemModifierRepository extends ModifierRepository {
+  protected db: AbstractSublevel<
+    AbstractSublevel<
+      AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
+      LevelDefaultTyping,
+      string,
+      FacilityItemValues
+      >,
+    LevelDefaultTyping,
+    ModifiersKey,
+    ModifiersValues
+  >;
+
+  constructor(facilityId: string, indexKey: FacilityIndexKey, itemId: string) {
+    super();
+
+    this.db = this.dbService.getItemModifiersDB(facilityId, indexKey, itemId);
+  }
+}
+
+export class FacilityModifierRepository extends ModifierRepository {
+  protected db: AbstractSublevel<
+    AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
+    LevelDefaultTyping,
+    ModifiersKey,
+    ModifiersValues
+  >;
+
+  constructor(facilityId: string) {
+    super();
+
+    this.db = this.dbService.getFacilityModifiersDB(facilityId);
   }
 }
 

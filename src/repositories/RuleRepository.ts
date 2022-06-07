@@ -7,7 +7,6 @@ import DBService, {
   Rules,
   RulesItemKey
 } from '../services/DBService';
-import ApiError from '../exceptions/ApiError';
 import {  AbstractSublevel } from 'abstract-level';
 
 abstract class RuleRepository {
@@ -18,11 +17,11 @@ abstract class RuleRepository {
     try {
       return await this.db.get(key);
     } catch (e) {
-      if (e.status === 404) {
-        throw ApiError.NotFound(`Unable to get "${key}" of rule level"`);
+      if (e.status !== 404) {
+        throw e;
       }
-      throw e;
     }
+    return null;
   }
 
   public async setRule(key: RulesItemKey, value: Rules): Promise<void> {

@@ -8,8 +8,10 @@ import type {
 import { DateTime } from 'luxon';
 import ApiError from '../exceptions/ApiError';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
-import { FacilityModifierRepository } from '../repositories/FacilityModifierRepository';
-import { ItemModifierRepository } from '../repositories/ItemModifierRegistry';
+import {
+  FacilityModifierRepository,
+  ItemModifierRepository
+} from '../repositories/ModifierRepository';
 
 export class FacilityController {
   // Returns availability of the space
