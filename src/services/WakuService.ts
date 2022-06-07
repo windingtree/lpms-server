@@ -1,24 +1,38 @@
 import { Waku, WakuMessage } from 'js-waku';
 import type { MessageType } from '@protobuf-ts/runtime';
 import { wakuConfig } from '../config';
+import log from './LogService';
 
 export type WakuMessageHandler = (message: WakuMessage) => void;
 
-export class WakuService {
-  public waku: Waku;
+export default class WakuService {
+  protected waku: Waku;
+  private static _instance: WakuService = new WakuService();
 
-  public async connect(): Promise<WakuService> {
-    if (this.waku) {
-      return this;
+  constructor() {
+    if (WakuService._instance) {
+      throw new Error(
+        'Error: Instantiation failed: Use WakuService.getInstance() instead of new'
+      );
     }
 
-    console.log('Connecting to Waku...');
-    const waku = await Waku.create(wakuConfig);
-    await waku.waitForRemotePeer();
-    console.log('...Connected');
+    Waku.create(wakuConfig).then(
+      (waku) => {
+        log.green('Connecting to Waku...');
 
-    this.waku = waku;
-    return this;
+        waku.waitForRemotePeer(undefined, 10000).then(() => {
+          log.green('...Connected');
+          this.waku = waku;
+        });
+      },
+      () => {
+        log.red('...Failed');
+      }
+    );
+  }
+
+  public static getInstance(): WakuService {
+    return WakuService._instance;
   }
 
   public async sendMessage<T extends object>(
@@ -26,10 +40,6 @@ export class WakuService {
     message: T,
     topic: string
   ): Promise<void> {
-    if (!this.waku) {
-      await this.connect();
-    }
-
     const msg = await WakuMessage.fromBytes(
       protoMessageInstance.toBinary(message),
       topic
@@ -49,17 +59,12 @@ export class WakuService {
     messageHandler: WakuMessageHandler,
     topics: string[]
   ) {
-    if (!this.waku) {
-      await this.connect();
-    }
     this.waku.relay.addObserver(messageHandler, topics);
-    console.log('Subscribed to topics:', topics);
+    log.green('Subscribed to topics:' + topics);
 
     return () => {
       this.waku.relay.deleteObserver(messageHandler, topics);
-      console.log('Unsubscribed from topics:', topics);
+      log.yellow('Unsubscribed from topics:' + topics);
     };
   }
 }
-
-export default new WakuService();
