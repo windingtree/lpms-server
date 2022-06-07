@@ -16,6 +16,7 @@ database
 # temp files
 temp
 cache
+.eslintcache
 
 # node
 node_modules
