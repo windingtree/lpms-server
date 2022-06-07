@@ -49,8 +49,7 @@ describe('repository rate test', async () => {
 
   it('set rate', async () => {
     const rate: Rates = {
-      cost: 100,
-      includedOccupancy: 100
+      cost: 100
     }
 
     await spaceRuleRepository.setRateDefault(rate);
