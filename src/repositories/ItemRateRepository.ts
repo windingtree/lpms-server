@@ -41,14 +41,14 @@ abstract class ItemRateRepository {
     }
   }
 
-  public async setRateByDate(
+  public async setRate(
     key: FormattedDate,
     value: Rates
   ): Promise<void> {
     await this.db.put(key, value);
   }
 
-  public async setDefaultRate(value: Rates): Promise<void> {
+  public async setRateDefault(value: Rates): Promise<void> {
     await this.db.put('default', value);
   }
 
