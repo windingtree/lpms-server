@@ -6,6 +6,7 @@ import DBService, {
 } from '../services/DBService';
 import { Level } from 'level';
 import { Item } from '../proto/facility';
+import ApiError from '../exceptions/ApiError';
 
 export class FacilityRepository {
   private dbService: DBService;
@@ -72,7 +73,9 @@ export class FacilityRepository {
       return await this.dbService.getFacilityDB(facilityId).get(key);
     } catch (e) {
       if (e.status === 404) {
-        throw new Error(`Unable to get "${key}" of facility "${facilityId}"`);
+        throw ApiError.NotFound(
+          `Unable to get "${key}" of facility "${facilityId}"`
+        );
       }
       throw e;
     }
@@ -156,7 +159,7 @@ export class FacilityRepository {
         .get(key);
     } catch (e) {
       if (e.status === 404) {
-        throw new Error(
+        throw ApiError.NotFound(
           `Unable to get "${key}" of item "${itemId}" of facility "${facilityId}"`
         );
       }
