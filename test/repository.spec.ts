@@ -34,21 +34,11 @@ describe('facility repository rule test', async () => {
   });
 
   it('check rule not exist', async () => {
-    let error;
+    const result = await facilityRuleRepository.getRule('notice_required');
+    const result2 = await spaceRuleRepository.getRule('notice_required');
 
-    try {
-      await facilityRuleRepository.getRule('notice_required');
-    } catch (e) {
-      error = e;
-    }
-    expect(error.status).to.be.equal(404);
-
-    try {
-      await spaceRuleRepository.getRule('notice_required');
-    } catch (e) {
-      error = e;
-    }
-    expect(error.status).to.be.equal(404);
+    expect(result).to.be.null;
+    expect(result2).to.be.null;
   });
 });
 
@@ -63,7 +53,7 @@ describe('repository rate test', async () => {
       includedOccupancy: 100
     }
 
-    await spaceRuleRepository.setDefaultRate(rate);
+    await spaceRuleRepository.setRateDefault(rate);
   });
 
   it('get rate', async () => {

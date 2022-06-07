@@ -10,42 +10,14 @@ import { AbstractSublevel } from 'abstract-level';
 import { StubStorage } from '../proto/lpms';
 import ApiError from '../exceptions/ApiError';
 
-export class StubRepository {
-  private dbService: DBService;
-  private db: AbstractSublevel<
-    AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
-    LevelDefaultTyping,
-    string,
-    FacilityStubValues
-  >;
-
-  constructor(facilityId: string) {
-    this.dbService = DBService.getInstance();
-    this.db = this.dbService.getFacilityStubsDB(facilityId);
-  }
-
-  // --- availability getters / setters
-
-  public async getStub(key: FacilityStubKey): Promise<FacilityStubValues> {
-    try {
-      return await this.db.get(key);
-    } catch (e) {
-      if (e.status === 404) {
-        throw ApiError.NotFound(`Unable to get "${key}" of stub level"`);
-      }
-      throw e;
-    }
-  }
-
-  public async setStub(key: FacilityStubKey, stub: StubStorage): Promise<void> {
-    await this.db.put(key, stub);
-  }
+export abstract class AbstractStubRepository {
+  protected dbService: DBService = DBService.getInstance();
+  protected db;
 
   // --- daily index management
-
   public async getIndex(idx: FormattedDate): Promise<string[]> {
     try {
-      return await this.db.get<FormattedDate, string[]>(idx, {
+      return await this.db.get(idx, {
         valueEncoding: 'json'
       });
     } catch (e) {
@@ -77,5 +49,37 @@ export class StubRepository {
         await this.db.put(idx, Array.from(ids));
       }
     }
+  }
+}
+
+export class StubRepository extends AbstractStubRepository{
+  protected db: AbstractSublevel<
+    AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
+    LevelDefaultTyping,
+    string,
+    FacilityStubValues
+  >;
+
+  constructor(facilityId: string) {
+    super();
+
+    this.db = this.dbService.getFacilityStubsDB(facilityId);
+  }
+
+  // --- availability getters / setters
+
+  public async getStub(key: FacilityStubKey): Promise<FacilityStubValues> {
+    try {
+      return await this.db.get(key);
+    } catch (e) {
+      if (e.status === 404) {
+        throw ApiError.NotFound(`Unable to get "${key}" of stub level"`);
+      }
+      throw e;
+    }
+  }
+
+  public async setStub(key: FacilityStubKey, stub: StubStorage): Promise<void> {
+    await this.db.put(key, stub);
   }
 }
