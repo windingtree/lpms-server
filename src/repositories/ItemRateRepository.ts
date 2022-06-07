@@ -11,16 +11,19 @@ import ApiError from '../exceptions/ApiError';
 import { AbstractSublevel } from 'abstract-level';
 import { Rates } from '../proto/lpms';
 
-
 abstract class ItemRateRepository {
   protected dbService = DBService.getInstance();
-  protected db: AbstractSublevel<AbstractSublevel<AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
-    LevelDefaultTyping,
-    string,
-    FacilityItemValues>,
+  protected db: AbstractSublevel<
+    AbstractSublevel<
+      AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
+      LevelDefaultTyping,
+      string,
+      FacilityItemValues
+    >,
     LevelDefaultTyping,
     DefaultOrDateItemKey,
-    Rates>;
+    Rates
+  >;
 
   protected constructor(
     facilityId: string,
@@ -41,10 +44,7 @@ abstract class ItemRateRepository {
     }
   }
 
-  public async setRate(
-    key: FormattedDate,
-    value: Rates
-  ): Promise<void> {
+  public async setRate(key: FormattedDate, value: Rates): Promise<void> {
     await this.db.put(key, value);
   }
 

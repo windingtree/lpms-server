@@ -44,7 +44,7 @@ export class ItemModifierRepository extends ModifierRepository {
       LevelDefaultTyping,
       string,
       FacilityItemValues
-      >,
+    >,
     LevelDefaultTyping,
     ModifiersKey,
     ModifiersValues

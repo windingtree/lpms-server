@@ -52,7 +52,7 @@ export abstract class AbstractStubRepository {
   }
 }
 
-export class StubRepository extends AbstractStubRepository{
+export class StubRepository extends AbstractStubRepository {
   protected db: AbstractSublevel<
     AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
     LevelDefaultTyping,

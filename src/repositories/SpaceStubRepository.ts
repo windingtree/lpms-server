@@ -9,7 +9,7 @@ import {
 import { AbstractSublevel } from 'abstract-level';
 import { AbstractStubRepository } from './StubRepository';
 
-export class SpaceStubRepository extends AbstractStubRepository{
+export class SpaceStubRepository extends AbstractStubRepository {
   protected db: AbstractSublevel<
     AbstractSublevel<
       AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
