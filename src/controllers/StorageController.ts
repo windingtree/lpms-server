@@ -12,7 +12,7 @@ import { web3StorageKey, typedDataDomain } from '../config';
 import { walletAccountsIndexes } from '../types';
 import { Facility, Item, ItemType, Space } from '../proto/facility';
 import facilityService from '../services/FacilityService';
-import { FacilitySpaceLevelValues } from 'src/services/DBService';
+import { FacilitySpaceValues } from 'src/services/DBService';
 const { readFile } = promises;
 
 export class StorageController {
@@ -75,7 +75,7 @@ export class StorageController {
       ]);
 
       // Extract spaces from metadata
-      const spaces: Record<string, [string, FacilitySpaceLevelValues][]> = {};
+      const spaces: Record<string, [string, FacilitySpaceValues][]> = {};
       const otherItems: Record<string, [string, Item][]> = {};
 
       for (const item of serviceProviderData.items) {
@@ -84,11 +84,14 @@ export class StorageController {
 
         if (type === ItemType.SPACE) {
           spaces[itemId] = [
-            ['metadata_generic', generic as Item],
-            ['metadata', (payload ? Space.fromBinary(payload) : {}) as Space]
+            ['metadata', generic as Item],
+            [
+              'metadata_impl',
+              (payload ? Space.fromBinary(payload) : {}) as Space
+            ]
           ];
         } else {
-          otherItems[itemId] = [['metadata_generic', generic as Item]];
+          otherItems[itemId] = [['metadata', generic as Item]];
         }
       }
 
