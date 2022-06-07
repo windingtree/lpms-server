@@ -1651,10 +1651,10 @@
   resolved "https://registry.yarnpkg.com/@web3-storage/parse-link-header/-/parse-link-header-3.1.0.tgz#4562724987649dd6d3e07c87be1826804d212ef7"
   integrity sha512-K1undnK70vLLauqdE8bq/l98isTF2FDhcP0UPpXVSjkSWe3xhAn5eRXk5jfA1E5ycNm84Ws/rQFUD7ue11nciw==
 
-"@windingtree/stays-models@^2.0.1":
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/@windingtree/stays-models/-/stays-models-2.0.1.tgz#27e3bdb0907fefbdff1577c112ade3d37d85ca52"
-  integrity sha512-idvgsYvXsjUMNf3LH6XAZinH676EDVXA+t3txDxkWY5vlikFhw3kmrMD63QjgQjHoXhMikYM8r08AXsZD1YU5w==
+"@windingtree/stays-models@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@windingtree/stays-models/-/stays-models-2.0.2.tgz#bf157abbea53c8f858151ec31389cfe11b374302"
+  integrity sha512-s5BW5d36Gmnw7a8mczpXmxSP1A+1NNCWiHWqBz9hODuliuLPaDQjWL0DCiVZJXvT107xX3sLzSaYE/eDR6NtMA==
   dependencies:
     "@protobuf-ts/runtime" "^2.6.0"
     zlib "^1.0.5"
@@ -1666,13 +1666,14 @@
   dependencies:
     "@openzeppelin/contracts" "^4.5.0"
 
-"@windingtree/videre-sdk@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@windingtree/videre-sdk/-/videre-sdk-0.5.0.tgz#29967c206b5f96fec74572388c660fe98330ff6c"
-  integrity sha512-+rHZFcWEN7z7+F4rzBJc9EEPZuWs86dzaWAXRosbibMH92tlQZYv5KAB6VAoPz3K+gasx786Wzr2/PGqkUsIsg==
+"@windingtree/videre-sdk@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@windingtree/videre-sdk/-/videre-sdk-0.6.0.tgz#cb4120252ea1ba783b7f2a8aa98571f73bbfa696"
+  integrity sha512-yTk0FQlBb3Vhy+ICNkPZ5ZEppYBuh1s0gO+rft8BH8wIdRY+tPX44DauBS3q2zBmc0oyxM8bCw48NBFyxG5AOg==
   dependencies:
     "@protobuf-ts/runtime" "^2.5.0"
     ethers "^5.6.5"
+    h3-js "^3.7.2"
 
 "@zxing/text-encoding@0.9.0":
   version "0.9.0"
@@ -2307,6 +2308,13 @@ cborg@^1.3.3, cborg@^1.5.4, cborg@^1.6.0, cborg@^1.8.0:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/cborg/-/cborg-1.9.3.tgz#672f4dbcd7149f07de3317848cbab43b20a63d2a"
   integrity sha512-TbdsdV0zs0pOBet7KHu6G+JDnx7DcHcpc2ggNxbyJ+bqA09UGflSJKBLGOqsQy6vM9xzHkrChrz5eRYtzAN3Dw==
+
+chai-ethers@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/chai-ethers/-/chai-ethers-0.0.1.tgz#2dcc2d3251a07ea42ac37923b976198cccad3f1c"
+  integrity sha512-yajwk1BSf+lO2LzV+vra/iKukiUJcfD2aEVBZRWmaIJr0kI0eI1s6VF47qoXNolYxg0bf/SAlHSfwaPZWKBVyQ==
+  dependencies:
+    ethers "^5.0.0"
 
 chai@^4.3.6:
   version "4.3.6"
@@ -3494,6 +3502,42 @@ etag@~1.8.1:
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha1-Qa4u62XvpiJorr/qg6x9eSmbCIc=
 
+ethers@^5.0.0, ethers@^5.6.8:
+  version "5.6.8"
+  resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.6.8.tgz#d36b816b4896341a80a8bbd2a44e8cb6e9b98dd4"
+  integrity sha512-YxIGaltAOdvBFPZwIkyHnXbW40f1r8mHUgapW6dxkO+6t7H6wY8POUn0Kbxrd/N7I4hHxyi7YCddMAH/wmho2w==
+  dependencies:
+    "@ethersproject/abi" "5.6.3"
+    "@ethersproject/abstract-provider" "5.6.1"
+    "@ethersproject/abstract-signer" "5.6.2"
+    "@ethersproject/address" "5.6.1"
+    "@ethersproject/base64" "5.6.1"
+    "@ethersproject/basex" "5.6.1"
+    "@ethersproject/bignumber" "5.6.2"
+    "@ethersproject/bytes" "5.6.1"
+    "@ethersproject/constants" "5.6.1"
+    "@ethersproject/contracts" "5.6.2"
+    "@ethersproject/hash" "5.6.1"
+    "@ethersproject/hdnode" "5.6.2"
+    "@ethersproject/json-wallets" "5.6.1"
+    "@ethersproject/keccak256" "5.6.1"
+    "@ethersproject/logger" "5.6.0"
+    "@ethersproject/networks" "5.6.3"
+    "@ethersproject/pbkdf2" "5.6.1"
+    "@ethersproject/properties" "5.6.0"
+    "@ethersproject/providers" "5.6.8"
+    "@ethersproject/random" "5.6.1"
+    "@ethersproject/rlp" "5.6.1"
+    "@ethersproject/sha2" "5.6.1"
+    "@ethersproject/signing-key" "5.6.2"
+    "@ethersproject/solidity" "5.6.1"
+    "@ethersproject/strings" "5.6.1"
+    "@ethersproject/transactions" "5.6.2"
+    "@ethersproject/units" "5.6.1"
+    "@ethersproject/wallet" "5.6.2"
+    "@ethersproject/web" "5.6.1"
+    "@ethersproject/wordlists" "5.6.1"
+
 ethers@^5.6.5:
   version "5.6.5"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.6.5.tgz#3185ac7815dc640993408adf6f133ffabfbcbb63"
@@ -3529,42 +3573,6 @@ ethers@^5.6.5:
     "@ethersproject/wallet" "5.6.0"
     "@ethersproject/web" "5.6.0"
     "@ethersproject/wordlists" "5.6.0"
-
-ethers@^5.6.8:
-  version "5.6.8"
-  resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.6.8.tgz#d36b816b4896341a80a8bbd2a44e8cb6e9b98dd4"
-  integrity sha512-YxIGaltAOdvBFPZwIkyHnXbW40f1r8mHUgapW6dxkO+6t7H6wY8POUn0Kbxrd/N7I4hHxyi7YCddMAH/wmho2w==
-  dependencies:
-    "@ethersproject/abi" "5.6.3"
-    "@ethersproject/abstract-provider" "5.6.1"
-    "@ethersproject/abstract-signer" "5.6.2"
-    "@ethersproject/address" "5.6.1"
-    "@ethersproject/base64" "5.6.1"
-    "@ethersproject/basex" "5.6.1"
-    "@ethersproject/bignumber" "5.6.2"
-    "@ethersproject/bytes" "5.6.1"
-    "@ethersproject/constants" "5.6.1"
-    "@ethersproject/contracts" "5.6.2"
-    "@ethersproject/hash" "5.6.1"
-    "@ethersproject/hdnode" "5.6.2"
-    "@ethersproject/json-wallets" "5.6.1"
-    "@ethersproject/keccak256" "5.6.1"
-    "@ethersproject/logger" "5.6.0"
-    "@ethersproject/networks" "5.6.3"
-    "@ethersproject/pbkdf2" "5.6.1"
-    "@ethersproject/properties" "5.6.0"
-    "@ethersproject/providers" "5.6.8"
-    "@ethersproject/random" "5.6.1"
-    "@ethersproject/rlp" "5.6.1"
-    "@ethersproject/sha2" "5.6.1"
-    "@ethersproject/signing-key" "5.6.2"
-    "@ethersproject/solidity" "5.6.1"
-    "@ethersproject/strings" "5.6.1"
-    "@ethersproject/transactions" "5.6.2"
-    "@ethersproject/units" "5.6.1"
-    "@ethersproject/wallet" "5.6.2"
-    "@ethersproject/web" "5.6.1"
-    "@ethersproject/wordlists" "5.6.1"
 
 event-iterator@^2.0.0:
   version "2.0.0"
@@ -4178,6 +4186,11 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.9:
   version "4.2.10"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
   integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
+
+h3-js@^3.7.2:
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/h3-js/-/h3-js-3.7.2.tgz#61d4feb7bb42868ca9cdb2d5cf9d9dda94f9e5a3"
+  integrity sha512-LPjlHSwB9zQZrMqKloCZmmmt3yZzIK7nqPcXqwU93zT3TtYG6jP4tZBzAPouxut7lLjdFbMQ75wRBiKfpsnY7w==
 
 hamt-sharding@^2.0.0:
   version "2.0.1"
