@@ -95,6 +95,7 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-markdown": "^2.2.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-promise": "^6.0.0",
@@ -113,6 +114,9 @@
     "typescript": "^4.7.2"
   },
   "lint-staged": {
-    "*.ts,*.js": ["eslint --cache --fix", "prettier --write"]
+    "*.{ts,js,sol,json}": [
+      "eslint --cache --fix",
+      "prettier --write"
+    ]
   }
 }
