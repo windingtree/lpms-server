@@ -169,13 +169,6 @@ export default class DBService {
     >('rates', { valueEncoding: 'json' });
   }
 
-  public getSpaceRulesDB(facilityId: string, spaceId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<
-      RulesItemKey,
-      Rules
-    >('rules', { valueEncoding: 'json' });
-  }
-
   public getSpaceStubsDB(facilityId: string, spaceId: string) {
     return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<
       SpaceStubKey,
@@ -192,5 +185,16 @@ export default class DBService {
       ModifiersKey,
       ModifiersValues
     >('modifiers', { valueEncoding: 'json' });
+  }
+
+  public getItemRulesDB(
+    facilityId: string,
+    indexKey: FacilityIndexKey,
+    itemId: string
+  ) {
+    return this.getFacilityItemDB(facilityId, indexKey, itemId).sublevel<
+      RulesItemKey,
+      Rules
+      >('rules', { valueEncoding: 'json' });
   }
 }
