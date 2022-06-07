@@ -7,7 +7,7 @@ import DBService, {
   Rules,
   RulesItemKey
 } from '../services/DBService';
-import {  AbstractSublevel } from 'abstract-level';
+import { AbstractSublevel } from 'abstract-level';
 
 abstract class RuleRepository {
   protected db;
@@ -33,7 +33,6 @@ abstract class RuleRepository {
   }
 }
 
-
 abstract class ItemRuleRepository extends RuleRepository {
   protected db: AbstractSublevel<
     AbstractSublevel<
@@ -47,7 +46,11 @@ abstract class ItemRuleRepository extends RuleRepository {
     Rules
   >;
 
-  protected constructor(facilityId: string, indexKey: FacilityIndexKey, itemId: string) {
+  protected constructor(
+    facilityId: string,
+    indexKey: FacilityIndexKey,
+    itemId: string
+  ) {
     super();
 
     this.db = this.dbService.getItemRulesDB(facilityId, indexKey, itemId);
