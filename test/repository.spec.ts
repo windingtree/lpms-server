@@ -1,8 +1,9 @@
 import { FacilityRuleRepository, SpaceRuleRepository } from '../src/repositories/RuleRepository';
-import { NoticeRequiredRule } from '../src/proto/lpms';
+import { NoticeRequiredRule, Rates } from '../src/proto/lpms';
 import { expect } from 'chai';
+import { SpaceRateRepository } from '../src/repositories/ItemRateRepository';
 
-describe('facility repository test', async () => {
+describe('facility repository rule test', async () => {
   const facilityId = '0x1234567890';
   const spaceId = '0x1234567890';
   const facilityRuleRepository = new FacilityRuleRepository(facilityId);
@@ -18,8 +19,10 @@ describe('facility repository test', async () => {
   });
 
   it('get rule', async () => {
-    const rule = await facilityRuleRepository.getRule('notice_required') as NoticeRequiredRule;
-    const spaceRule = await spaceRuleRepository.getRule('notice_required') as NoticeRequiredRule;
+    const rule = await facilityRuleRepository.getRule('notice_required')as
+      NoticeRequiredRule;
+    const spaceRule = await spaceRuleRepository.getRule('notice_required') as
+      NoticeRequiredRule;
 
     expect(rule.numDays).to.be.equal(10);
     expect(spaceRule.numDays).to.be.equal(10);
@@ -42,6 +45,42 @@ describe('facility repository test', async () => {
 
     try {
       await spaceRuleRepository.getRule('notice_required');
+    } catch (e) {
+      error = e;
+    }
+    expect(error.status).to.be.equal(404);
+  });
+});
+
+describe('repository rate test', async () => {
+  const facilityId = '0x1234567890';
+  const spaceId = '0x1234567890';
+  const spaceRuleRepository = new SpaceRateRepository(facilityId, spaceId);
+
+  it('set rate', async () => {
+    const rate: Rates = {
+      cost: 100,
+      includedOccupancy: 100
+    }
+
+    await spaceRuleRepository.setDefaultRate(rate);
+  });
+
+  it('get rate', async () => {
+    const spaceRate = await spaceRuleRepository.getRate('default');
+
+    expect(spaceRate?.cost).to.be.equal(100);
+  });
+
+  it('delete rate', async () => {
+    await spaceRuleRepository.delRate('default');
+  });
+
+  it('check rate not exist', async () => {
+    let error;
+
+    try {
+      await spaceRuleRepository.getRate('default');
     } catch (e) {
       error = e;
     }
