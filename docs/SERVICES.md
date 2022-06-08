@@ -94,6 +94,13 @@ async quote(facilityId: string, spaceId: string, ask: Ask): BigNumber
          ii.    facilityId.modifiers.occupancy; else
          iii.   none
 
+         When applying the modifier, it's anticipated that APs will want to charge
+         more per additional occupant as this use case exists within industry
+         already. Generally this would be a 'fixed' additional fee per occupant
+         over the base rate of 1 occupant. Using a 'ratio' additional fee however
+         would allow an AP to have a policy such that they could say: "I want a
+         15% fee on the room rate for each additional occupant.".
+
     After steps a-c are applied, this results in the `adjustedDailyRate`. This is then added to the `totalCost`.
 
 2.  Apply `length_of_stay` modifier, in order of priority:
