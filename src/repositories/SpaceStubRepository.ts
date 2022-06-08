@@ -48,4 +48,8 @@ export class SpaceStubRepository extends AbstractStubRepository {
   ): Promise<void> {
     await this.db.put(key, value);
   }
+
+  public async delNumBookedByDate(key: SpaceStubKey): Promise<void> {
+    await this.db.del(key);
+  }
 }

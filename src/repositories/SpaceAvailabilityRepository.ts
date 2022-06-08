@@ -51,4 +51,8 @@ export class SpaceAvailabilityRepository {
   ): Promise<void> {
     await this.db.put(key, availability);
   }
+
+  public async delAvailability(key: DefaultOrDateItemKey): Promise<void> {
+    await this.db.del(key);
+  }
 }

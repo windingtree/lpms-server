@@ -166,6 +166,15 @@ export class FacilityRepository {
       throw e;
     }
   }
+
+  public async delItemKey(
+    facilityId: string,
+    idx: FacilityIndexKey,
+    itemId: string,
+    key: string
+  ): Promise<void> {
+    await this.dbService.getFacilityItemDB(facilityId, idx, itemId).del(key);
+  }
 }
 
 export default new FacilityRepository();
