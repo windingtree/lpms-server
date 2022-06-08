@@ -11,6 +11,7 @@ import { FormattedDate, RulesItemKey } from './DBService';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
 import { SpaceStubRepository } from '../repositories/SpaceStubRepository';
 import ApiError from '../exceptions/ApiError';
+import { getSecondsFromDays } from '../utils';
 
 export class SearchService {
   protected facilityRuleRepository: FacilityRuleRepository;
@@ -81,8 +82,8 @@ export class SearchService {
       throw ApiError.BadRequest('invalid dates in ask');
     }
 
-    let from = DateTime.fromObject(this.ask.checkIn);
-    const to = DateTime.fromObject(this.ask.checkOut);
+    let from = DateTime.fromObject(this.ask.checkIn, { zone: 'utc' });
+    const to = DateTime.fromObject(this.ask.checkOut, { zone: 'utc' });
     const dates: DateTime[] = [];
 
     while (from <= to) {
@@ -109,15 +110,15 @@ export class SearchService {
 
     const firstDay = dates[0];
 
-    const today = DateTime.now();
+    const today = DateTime.now().setZone('utc');
     const interval = Interval.fromDateTimes(today, firstDay).toDuration([
       'days'
     ]);
 
-    if (
-      noticeRequirementRule &&
-      noticeRequirementRule.numDays > interval.get('days')
-    ) {
+    const ruleSeconds = getSecondsFromDays(noticeRequirementRule.numDays);
+    const intervalSeconds = getSecondsFromDays(interval.get('days'));
+
+    if (noticeRequirementRule && ruleSeconds > intervalSeconds) {
       return false;
     }
 
