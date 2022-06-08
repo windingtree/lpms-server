@@ -1666,13 +1666,14 @@
   dependencies:
     "@openzeppelin/contracts" "^4.5.0"
 
-"@windingtree/videre-sdk@^0.5.0":
-  version "0.5.0"
-  resolved "https://registry.yarnpkg.com/@windingtree/videre-sdk/-/videre-sdk-0.5.0.tgz#29967c206b5f96fec74572388c660fe98330ff6c"
-  integrity sha512-+rHZFcWEN7z7+F4rzBJc9EEPZuWs86dzaWAXRosbibMH92tlQZYv5KAB6VAoPz3K+gasx786Wzr2/PGqkUsIsg==
+"@windingtree/videre-sdk@^0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@windingtree/videre-sdk/-/videre-sdk-0.6.0.tgz#cb4120252ea1ba783b7f2a8aa98571f73bbfa696"
+  integrity sha512-yTk0FQlBb3Vhy+ICNkPZ5ZEppYBuh1s0gO+rft8BH8wIdRY+tPX44DauBS3q2zBmc0oyxM8bCw48NBFyxG5AOg==
   dependencies:
     "@protobuf-ts/runtime" "^2.5.0"
     ethers "^5.6.5"
+    h3-js "^3.7.2"
 
 "@zxing/text-encoding@0.9.0":
   version "0.9.0"
@@ -4178,6 +4179,11 @@ graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.2.0, graceful-fs@^4.2.9:
   version "4.2.10"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
   integrity sha512-9ByhssR2fPVsNZj478qUUbKfmL0+t5BDVyjShtyZZLiK7ZDAArFFfopyOTj0M05wE2tJPisA4iTnnXl2YoPvOA==
+
+h3-js@^3.7.2:
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/h3-js/-/h3-js-3.7.2.tgz#61d4feb7bb42868ca9cdb2d5cf9d9dda94f9e5a3"
+  integrity sha512-LPjlHSwB9zQZrMqKloCZmmmt3yZzIK7nqPcXqwU93zT3TtYG6jP4tZBzAPouxut7lLjdFbMQ75wRBiKfpsnY7w==
 
 hamt-sharding@^2.0.0:
   version "2.0.1"
