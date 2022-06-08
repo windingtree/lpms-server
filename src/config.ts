@@ -1,4 +1,5 @@
 import type { TypedDataDomain } from '@ethersproject/abstract-signer';
+import { VidereConfig } from '@windingtree/videre-sdk';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -36,9 +37,13 @@ export const defaultManagerLogin = 'manager';
 export const defaultManagerPassword = 'winwin';
 export const web3StorageKey = process.env.WEB3STORAGE_KEY as string;
 export const wakuConfig = { bootstrap: { default: true } };
+export const videreConfig: VidereConfig = {
+  line: 'stays',
+  version: 1
+};
 export const typedDataDomain: TypedDataDomain = {
-  name: 'stays',
-  version: '1',
+  name: videreConfig.line,
+  version: String(videreConfig.version),
   verifyingContract: String(process.env.APP_VERIFYING_CONTRACT),
   chainId: Number(process.env.APP_CHAIN_ID)
 };
