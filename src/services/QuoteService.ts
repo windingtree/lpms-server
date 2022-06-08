@@ -113,7 +113,7 @@ export class QuoteService {
               .div(BigNumber.from(losSpaceModifier.valueOneof.ratio.q));
             break;
           case 'fixed':
-            rate = BigNumber.from(losSpaceModifier.valueOneof.fixed);
+            rate = rate.add(BigNumber.from(losSpaceModifier.valueOneof.fixed));
             break;
           default:
         }
@@ -164,7 +164,7 @@ export class QuoteService {
               .div(BigNumber.from(modifier.valueOneof.ratio.q));
             break;
           case 'fixed':
-            rate = BigNumber.from(modifier.valueOneof.fixed);
+            rate = rate.add(BigNumber.from(modifier.valueOneof.fixed));
             break;
           default:
         }

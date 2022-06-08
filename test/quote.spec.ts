@@ -269,7 +269,9 @@ describe('QuoteService', () => {
             expect(value).to.eq(
               calcOccupancyRatio(
                 // fixed 20
-                BigNumber.from((dowModifier.tue as any).valueOneof.fixed),
+                BigNumber.from(normalRate.cost).add(
+                  BigNumber.from((dowModifier.tue as any).valueOneof.fixed)
+                ),
                 totalNumberOccupants,
                 (occupancyModifierRatio as any).valueOneof.ratio.p,
                 (occupancyModifierRatio as any).valueOneof.ratio.q
@@ -313,7 +315,7 @@ describe('QuoteService', () => {
     it('should return quote', async () => {
       const quote = await quoteService.quote(facilityId, spaceId, ask);
       // Stupid Check
-      expect(quote).to.eq(BigNumber.from(194));
+      expect(quote).to.eq(BigNumber.from(302));
     });
   });
 });
