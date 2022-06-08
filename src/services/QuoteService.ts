@@ -4,6 +4,7 @@ import { FormattedDate } from './DBService';
 import { Ask } from '../proto/ask';
 import { Date } from '../proto/date';
 import {
+  Condition,
   DayOfWeekRateModifier,
   DayOfWeekRateModifierElement,
   LOSRateModifier,
@@ -86,19 +87,19 @@ export class QuoteService {
       let applicable = false;
 
       switch (losSpaceModifier.condition) {
-        case 0:
+        case Condition.LT:
           applicable = daysTotal < losSpaceModifier.los;
           break;
-        case 1:
+        case Condition.LTE:
           applicable = daysTotal <= losSpaceModifier.los;
           break;
-        case 2:
+        case Condition.EQ:
           applicable = daysTotal === losSpaceModifier.los;
           break;
-        case 3:
+        case Condition.GTE:
           applicable = daysTotal >= losSpaceModifier.los;
           break;
-        case 4:
+        case Condition.GT:
           applicable = daysTotal > losSpaceModifier.los;
           break;
         default:
