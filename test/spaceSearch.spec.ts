@@ -34,7 +34,7 @@ describe('search service test', async () => {
   const toDate = DateTime.now().plus({ days: 8 });
   const formattedDate = fromDate.toFormat('yyyy-MM-dd') as FormattedDate;
 
-  async function init() {
+  beforeEach(async () => {
     const space: Space = {
       uris: [
         {
@@ -179,7 +179,7 @@ describe('search service test', async () => {
       `${formattedDate}-num_booked`,
       0
     );
-  }
+  });
 
   function getAsk(): Ask {
     return {
@@ -200,7 +200,6 @@ describe('search service test', async () => {
   }
 
   it('check search', async () => {
-    await init();
     const search = new SearchService(facilityId, getAsk());
     const result = await search.search();
 
@@ -258,7 +257,6 @@ describe('search service test', async () => {
   });
 
   it('change max day rule', async () => {
-    await init();
     const rule: DayOfWeekLOSRule = {};
     rule[fromDate.toFormat('ccc').toLowerCase()] = {
       minLengthOfStay: 1,
@@ -277,8 +275,6 @@ describe('search service test', async () => {
   });
 
   it('change notice_required rule', async () => {
-    await init();
-
     await spaceRuleRepository.setRule('notice_required', {
       numDays: 1
     });
@@ -296,8 +292,6 @@ describe('search service test', async () => {
   });
 
   it('change num booked', async () => {
-    await init();
-
     await spaceStubRepository.setNumBookedByDate(
       `${formattedDate}-num_booked`,
       10
