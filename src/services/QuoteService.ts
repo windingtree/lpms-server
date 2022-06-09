@@ -57,26 +57,16 @@ export class QuoteService {
     checkIn: Date,
     checkOut: Date
   ): Promise<BigNumber> => {
-    let losSpaceModifier: undefined | LOSRateModifier;
+    let losSpaceModifier: null | LOSRateModifier;
 
-    try {
-      losSpaceModifier = (await modifiers.getModifier(
+    losSpaceModifier = await modifiers.getModifier<LOSRateModifier>(
+      'length_of_stay'
+    );
+
+    if (!losSpaceModifier) {
+      losSpaceModifier = await facilityModifiers.getModifier<LOSRateModifier>(
         'length_of_stay'
-      )) as LOSRateModifier;
-    } catch (e) {
-      if (e.status !== 404) {
-        throw e;
-      }
-
-      try {
-        losSpaceModifier = (await facilityModifiers.getModifier(
-          'length_of_stay'
-        )) as LOSRateModifier;
-      } catch (e) {
-        if (e.status !== 404) {
-          throw e;
-        }
-      }
+      );
     }
 
     if (losSpaceModifier) {
@@ -129,26 +119,17 @@ export class QuoteService {
     { modifiers, facilityModifiers }: QuoteRepositories,
     day: DateTime
   ): Promise<BigNumber> => {
-    let dowSpaceModifier: undefined | DayOfWeekRateModifier;
+    let dowSpaceModifier: null | DayOfWeekRateModifier;
 
-    try {
-      dowSpaceModifier = (await modifiers.getModifier(
-        'day_of_week'
-      )) as DayOfWeekRateModifier;
-    } catch (e) {
-      if (e.status !== 404) {
-        throw e;
-      }
+    dowSpaceModifier = await modifiers.getModifier<DayOfWeekRateModifier>(
+      'day_of_week'
+    );
 
-      try {
-        dowSpaceModifier = (await facilityModifiers.getModifier(
+    if (!dowSpaceModifier) {
+      dowSpaceModifier =
+        await facilityModifiers.getModifier<DayOfWeekRateModifier>(
           'day_of_week'
-        )) as DayOfWeekRateModifier;
-      } catch (e) {
-        if (e.status !== 404) {
-          throw e;
-        }
-      }
+        );
     }
 
     if (dowSpaceModifier) {
@@ -181,26 +162,15 @@ export class QuoteService {
     numPaxAdult: number,
     numPaxChild?: number
   ): Promise<BigNumber> => {
-    let occupancySpaceModifier: undefined | OccupancyRateModifier;
+    let occupancySpaceModifier: null | OccupancyRateModifier;
 
-    try {
-      occupancySpaceModifier = (await modifiers.getModifier(
-        'occupancy'
-      )) as OccupancyRateModifier;
-    } catch (e) {
-      if (e.status !== 404) {
-        throw e;
-      }
+    occupancySpaceModifier = await modifiers.getModifier<OccupancyRateModifier>(
+      'occupancy'
+    );
 
-      try {
-        occupancySpaceModifier = (await facilityModifiers.getModifier(
-          'occupancy'
-        )) as OccupancyRateModifier;
-      } catch (e) {
-        if (e.status !== 404) {
-          throw e;
-        }
-      }
+    if (!occupancySpaceModifier) {
+      occupancySpaceModifier =
+        await facilityModifiers.getModifier<OccupancyRateModifier>('occupancy');
     }
 
     if (occupancySpaceModifier) {
