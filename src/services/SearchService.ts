@@ -50,12 +50,17 @@ export class SearchService {
       const set = new Set();
 
       for (const v of spacesIds) {
-        const space = await facilityRepository.getItemKey(
+        const space = await facilityRepository.getItemKey<Space>(
           this.facilityId,
           'spaces',
           v,
           'metadata'
         );
+
+        if (space === null) {
+          throw ApiError.NotFound(`Unable to find "metadata" for space: ${v}`);
+        }
+
         set.add({ space, id: v });
       }
 

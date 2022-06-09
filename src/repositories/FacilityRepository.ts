@@ -6,7 +6,6 @@ import DBService, {
 } from '../services/DBService';
 import { Level } from 'level';
 import { Item } from '../proto/facility';
-import ApiError from '../exceptions/ApiError';
 
 export class FacilityRepository {
   private dbService: DBService;
@@ -65,20 +64,18 @@ export class FacilityRepository {
     await this.dbService.getFacilityDB(facilityId).put(key, value);
   }
 
-  public async getFacilityKey(
+  public async getFacilityKey<T extends FacilityValues>(
     facilityId: string,
     key: FacilityKey | FacilityIndexKey
-  ): Promise<FacilityValues> {
+  ): Promise<T | null> {
     try {
-      return await this.dbService.getFacilityDB(facilityId).get(key);
+      return (await this.dbService.getFacilityDB(facilityId).get(key)) as T;
     } catch (e) {
-      if (e.status === 404) {
-        throw ApiError.NotFound(
-          `Unable to get "${key}" of facility "${facilityId}"`
-        );
+      if (e.status !== 404) {
+        throw e;
       }
-      throw e;
     }
+    return null;
   }
 
   public async delFacilityKey(
@@ -154,24 +151,22 @@ export class FacilityRepository {
       .put(key, value);
   }
 
-  public async getItemKey(
+  public async getItemKey<T extends Item | FacilitySpaceValues>(
     facilityId: string,
     idx: FacilityIndexKey,
     itemId: string,
     key: string
-  ): Promise<Item | FacilitySpaceValues> {
+  ): Promise<T | null> {
     try {
-      return await this.dbService
+      return (await this.dbService
         .getFacilityItemDB(facilityId, idx, itemId)
-        .get(key);
+        .get(key)) as T;
     } catch (e) {
-      if (e.status === 404) {
-        throw ApiError.NotFound(
-          `Unable to get "${key}" of item "${itemId}" of facility "${facilityId}"`
-        );
+      if (e.status !== 404) {
+        throw e;
       }
-      throw e;
     }
+    return null;
   }
 
   public async delItemKey(

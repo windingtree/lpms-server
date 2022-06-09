@@ -10,12 +10,13 @@ import log from './LogService';
 import WakuService from './WakuService';
 import WalletService from './WalletService';
 
-import { walletAccountsIndexes } from 'src/types';
-import { Facility } from 'src/proto/facility';
-import { Ping, Pong } from 'src/proto/pingpong';
-import { LatLng } from 'src/proto/latlng';
+import { walletAccountsIndexes } from '../types';
+import { Facility } from '../proto/facility';
+import { Ping, Pong } from '../proto/pingpong';
+import { LatLng } from '../proto/latlng';
 
 import { typedDataDomain, videreConfig } from '../config';
+import ApiError from '../exceptions/ApiError';
 
 export default class PingPongService {
   protected waku: WakuService;
@@ -28,10 +29,17 @@ export default class PingPongService {
    * for a specified facility.
    */
   public async start(facilityId: string): Promise<void> {
-    const metadata: Facility = (await facilityRepository.getFacilityKey(
+    const metadata = await facilityRepository.getFacilityKey<Facility>(
       facilityId,
       'metadata'
-    )) as Facility;
+    );
+
+    if (metadata === null) {
+      throw ApiError.NotFound(
+        `Unable to find "metadata" of the facility: ${facilityId}`
+      );
+    }
+
     const loc = metadata.location;
 
     if (!this.waku) this.waku = WakuService.getInstance();
