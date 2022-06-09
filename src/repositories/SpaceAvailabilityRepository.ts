@@ -25,7 +25,7 @@ export class SpaceAvailabilityRepository {
 
   public async getSpaceAvailability(
     key: DefaultOrDateItemKey
-  ): Promise<Availability> {
+  ): Promise<Availability | null> {
     try {
       return await this.db.get(key);
     } catch (e) {
@@ -33,10 +33,7 @@ export class SpaceAvailabilityRepository {
         throw e;
       }
     }
-
-    return {
-      numSpaces: 0
-    };
+    return null;
   }
 
   public async setAvailabilityDefault(

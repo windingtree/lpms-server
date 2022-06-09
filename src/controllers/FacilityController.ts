@@ -24,11 +24,17 @@ export class FacilityController {
       const { facilityId, spaceId, date } = req.params;
 
       const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
-      const numSpaces = await repository.getSpaceAvailability(
+      const availability = await repository.getSpaceAvailability(
         date as FormattedDate
       );
 
-      return res.json({ numSpaces });
+      if (!availability) {
+        throw ApiError.NotFound(
+          `Unable to get availability of space: ${spaceId} of the facility: ${facilityId}`
+        );
+      }
+
+      return res.json(availability);
     } catch (e) {
       next(e);
     }
