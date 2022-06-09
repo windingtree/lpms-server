@@ -2,7 +2,7 @@ import {
   FacilityRuleRepository,
   SpaceRuleRepository
 } from '../src/repositories/RuleRepository';
-import { Exception, Space, SpaceTier } from '../src/proto/facility';
+import { Exception, Facility, Space, SpaceTier } from '../src/proto/facility';
 import { ContactType } from '../src/proto/contact';
 import { FacilityRepository } from '../src/repositories/FacilityRepository';
 import { SpaceAvailabilityRepository } from '../src/repositories/SpaceAvailabilityRepository';
@@ -13,6 +13,7 @@ import { expect } from 'chai';
 import { SearchService } from '../src/services/SearchService';
 import { DayOfWeekLOSRule } from '../src/proto/lpms';
 import { FormattedDate } from '../src/services/DBService';
+import { convertDaysToSeconds } from '../src/utils';
 
 describe('search service test', async () => {
   const facilityId = '0x1234567890';
@@ -34,7 +35,50 @@ describe('search service test', async () => {
   const toDate = DateTime.now().plus({ days: 8 });
   const formattedDate = fromDate.toFormat('yyyy-MM-dd') as FormattedDate;
 
-  beforeEach(async () => {
+  before(async () => {
+    const facility: Facility = {
+      name: 'Awesome ski chalet',
+      description: 'Some chalet in the best place of all! 🏔️',
+      location: {
+        latitude: 43.0335,
+        longitude: 42.6895
+      },
+      policies: {
+        timezone: 'Asia/Almaty',
+        currencyCode: 'xDAI',
+        checkInTimeOneof: { oneofKind: 'checkInTime', checkInTime: '1500' },
+        checkOutTimeOneof: { oneofKind: 'checkOutTime', checkOutTime: '1000' }
+      },
+      photos: [
+        { uri: '/image1.jpg', description: 'Chic guesthouse' },
+        { uri: '/image2.jpg', description: 'Winter Wonderland' }
+      ],
+      uris: [
+        {
+          uri: 'https://wonderland.somewhere/',
+          typeOneof: { oneofKind: 'type', type: ContactType.WORK }
+        }
+      ],
+      emails: [
+        {
+          email: 'example@example.com',
+          typeOneof: { oneofKind: 'type', type: ContactType.WORK }
+        }
+      ],
+      phones: [
+        {
+          number: '0123456789',
+          typeOneof: { oneofKind: 'type', type: ContactType.WORK }
+        }
+      ],
+      connectivity: {
+        wifiAvailableOneof: { oneofKind: 'wifiAvailable', wifiAvailable: true },
+        wifiForFreeOneof: { oneofKind: 'wifiForFree', wifiForFree: true }
+      }
+    };
+
+    await facilityRepo.setFacilityKey(facilityId, 'metadata', facility);
+
     const space: Space = {
       uris: [
         {
@@ -149,7 +193,9 @@ describe('search service test', async () => {
       'metadata',
       space
     );
+  });
 
+  beforeEach(async () => {
     await spaceAvailabilityRepository.setAvailabilityDefault({
       numSpaces: 10
     });
@@ -164,13 +210,13 @@ describe('search service test', async () => {
     };
 
     await facilityRuleRepository.setRule('notice_required', {
-      numDays: 0
+      value: 0
     });
 
     await facilityRuleRepository.setRule('length_of_stay', rule);
 
     await spaceRuleRepository.setRule('notice_required', {
-      numDays: 0
+      value: 0
     });
 
     await spaceRuleRepository.setRule('length_of_stay', rule);
@@ -276,11 +322,11 @@ describe('search service test', async () => {
 
   it('change notice_required rule', async () => {
     await spaceRuleRepository.setRule('notice_required', {
-      numDays: 1
+      value: convertDaysToSeconds(2)
     });
 
     await facilityRuleRepository.setRule('notice_required', {
-      numDays: 1
+      value: convertDaysToSeconds(2)
     });
 
     const ask = getAsk();
@@ -306,6 +352,7 @@ describe('search service test', async () => {
   });
 
   it('delete all data', async () => {
+    await facilityRepo.delFacilityKey(facilityId, 'metadata');
     await facilityRepo.delFromIndex(facilityId, 'spaces', spaceId);
     await facilityRepo.delFromIndex(facilityId, 'spaces', spaceId2);
     await facilityRepo.delItemKey(facilityId, 'spaces', spaceId, 'metadata');

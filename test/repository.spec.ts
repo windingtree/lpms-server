@@ -14,7 +14,7 @@ describe('facility repository rule test', async () => {
 
   it('set rule', async () => {
     const rule: NoticeRequiredRule = {
-      numDays: 10
+      value: 10
     };
 
     await facilityRuleRepository.setRule('notice_required', rule);
@@ -29,8 +29,8 @@ describe('facility repository rule test', async () => {
       'notice_required'
     )) as NoticeRequiredRule;
 
-    expect(rule.numDays).to.be.equal(10);
-    expect(spaceRule.numDays).to.be.equal(10);
+    expect(rule.value).to.be.equal(10);
+    expect(spaceRule.value).to.be.equal(10);
   });
 
   it('delete rule', async () => {
