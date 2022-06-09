@@ -50,53 +50,53 @@ export class QuoteService {
     checkIn: Date,
     checkOut: Date
   ): Promise<BigNumber> => {
-    let losSpaceModifier: null | LOSRateModifier;
+    let losModifier: null | LOSRateModifier;
 
-    losSpaceModifier = await modifiers.getModifier<LOSRateModifier>(
+    losModifier = await modifiers.getModifier<LOSRateModifier>(
       'length_of_stay'
     );
 
-    if (!losSpaceModifier) {
-      losSpaceModifier = await facilityModifiers.getModifier<LOSRateModifier>(
+    if (!losModifier) {
+      losModifier = await facilityModifiers.getModifier<LOSRateModifier>(
         'length_of_stay'
       );
     }
 
-    if (losSpaceModifier) {
+    if (losModifier) {
       const daysTotal = DateTime.fromObject(checkOut).diff(
         DateTime.fromObject(checkIn),
         'days'
       ).days;
       let applicable = false;
 
-      switch (losSpaceModifier.condition) {
+      switch (losModifier.condition) {
         case Condition.LT:
-          applicable = daysTotal < losSpaceModifier.los;
+          applicable = daysTotal < losModifier.los;
           break;
         case Condition.LTE:
-          applicable = daysTotal <= losSpaceModifier.los;
+          applicable = daysTotal <= losModifier.los;
           break;
         case Condition.EQ:
-          applicable = daysTotal === losSpaceModifier.los;
+          applicable = daysTotal === losModifier.los;
           break;
         case Condition.GTE:
-          applicable = daysTotal >= losSpaceModifier.los;
+          applicable = daysTotal >= losModifier.los;
           break;
         case Condition.GT:
-          applicable = daysTotal > losSpaceModifier.los;
+          applicable = daysTotal > losModifier.los;
           break;
         default:
       }
 
       if (applicable) {
-        switch (losSpaceModifier.valueOneof.oneofKind) {
+        switch (losModifier.valueOneof.oneofKind) {
           case 'ratio':
             rate = rate
-              .mul(BigNumber.from(losSpaceModifier.valueOneof.ratio.p))
-              .div(BigNumber.from(losSpaceModifier.valueOneof.ratio.q));
+              .mul(BigNumber.from(losModifier.valueOneof.ratio.p))
+              .div(BigNumber.from(losModifier.valueOneof.ratio.q));
             break;
           case 'fixed':
-            rate = rate.add(BigNumber.from(losSpaceModifier.valueOneof.fixed));
+            rate = rate.add(BigNumber.from(losModifier.valueOneof.fixed));
             break;
           default:
         }
@@ -112,21 +112,20 @@ export class QuoteService {
     { modifiers, facilityModifiers }: QuoteRepositories,
     day: DateTime
   ): Promise<BigNumber> => {
-    let dowSpaceModifier: null | DayOfWeekRateModifier;
+    let dowModifier: null | DayOfWeekRateModifier;
 
-    dowSpaceModifier = await modifiers.getModifier<DayOfWeekRateModifier>(
+    dowModifier = await modifiers.getModifier<DayOfWeekRateModifier>(
       'day_of_week'
     );
 
-    if (!dowSpaceModifier) {
-      dowSpaceModifier =
-        await facilityModifiers.getModifier<DayOfWeekRateModifier>(
-          'day_of_week'
-        );
+    if (!dowModifier) {
+      dowModifier = await facilityModifiers.getModifier<DayOfWeekRateModifier>(
+        'day_of_week'
+      );
     }
 
-    if (dowSpaceModifier) {
-      const modifier = dowSpaceModifier[
+    if (dowModifier) {
+      const modifier = dowModifier[
         day.weekdayShort.toLocaleLowerCase()
       ] as DayOfWeekRateModifierElement;
 
@@ -155,33 +154,29 @@ export class QuoteService {
     numPaxAdult: number,
     numPaxChild?: number
   ): Promise<BigNumber> => {
-    let occupancySpaceModifier: null | OccupancyRateModifier;
+    let occupancyModifier: null | OccupancyRateModifier;
 
-    occupancySpaceModifier = await modifiers.getModifier<OccupancyRateModifier>(
+    occupancyModifier = await modifiers.getModifier<OccupancyRateModifier>(
       'occupancy'
     );
 
-    if (!occupancySpaceModifier) {
-      occupancySpaceModifier =
+    if (!occupancyModifier) {
+      occupancyModifier =
         await facilityModifiers.getModifier<OccupancyRateModifier>('occupancy');
     }
 
-    if (occupancySpaceModifier) {
+    if (occupancyModifier) {
       const totalNumberOccupants = (numPaxAdult || 1) + (numPaxChild || 0);
 
-      switch (occupancySpaceModifier.valueOneof.oneofKind) {
+      switch (occupancyModifier.valueOneof.oneofKind) {
         case 'ratio':
           rate = rate.add(
             BigNumber.from(totalNumberOccupants)
               .sub(BigNumber.from(1))
               .mul(
                 rate
-                  .mul(
-                    BigNumber.from(occupancySpaceModifier.valueOneof.ratio.p)
-                  )
-                  .div(
-                    BigNumber.from(occupancySpaceModifier.valueOneof.ratio.q)
-                  )
+                  .mul(BigNumber.from(occupancyModifier.valueOneof.ratio.p))
+                  .div(BigNumber.from(occupancyModifier.valueOneof.ratio.q))
                   .sub(rate)
               )
           );
@@ -190,7 +185,7 @@ export class QuoteService {
           rate = rate.add(
             BigNumber.from(totalNumberOccupants)
               .sub(BigNumber.from(1))
-              .mul(BigNumber.from(occupancySpaceModifier.valueOneof.fixed))
+              .mul(BigNumber.from(occupancyModifier.valueOneof.fixed))
           );
           break;
         default:
