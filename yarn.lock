@@ -1681,10 +1681,10 @@
   resolved "https://registry.yarnpkg.com/@web3-storage/parse-link-header/-/parse-link-header-3.1.0.tgz#4562724987649dd6d3e07c87be1826804d212ef7"
   integrity sha512-K1undnK70vLLauqdE8bq/l98isTF2FDhcP0UPpXVSjkSWe3xhAn5eRXk5jfA1E5ycNm84Ws/rQFUD7ue11nciw==
 
-"@windingtree/stays-models@^2.1.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@windingtree/stays-models/-/stays-models-2.1.0.tgz#8b7290cd1a94b5d6106f4e46391e728a764bd309"
-  integrity sha512-CChkeQlXxUYxvr2RH7HNUCg5XbePKykmMIKYiXlho/dXe063zU95WgOH7y9fOycI084mbpqtAs5XrVARzYzRZg==
+"@windingtree/stays-models@^2.1.1":
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/@windingtree/stays-models/-/stays-models-2.1.1.tgz#0b599034860b7e1384855f13bd473471c081bdf9"
+  integrity sha512-hZXS+OkfITqiD1rEO7cGi48WM6NFcGvJXOqOoGbj1xfRfK2UTHEcsoagMO0sn0Y2ZPqU62Cx1i0QEI1mjYHaQw==
   dependencies:
     "@protobuf-ts/runtime" "^2.6.0"
     zlib "^1.0.5"
