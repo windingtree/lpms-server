@@ -168,7 +168,7 @@ describe('QuoteService', () => {
             reposClear,
             DateTime.fromObject(ask.checkIn as Date)
           )
-        ).to.be.rejectedWith('Unable to get "default" of rate level');
+        ).to.be.rejectedWith('Unable to get base for the space');
       });
     });
 
