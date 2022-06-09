@@ -71,13 +71,6 @@ describe('repository rate test', async () => {
   });
 
   it('check rate not exist', async () => {
-    let error;
-
-    try {
-      await spaceRuleRepository.getRate('default');
-    } catch (e) {
-      error = e;
-    }
-    expect(error.status).to.be.equal(404);
+    expect(await spaceRuleRepository.getRate('default')).to.be.null;
   });
 });

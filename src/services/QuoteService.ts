@@ -29,22 +29,16 @@ export class QuoteService {
     { rates }: QuoteRepositories,
     day: DateTime
   ): Promise<BigNumber> => {
-    let baseRate: Rates | null;
+    let baseRate = await rates.getRate(
+      day.toFormat('yyyy-MM-dd') as FormattedDate
+    );
 
-    try {
-      baseRate = await rates.getRate(
-        day.toFormat('yyyy-MM-dd') as FormattedDate
-      );
-    } catch (e) {
-      if (e.status !== 404) {
-        throw e;
-      }
-
+    if (!baseRate) {
       baseRate = await rates.getRate('default');
     }
 
     if (!baseRate) {
-      throw new Error('Unable to get base rate for the space');
+      throw new Error('Unable to get base for the space');
     }
 
     return BigNumber.from(baseRate.cost);

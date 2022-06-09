@@ -38,7 +38,6 @@ export class SpaceStubRepository extends AbstractStubRepository {
         throw e;
       }
     }
-
     return 0;
   }
 

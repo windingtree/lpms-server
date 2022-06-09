@@ -13,11 +13,11 @@ export class TokenRepository {
     try {
       return await this.db.get(String(userId));
     } catch (e) {
-      if (e.status === 404) {
-        return [];
+      if (e.status !== 404) {
+        throw e;
       }
-      throw e;
     }
+    return [];
   }
 
   public async setUserTokens(
