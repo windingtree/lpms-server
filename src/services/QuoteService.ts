@@ -8,8 +8,7 @@ import {
   DayOfWeekRateModifier,
   DayOfWeekRateModifierElement,
   LOSRateModifier,
-  OccupancyRateModifier,
-  Rates
+  OccupancyRateModifier
 } from '../proto/lpms';
 import { SpaceRateRepository } from '../repositories/ItemRateRepository';
 import {

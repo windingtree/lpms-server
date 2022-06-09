@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { expect } from './chai-setup';
 import { DateTime } from 'luxon';
 import { FormattedDate } from '../src/services/DBService';
