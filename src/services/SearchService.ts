@@ -9,7 +9,7 @@ import {
   SpaceRuleRepository
 } from '../repositories/RuleRepository';
 import { DayOfWeekLOSRule, NoticeRequiredRule } from '../proto/lpms';
-import { FormattedDate, RulesItemKey } from './DBService';
+import { FormattedDate, Rules, RulesItemKey } from './DBService';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
 import { SpaceStubRepository } from '../repositories/SpaceStubRepository';
 import ApiError from '../exceptions/ApiError';
@@ -143,10 +143,10 @@ export class SearchService {
       spaceId
     );
 
-    const noticeRequirementRule = (await this.getRule(
+    const noticeRequirementRule = await this.getRule<NoticeRequiredRule>(
       'notice_required',
       spaceRuleRepository
-    )) as NoticeRequiredRule;
+    );
 
     const firstDay = dates[0];
 
@@ -165,40 +165,42 @@ export class SearchService {
     }
 
     const formattedFirstDay = firstDay.toFormat('ccc').toLowerCase();
-    const lOSRule = (await this.getRule(
+    const lOSRule = await this.getRule<DayOfWeekLOSRule>(
       'length_of_stay',
       spaceRuleRepository,
       formattedFirstDay
-    )) as DayOfWeekLOSRule;
+    );
 
     const lOS = dates.length;
     let minLOS = 0;
     let maxLOS = 0;
 
-    try {
-      minLOS = lOSRule[formattedFirstDay]?.minLengthOfStay || 0;
-    } catch (e) {
-      //rule not exist
-    }
+    if (lOSRule) {
+      try {
+        minLOS = lOSRule[formattedFirstDay]?.minLengthOfStay || 0;
+      } catch (e) {
+        //rule not exist
+      }
 
-    try {
-      maxLOS = lOSRule[formattedFirstDay]?.maxLengthOfStay || 0;
-    } catch (e) {
-      //rule not exist
+      try {
+        maxLOS = lOSRule[formattedFirstDay]?.maxLengthOfStay || 0;
+      } catch (e) {
+        //rule not exist
+      }
     }
 
     return (minLOS === 0 || lOS > minLOS) && (maxLOS === 0 || lOS < maxLOS);
   }
 
-  private async getRule(
+  private async getRule<T extends Rules>(
     ruleName: RulesItemKey,
     spaceRuleRepository: SpaceRuleRepository,
     weekDay: null | string = null
-  ) {
-    let rule = await spaceRuleRepository.getRule(ruleName);
+  ): Promise<T | null> {
+    let rule = await spaceRuleRepository.getRule<T>(ruleName);
 
     if (!rule || (weekDay && !(weekDay in rule))) {
-      rule = await this.facilityRuleRepository.getRule(ruleName);
+      rule = await this.facilityRuleRepository.getRule<T>(ruleName);
     }
 
     return rule;
