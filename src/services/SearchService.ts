@@ -252,9 +252,15 @@ export class SearchService {
       spaceId
     );
 
-    const defaultAvailable = await availabilityRepository.getSpaceAvailability(
+    let defaultAvailable = await availabilityRepository.getSpaceAvailability(
       'default'
     );
+
+    if (!defaultAvailable) {
+      defaultAvailable = {
+        numSpaces: 0
+      };
+    }
 
     for (const date of dates) {
       try {
@@ -264,7 +270,7 @@ export class SearchService {
           formattedDate
         );
 
-        if (available.numSpaces === 0) {
+        if (!available) {
           available = defaultAvailable;
         }
 
