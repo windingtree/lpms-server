@@ -1,6 +1,8 @@
 import { Ask } from '../proto/ask';
-import facilityRepository from '../repositories/FacilityRepository';
-import { Space } from '../proto/facility';
+import facilityRepository, {
+  FacilityRepository
+} from '../repositories/FacilityRepository';
+import { Facility, Space } from '../proto/facility';
 import { DateTime, Interval } from 'luxon';
 import {
   FacilityRuleRepository,
@@ -11,20 +13,34 @@ import { FormattedDate, RulesItemKey } from './DBService';
 import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
 import { SpaceStubRepository } from '../repositories/SpaceStubRepository';
 import ApiError from '../exceptions/ApiError';
-import { getSecondsFromDays } from '../utils';
+import { convertDaysToSeconds } from '../utils';
 
 export class SearchService {
   protected facilityRuleRepository: FacilityRuleRepository;
   protected facilityId: string;
   protected ask: Ask;
+  protected facilityRepository: FacilityRepository;
+  protected facility: Facility;
+  private checkInTime: string;
 
   constructor(facilityId: string, ask: Ask) {
     this.facilityRuleRepository = new FacilityRuleRepository(facilityId);
+    this.facilityRepository = new FacilityRepository();
     this.facilityId = facilityId;
     this.ask = ask;
   }
 
   public search = async (): Promise<string[]> => {
+    this.facility = (await this.facilityRepository.getFacilityKey(
+      this.facilityId,
+      'metadata'
+    )) as Facility;
+
+    this.checkInTime =
+      this.facility.policies?.checkInTimeOneof.oneofKind === 'checkInTime'
+        ? this.facility.policies.checkInTimeOneof.checkInTime
+        : 'utc';
+
     const spacesIds = await facilityRepository.getFacilityKey(
       this.facilityId,
       'spaces'
@@ -82,8 +98,27 @@ export class SearchService {
       throw ApiError.BadRequest('invalid dates in ask');
     }
 
-    let from = DateTime.fromObject(this.ask.checkIn, { zone: 'utc' });
-    const to = DateTime.fromObject(this.ask.checkOut, { zone: 'utc' });
+    const checkIn = DateTime.fromFormat(this.checkInTime, 'hhmm', {
+      zone: this.facility.policies?.timezone
+    }).setZone('utc');
+
+    let from = DateTime.fromObject(
+      {
+        ...this.ask.checkIn,
+        hour: checkIn.hour,
+        minute: checkIn.minute
+      },
+      { zone: 'utc' }
+    );
+    const to = DateTime.fromObject(
+      {
+        ...this.ask.checkOut,
+        hour: checkIn.hour,
+        minute: checkIn.minute
+      },
+      { zone: 'utc' }
+    );
+
     const dates: DateTime[] = [];
 
     while (from <= to) {
@@ -110,15 +145,17 @@ export class SearchService {
 
     const firstDay = dates[0];
 
-    const today = DateTime.now().setZone('utc');
-    const interval = Interval.fromDateTimes(today, firstDay).toDuration([
+    const checkIn = DateTime.now().setZone('utc');
+    const interval = Interval.fromDateTimes(checkIn, firstDay).toDuration([
       'days'
     ]);
 
-    const ruleSeconds = getSecondsFromDays(noticeRequirementRule.numDays);
-    const intervalSeconds = getSecondsFromDays(interval.get('days'));
+    const intervalSeconds = convertDaysToSeconds(interval.get('days'));
 
-    if (noticeRequirementRule && ruleSeconds > intervalSeconds) {
+    if (
+      noticeRequirementRule &&
+      noticeRequirementRule.value > intervalSeconds
+    ) {
       return false;
     }
 

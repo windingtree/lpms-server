@@ -55,7 +55,7 @@ export class FacilityRepository {
     }
   }
 
-  // --- facility level getters / setters
+  // --- facility level getters / setters / del
 
   public async setFacilityKey(
     facilityId: string,
@@ -79,6 +79,13 @@ export class FacilityRepository {
       }
       throw e;
     }
+  }
+
+  public async delFacilityKey(
+    facilityId: string,
+    key: FacilityKey | FacilityIndexKey
+  ): Promise<void> {
+    await this.dbService.getFacilityDB(facilityId).del(key);
   }
 
   // --- items (space and otherItems) index management
