@@ -13,9 +13,9 @@ abstract class RuleRepository {
   protected db;
   protected dbService = DBService.getInstance();
 
-  public async getRule(key: RulesItemKey): Promise<Rules | null> {
+  public async getRule<T extends Rules>(key: RulesItemKey): Promise<T | null> {
     try {
-      return await this.db.get(key);
+      return (await this.db.get(key)) as T;
     } catch (e) {
       if (e.status !== 404) {
         throw e;
