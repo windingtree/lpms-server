@@ -92,6 +92,12 @@ export class FacilityController {
         modifierKey as ModifiersKey
       );
 
+      if (!modifier) {
+        throw ApiError.NotFound(
+          `Unable to get "${modifierKey}" of the facility: ${facilityId}`
+        );
+      }
+
       res.json(modifier);
     } catch (e) {
       next(e);
@@ -113,19 +119,19 @@ export class FacilityController {
         itemId
       );
 
-      let modifier: ModifiersValues;
+      let modifier = await repository.getModifier(modifierKey as ModifiersKey);
 
-      try {
-        modifier = await repository.getModifier(modifierKey as ModifiersKey);
-      } catch (e) {
-        if (e.status !== 404) {
-          throw e;
-        }
-
+      if (!modifier) {
         // If item does not contain such modifier then try to lookup the facility
         const facilityRepository = new FacilityModifierRepository(facilityId);
         modifier = await facilityRepository.getModifier(
           modifierKey as ModifiersKey
+        );
+      }
+
+      if (!modifier) {
+        throw ApiError.NotFound(
+          `Unable to get "${modifierKey}" of the "${itemKey}": ${itemId} of the facility: ${facilityId}`
         );
       }
 

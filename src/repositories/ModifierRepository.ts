@@ -1,5 +1,4 @@
 import { AbstractSublevel } from 'abstract-level';
-import ApiError from '../exceptions/ApiError';
 import DBService, {
   DBLevel,
   LevelDefaultTyping,
@@ -14,15 +13,17 @@ abstract class ModifierRepository {
   protected dbService: DBService = DBService.getInstance();
   protected db;
 
-  public async getModifier(key: ModifiersKey): Promise<ModifiersValues> {
+  public async getModifier<T extends ModifiersValues>(
+    key: ModifiersKey
+  ): Promise<T | null> {
     try {
-      return await this.db.get(key);
+      return (await this.db.get(key)) as T;
     } catch (e) {
-      if (e.status === 404) {
-        throw ApiError.NotFound(`Unable to get "${key}" of modifier level"`);
+      if (e.status !== 404) {
+        throw e;
       }
-      throw e;
     }
+    return null;
   }
 
   public async setModifier(
