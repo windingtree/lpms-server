@@ -39,7 +39,7 @@ export class SearchService {
     this.checkInTime =
       this.facility.policies?.checkInTimeOneof.oneofKind === 'checkInTime'
         ? this.facility.policies.checkInTimeOneof.checkInTime
-        : 'utc';
+        : '1500'; //todo think about default checkin time
 
     const spacesIds = await facilityRepository.getFacilityKey(
       this.facilityId,
@@ -148,12 +148,10 @@ export class SearchService {
       spaceRuleRepository
     );
 
-    const firstDay = dates[0];
+    const checkIn = dates[0];
 
-    const checkIn = DateTime.now().setZone('utc');
-    const interval = Interval.fromDateTimes(checkIn, firstDay).toDuration([
-      'days'
-    ]);
+    const now = DateTime.now().setZone('utc');
+    const interval = Interval.fromDateTimes(now, checkIn).toDuration(['days']);
 
     const intervalSeconds = convertDaysToSeconds(interval.get('days'));
 
@@ -164,11 +162,11 @@ export class SearchService {
       return false;
     }
 
-    const formattedFirstDay = firstDay.toFormat('ccc').toLowerCase();
+    const formattedCheckInDay = checkIn.toFormat('ccc').toLowerCase();
     const lOSRule = await this.getRule<DayOfWeekLOSRule>(
       'length_of_stay',
       spaceRuleRepository,
-      formattedFirstDay
+      formattedCheckInDay
     );
 
     const lOS = dates.length;
@@ -177,19 +175,19 @@ export class SearchService {
 
     if (lOSRule) {
       try {
-        minLOS = lOSRule[formattedFirstDay]?.minLengthOfStay || 0;
+        minLOS = lOSRule[formattedCheckInDay]?.minLengthOfStay || 0;
       } catch (e) {
         //rule not exist
       }
 
       try {
-        maxLOS = lOSRule[formattedFirstDay]?.maxLengthOfStay || 0;
+        maxLOS = lOSRule[formattedCheckInDay]?.maxLengthOfStay || 0;
       } catch (e) {
         //rule not exist
       }
     }
 
-    return (minLOS === 0 || lOS > minLOS) && (maxLOS === 0 || lOS < maxLOS);
+    return lOS > minLOS && lOS < maxLOS;
   }
 
   private async getRule<T extends Rules>(
@@ -207,19 +205,19 @@ export class SearchService {
   }
 
   private checkSuitableQuantity(space: Space) {
-    const numOfAdults =
+    const maxNumOfAdults =
       space.maxNumberOfAdultOccupantsOneof.oneofKind ===
       'maxNumberOfAdultOccupants'
         ? space.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
         : 0;
 
-    const numOfChildren =
+    const maxNumOfChildren =
       space.maxNumberOfChildOccupantsOneof.oneofKind ===
       'maxNumberOfChildOccupants'
         ? space.maxNumberOfChildOccupantsOneof.maxNumberOfChildOccupants
         : 0;
 
-    const guestCheck = numOfAdults - this.ask.numPaxAdult;
+    const guestCheck = maxNumOfAdults - this.ask.numPaxAdult;
 
     if (guestCheck < 0) {
       return false;
@@ -227,7 +225,7 @@ export class SearchService {
 
     //if there is a place left from an adult, we give it to a child
     const childrenCheck =
-      numOfChildren + guestCheck - (this.ask.numPaxChild || 0);
+      maxNumOfChildren + guestCheck - (this.ask.numPaxChild || 0);
 
     if (childrenCheck < 0) {
       return false;
@@ -252,15 +250,9 @@ export class SearchService {
       spaceId
     );
 
-    let defaultAvailable = await availabilityRepository.getSpaceAvailability(
+    const defaultAvailable = await availabilityRepository.getSpaceAvailability(
       'default'
     );
-
-    if (!defaultAvailable) {
-      defaultAvailable = {
-        numSpaces: 0
-      };
-    }
 
     for (const date of dates) {
       try {
@@ -272,6 +264,10 @@ export class SearchService {
 
         if (!available) {
           available = defaultAvailable;
+        }
+
+        if (!available) {
+          return false;
         }
 
         const numBooked = await spaceStubRepository.getNumBookedByDate(

@@ -126,7 +126,7 @@ export class QuoteService {
 
     if (dowModifier) {
       const modifier = dowModifier[
-        day.weekdayShort.toLocaleLowerCase()
+        day.toFormat('ccc').toLocaleLowerCase()
       ] as DayOfWeekRateModifierElement;
 
       if (modifier) {
