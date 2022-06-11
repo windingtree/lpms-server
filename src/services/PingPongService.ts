@@ -5,7 +5,8 @@ import WakuService from './WakuService';
 import WalletService from './WalletService';
 import { walletAccountsIndexes } from '../types';
 import { Ping, Pong } from '../proto/pingpong';
-import { typedDataDomain, videreConfig } from '../config';
+
+import { lineRegistryDataDomain, videreConfig } from '../config';
 import { getCurrentTimestamp } from '../utils';
 
 const unsubscribeHandler: () => void = () => {
@@ -54,7 +55,7 @@ export class PingPongService {
         this.waku.sendMessage(
           Pong,
           await vUtils.createSignedMessage<Pong>(
-            typedDataDomain,
+            lineRegistryDataDomain,
             eip712.pingpong.Pong,
             {
               serviceProvider: utils.arrayify(facilityId),

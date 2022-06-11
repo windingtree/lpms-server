@@ -16,6 +16,6 @@
     "composite": true,
     "skipLibCheck": true
   },
-  "include": ["./src", "./test", "./swagger"],
+  "include": ["./src", "./test", "./swagger", "./typechain-videre"],
   "types": ["reflect-metadata", "swagger-express-ts"]
 }
