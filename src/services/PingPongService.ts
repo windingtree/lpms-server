@@ -8,6 +8,7 @@ import { Ping, Pong } from '../proto/pingpong';
 
 import { lineRegistryDataDomain, videreConfig } from '../config';
 import { getCurrentTimestamp } from '../utils';
+import { FacilityServiceInterface } from './interfaces/FacilityServiceInterface';
 
 const unsubscribeHandler: () => void = () => {
   return;
@@ -18,7 +19,7 @@ interface Unsubscribe {
   handler: typeof unsubscribeHandler;
 }
 
-export class PingPongService {
+export class PingPongService implements FacilityServiceInterface {
   protected waku: WakuService;
 
   protected unsubscribes = new Map<string, Unsubscribe>();
