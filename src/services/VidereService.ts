@@ -5,14 +5,14 @@ import { Facility } from '../proto/facility';
 import ApiError from '../exceptions/ApiError';
 import { geoToH3 } from 'h3-js';
 import { constants } from '@windingtree/videre-sdk/dist/cjs/utils';
-import { FacilityServiceInterface } from './interfaces/FacilityServiceInterface';
+import { AbstractFacilityService } from './interfaces/AbstractFacilityService';
 import { checkFacilityRegister, verifyFacilityBidder } from '../utils';
 
 export class VidereService {
   private services = new Map<string, PingPongService | AuctioneerService>();
   private facilityIds = new Set<string>();
 
-  public async addService(service: FacilityServiceInterface): Promise<void> {
+  public async addService(service: AbstractFacilityService): Promise<void> {
     if (!this.services.has(service.constructor.name)) {
       if (this.facilityIds.size > 0) {
         for (const facilityId in this.facilityIds) {
@@ -25,7 +25,7 @@ export class VidereService {
     }
   }
 
-  public async delService(service: FacilityServiceInterface): Promise<void> {
+  public async delService(service: AbstractFacilityService): Promise<void> {
     if (this.services.has(service.constructor.name)) {
       for (const facilityId in this.facilityIds) {
         await service.stop(facilityId);
