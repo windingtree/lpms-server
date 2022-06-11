@@ -1,3 +1,4 @@
+import { Server as HttpServer } from 'http';
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -9,11 +10,12 @@ import errorMiddleware from '../middlewares/ErrorMiddleware';
 import { debugEnabled } from '../config';
 import responseTime from 'response-time';
 import { MetricsService } from './MetricsService';
+import { rejects } from 'assert';
 
 export default class ServerService {
   protected PORT: number;
   protected app: Express;
-  protected server;
+  protected server: HttpServer;
 
   constructor(port: number) {
     this.PORT = port;
@@ -86,14 +88,17 @@ export default class ServerService {
     return this.app;
   }
 
-  async start() {
-    try {
-      this.server = this.app.listen(this.PORT, () =>
-        console.log(`Server started on PORT = ${this.PORT}`)
-      );
-    } catch (e) {
-      console.error(e);
-    }
-    return this.server;
+  async start(): Promise<HttpServer> {
+    return await new Promise((resolve, reject) => {
+      try {
+        const server = this.server;
+        this.server = this.app.listen(this.PORT, () => {
+          console.log(`Server started on PORT = ${this.PORT}`);
+          resolve(server);
+        });
+      } catch (e) {
+        reject(e);
+      }
+    });
   }
 }

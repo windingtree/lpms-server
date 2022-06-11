@@ -11,7 +11,7 @@ process.on('unhandledRejection', async (error) => {
   process.exit(1);
 });
 
-const main = async (): Promise<ServerService> => {
+const main = async (): Promise<void> => {
   const server = new ServerService(port);
   // const waku = WakuService.getInstance;
 
@@ -21,7 +21,7 @@ const main = async (): Promise<ServerService> => {
     await MetricsService.startMetricsServer();
   }
 
-  return server.start();
+  await server.start();
 };
 
 export default main().catch(async (error) => {
