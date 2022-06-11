@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Express } from 'express';
 import client from 'prom-client';
 import { prometheusPort } from '../config';
 
@@ -20,7 +20,7 @@ export class MetricsService {
     help: 'fatal errors count'
   });
 
-  static startMetricsServer() {
+  static async startMetricsServer(): Promise<Express> {
     const app = express();
 
     const collectDefaultMetrics = client.collectDefaultMetrics;
@@ -33,10 +33,17 @@ export class MetricsService {
       res.end(response);
     });
 
-    app.listen(prometheusPort, () => {
-      console.log(
-        `Metrics server started at http://localhost:${prometheusPort}`
-      );
+    return await new Promise((resolve, reject) => {
+      try {
+        app.listen(prometheusPort, () => {
+          console.log(
+            `Metrics server started at http://localhost:${prometheusPort}`
+          );
+          resolve(app);
+        });
+      } catch (e) {
+        reject(e);
+      }
     });
   }
 }
