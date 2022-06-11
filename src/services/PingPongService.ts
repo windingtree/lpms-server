@@ -8,30 +8,17 @@ import { Ping, Pong } from '../proto/pingpong';
 
 import { lineRegistryDataDomain, videreConfig } from '../config';
 import { getCurrentTimestamp } from '../utils';
-import { FacilityServiceInterface } from './interfaces/FacilityServiceInterface';
+import { AbstractFacilityService } from './interfaces/AbstractFacilityService';
 
-const unsubscribeHandler: () => void = () => {
-  return;
-};
-
-interface Unsubscribe {
-  h3Index: string;
-  handler: typeof unsubscribeHandler;
-}
-
-export class PingPongService implements FacilityServiceInterface {
-  protected waku: WakuService;
-
-  protected unsubscribes = new Map<string, Unsubscribe>();
-  public locsManaged = new Map<string, string[]>();
-  public facilityToLoc = new Map<string, string>();
+export class PingPongService extends AbstractFacilityService {
+  constructor() {
+    super();
+  }
 
   /**
    * Start the ping / pong service for a specified facility.
    */
   public async start(facilityId: string, h3Index: string): Promise<void> {
-    if (!this.waku) this.waku = WakuService.getInstance();
-
     //store Maps
     this.facilityToLoc.set(facilityId, h3Index);
     if (this.locsManaged.has(h3Index)) {
