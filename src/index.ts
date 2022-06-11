@@ -3,7 +3,8 @@ import { port, prometheusEnabled } from './config';
 import bootstrapService from './services/BootstrapService';
 import DBService from './services/DBService';
 import { MetricsService } from './services/MetricsService';
-// import WakuService from './services/WakuService';
+import WakuService from './services/WakuService';
+import { VidereService } from './services/VidereService';
 
 process.on('unhandledRejection', async (error) => {
   console.log(error);
@@ -13,7 +14,8 @@ process.on('unhandledRejection', async (error) => {
 
 const main = async (): Promise<void> => {
   const server = new ServerService(port);
-  // const waku = WakuService.getInstance;
+  const wakuService = new WakuService();
+  const videreService = new VidereService();
 
   await bootstrapService.bootstrap();
 
@@ -22,6 +24,10 @@ const main = async (): Promise<void> => {
   }
 
   await server.start();
+
+  await wakuService.start();
+
+  await videreService.start();
 };
 
 export default main().catch(async (error) => {

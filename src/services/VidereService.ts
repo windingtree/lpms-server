@@ -12,6 +12,17 @@ export class VidereService {
   private services = new Map<string, PingPongService | AuctioneerService>();
   private facilityIds = new Set<string>();
 
+  public async start(): Promise<void> {
+    for (const id of await facilityRepository.getAllFacilityIds()) {
+      try {
+        await this.startFacility(id);
+      } catch (e) {
+        // log error
+        console.log(e);
+      }
+    }
+  }
+
   public async addService(service: AbstractFacilityService): Promise<void> {
     if (!this.services.has(service.constructor.name)) {
       if (this.facilityIds.size > 0) {
@@ -87,5 +98,3 @@ export class VidereService {
     return geoToH3(loc.latitude, loc.longitude, constants.DefaultH3Resolution);
   }
 }
-
-export default new VidereService();
