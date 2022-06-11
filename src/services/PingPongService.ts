@@ -6,6 +6,7 @@ import WalletService from './WalletService';
 import { walletAccountsIndexes } from '../types';
 import { Ping, Pong } from '../proto/pingpong';
 import { typedDataDomain, videreConfig } from '../config';
+import { getCurrentTimestamp } from '../utils';
 
 const unsubscribeHandler: () => void = () => {
   return;
@@ -43,26 +44,24 @@ export class PingPongService {
     const observer = await this.waku.makeWakuObserver(
       async (message) => {
         const msg = this.waku.processMessage(Ping, message);
-        if (msg) {
-          log.green(`Ping received with timestamp: ${msg.timestamp}`);
+        if (msg) log.green(`Ping received with timestamp: ${msg.timestamp}`);
 
-          // respond to the ping with a pong
-          this.waku.sendMessage(
-            Pong,
-            await vUtils.createSignedMessage<Pong>(
-              typedDataDomain,
-              eip712.pingpong.Pong,
-              {
-                serviceProvider: utils.arrayify(facilityId),
-                loc: utils.toUtf8Bytes(h3Index),
-                timestamp: msg.timestamp,
-                signature: utils.toUtf8Bytes('') // initially blank signature which gets filled in
-              },
-              await WalletService.getWalletByIndex(walletAccountsIndexes.BIDDER)
-            ),
-            vUtils.generateTopic({ ...videreConfig, topic: 'pong' }, h3Index)
-          );
-        }
+        // respond to the ping with a pong
+        this.waku.sendMessage(
+          Pong,
+          await vUtils.createSignedMessage<Pong>(
+            typedDataDomain,
+            eip712.pingpong.Pong,
+            {
+              serviceProvider: utils.arrayify(facilityId),
+              loc: utils.toUtf8Bytes(h3Index),
+              timestamp: getCurrentTimestamp(),
+              signature: utils.toUtf8Bytes('') // initially blank signature which gets filled in
+            },
+            await WalletService.getWalletByIndex(walletAccountsIndexes.BIDDER)
+          ),
+          vUtils.generateTopic({ ...videreConfig, topic: 'pong' }, h3Index)
+        );
       },
       [vUtils.generateTopic({ ...videreConfig, topic: 'ping' }, h3Index)]
     );
@@ -87,7 +86,6 @@ export class PingPongService {
         if (this.locsManaged.get(unsubscribe.h3Index)?.length === 0) {
           this.locsManaged.delete(unsubscribe.h3Index);
         }
-        1;
       }
 
       unsubscribe.handler();
