@@ -8,6 +8,7 @@ export type WakuMessageHandler = (message: WakuMessage) => void;
 export default class WakuService {
   protected waku: Waku;
   private static _instance: WakuService = new WakuService();
+  public isConnected: boolean;
 
   constructor() {
     if (WakuService._instance) {
@@ -15,24 +16,35 @@ export default class WakuService {
         'Error: Instantiation failed: Use WakuService.getInstance() instead of new'
       );
     }
-
-    Waku.create(wakuConfig).then(
-      (waku) => {
-        log.green('Connecting to Waku...');
-
-        waku.waitForRemotePeer(undefined, 10000).then(() => {
-          log.green('...Connected');
-          this.waku = waku;
-        });
-      },
-      () => {
-        log.red('...Failed');
-      }
-    );
   }
 
   public static getInstance(): WakuService {
     return WakuService._instance;
+  }
+
+  public async start(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        Waku.create(wakuConfig).then(
+          (waku) => {
+            log.green('Connecting to Waku...');
+
+            waku.waitForRemotePeer(undefined, 10000).then(() => {
+              log.green('...Connected');
+              this.waku = waku;
+              this.isConnected = true;
+              resolve();
+            });
+          },
+          () => {
+            log.red('...Failed');
+          }
+        );
+      } catch (e) {
+        console.log(e);
+        reject(e);
+      }
+    });
   }
 
   public async sendMessage<T extends object>(
