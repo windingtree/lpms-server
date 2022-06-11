@@ -1,15 +1,61 @@
 import { Timestamp } from './proto/timestamp';
+import { providers } from 'ethers';
+import {
+  LineRegistry__factory,
+  ServiceProviderRegistry__factory
+} from '../typechain-videre';
+import walletService from './services/WalletService';
+import { walletAccountsIndexes } from './types';
 
 export function convertDaysToSeconds(days: number) {
   return days * 60 * 60 * 24;
 }
 //todo relocate to videre-sdk
 export function getCurrentTimestamp(): Timestamp {
-  //todo replace to vedere sdk
   const timeMS = Date.now();
 
   return {
     seconds: BigInt(Math.floor(timeMS / 1000)),
     nanos: (timeMS % 1000) * 1e6
   };
+}
+
+export async function checkFacilityRegister(
+  facilityId: string
+): Promise<boolean> {
+  const provider = new providers.JsonRpcProvider(String(process.env.RPC));
+  const lineRegistry = String(process.env.APP_VERIFYING_CONTRACT);
+
+  return await LineRegistry__factory.connect(lineRegistry, provider).exists(
+    facilityId
+  );
+}
+
+export async function verifyFacilityBidder(
+  facilityId: string
+): Promise<boolean> {
+  const provider = new providers.JsonRpcProvider(String(process.env.RPC));
+  const lineRegistry = String(process.env.APP_VERIFYING_CONTRACT);
+
+  const serviceProviderRegistry = await LineRegistry__factory.connect(
+    lineRegistry,
+    provider
+  ).serviceProviderRegistry();
+
+  const bidderAddress = await walletService.getWalletAccountByRole(
+    walletAccountsIndexes.BIDDER
+  );
+
+  return await ServiceProviderRegistry__factory.connect(
+    serviceProviderRegistry,
+    provider
+  ).can(
+    facilityId,
+    getContractRole(walletAccountsIndexes.BIDDER),
+    bidderAddress
+  );
+}
+
+export function getContractRole(role: walletAccountsIndexes): number {
+  return role + 1;
 }
