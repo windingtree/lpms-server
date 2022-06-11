@@ -44,7 +44,11 @@ export class PingPongService {
     const observer = await this.waku.makeWakuObserver(
       async (message) => {
         const msg = this.waku.processMessage(Ping, message);
-        if (msg) log.green(`Ping received with timestamp: ${msg.timestamp}`);
+        if (msg?.timestamp) {
+          log.green(`Ping received with timestamp: ${msg.timestamp}`);
+        } else {
+          log.yellow(`Ping received at local time: ${getCurrentTimestamp()}`);
+        }
 
         // respond to the ping with a pong
         this.waku.sendMessage(
