@@ -10,7 +10,6 @@ import errorMiddleware from '../middlewares/ErrorMiddleware';
 import { debugEnabled } from '../config';
 import responseTime from 'response-time';
 import { MetricsService } from './MetricsService';
-import { rejects } from 'assert';
 
 export default class ServerService {
   protected PORT: number;
