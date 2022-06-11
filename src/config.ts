@@ -1,4 +1,5 @@
 import type { TypedDataDomain } from '@ethersproject/abstract-signer';
+import { BaseProvider } from '@ethersproject/providers';
 import { VidereConfig } from '@windingtree/videre-sdk';
 import dotenv from 'dotenv';
 import { providers } from 'ethers';
@@ -20,9 +21,11 @@ checkEnvVariables([
   'APP_REFRESH_TOKEN_KEY',
   'APP_WALLET_PASSPHRASE',
   'WEB3STORAGE_KEY',
-  'RPC',
+  'APP_PROMETHEUS_PORT',
+  'APP_NETWORK_PROVIDER',
   'APP_VERIFYING_CONTRACT',
-  'APP_PROMETHEUS_PORT'
+  'APP_LINE',
+  'APP_VERSION'
 ]);
 
 export const port = Number(process.env.PORT);
@@ -50,16 +53,19 @@ export const wakuConfig = {
   }
 };
 export const videreConfig: VidereConfig = {
-  line: 'stays',
-  version: 1
+  line: String(process.env.APP_LINE),
+  version: Number(process.env.APP_VERSION)
 };
 
 export let lineRegistryDataDomain: TypedDataDomain;
 export let serviceProviderDataDomain: TypedDataDomain;
+export let provider: BaseProvider;
 
 // configure from the RPC
 (async () => {
-  const provider = new providers.JsonRpcProvider(String(process.env.RPC));
+  provider = new providers.JsonRpcProvider(
+    String(process.env.APP_NETWORK_PROVIDER)
+  );
   const chainId = (await provider.getNetwork()).chainId;
 
   const lineRegistry = String(process.env.APP_VERIFYING_CONTRACT);
