@@ -12,6 +12,7 @@ import {
   FacilityModifierRepository,
   ItemModifierRepository
 } from '../repositories/ModifierRepository';
+import videreService from '../services/VidereService';
 
 export class FacilityController {
   // Returns availability of the space
@@ -230,6 +231,40 @@ export class FacilityController {
       );
 
       await repository.delModifier(modifierKey as ModifiersKey);
+
+      res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  // activate facility services for facility by id
+  activateServices = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { facilityId } = req.params;
+
+      await videreService.startFacility(facilityId);
+
+      res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  // deactivate facility services for facility by id
+  deactivateServices = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    try {
+      const { facilityId } = req.params;
+
+      await videreService.stopFacility(facilityId);
 
       res.json({ success: true });
     } catch (e) {

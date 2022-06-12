@@ -816,3 +816,93 @@ router.delete(
   authMiddleware,
   facilityController.removeModifierOfItem
 );
+
+/**
+ * @swagger
+ * /facility/{facilityId}/activate-service:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: activate facility services for facility by id
+ *     tags: [Facility service]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.post(
+  '/facility/:facilityId/activate-service',
+  facilityController.activateServices
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/deactivate-service:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: deactivate facility services for facility by id
+ *     tags: [Facility service]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.post(
+  '/facility/:facilityId/deactivate-service',
+  facilityController.deactivateServices
+);

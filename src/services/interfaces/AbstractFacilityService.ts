@@ -7,14 +7,14 @@ export interface Unsubscribe {
   handler: UnsubscribeHandler;
 }
 
-export class AbstractFacilityService {
+export abstract class AbstractFacilityService {
   protected waku: WakuService;
 
   protected unsubscribes = new Map<string, Unsubscribe>();
   public locsManaged = new Map<string, string[]>();
   public facilityToLoc = new Map<string, string>();
 
-  constructor() {
+  protected constructor() {
     if (!this.waku) this.waku = WakuService.getInstance();
   }
 
