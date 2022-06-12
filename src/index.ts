@@ -5,7 +5,8 @@ import DBService from './services/DBService';
 import { MetricsService } from './services/MetricsService';
 import WakuService from './services/WakuService';
 import videreService from './services/VidereService';
-import PingPongService from './services/PingPongService';
+import pingPongService from './services/PingPongService';
+import auctioneerService from './services/AuctioneerService';
 
 process.on('unhandledRejection', async (error) => {
   console.log(error);
@@ -27,7 +28,8 @@ const main = async (): Promise<void> => {
 
   await wakuService.start();
 
-  await videreService.addService(PingPongService);
+  await videreService.addService(pingPongService);
+  await videreService.addService(auctioneerService);
   await videreService.start();
 };
 
