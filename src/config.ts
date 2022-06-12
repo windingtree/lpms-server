@@ -76,7 +76,7 @@ export let provider: BaseProvider;
   );
   const serviceProviderRegistry =
     await lineRegistryContract.serviceProviderRegistry();
-  const stays = await lineRegistryContract.terms(videreConfig.line);
+  // const stays = await lineRegistryContract.terms(videreConfig.line);
 
   log.green(`Chain ID: ${chainId}`);
   log.green(`Line registry: ${lineRegistry}`);
@@ -99,10 +99,10 @@ export let provider: BaseProvider;
   };
 
   // stays contract
-  staysDataDomain = {
+  /*staysDataDomain = {
     name: videreConfig.line,
     version: String(videreConfig.version),
     verifyingContract: stays,
     chainId: Number(chainId)
-  };
+  };*/
 })();
