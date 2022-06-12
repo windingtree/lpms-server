@@ -4,7 +4,8 @@ import bootstrapService from './services/BootstrapService';
 import DBService from './services/DBService';
 import { MetricsService } from './services/MetricsService';
 import WakuService from './services/WakuService';
-import { VidereService } from './services/VidereService';
+import videreService from './services/VidereService';
+import PingPongService from './services/PingPongService';
 
 process.on('unhandledRejection', async (error) => {
   console.log(error);
@@ -14,8 +15,7 @@ process.on('unhandledRejection', async (error) => {
 
 const main = async (): Promise<void> => {
   const server = new ServerService(port);
-  const wakuService = new WakuService();
-  const videreService = new VidereService();
+  const wakuService = WakuService.getInstance();
 
   await bootstrapService.bootstrap();
 
@@ -27,6 +27,7 @@ const main = async (): Promise<void> => {
 
   await wakuService.start();
 
+  await videreService.addService(PingPongService);
   await videreService.start();
 };
 
