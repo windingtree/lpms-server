@@ -1,40 +1,26 @@
 import { BigNumber, constants, utils } from 'ethers';
 import { eip712, utils as vUtils } from '@windingtree/videre-sdk';
-import WakuService from './WakuService';
 import WalletService from './WalletService';
 import { walletAccountsIndexes } from '../types';
 
 import { staysDataDomain, videreConfig } from '../config';
 import { generateBidLine } from '../utils';
-import { FacilityServiceInterface } from './interfaces/FacilityServiceInterface';
+import { AbstractFacilityService } from './interfaces/AbstractFacilityService';
 import { AskWrapper, BidLine, Bids, BidWrapper } from '../proto/bidask';
 import { Ask } from '../proto/ask';
 import { SearchService } from './SearchService';
 import { QuoteService } from './QuoteService';
 import { ask as staysEIP712 } from '@windingtree/stays-models/dist/cjs/eip712';
 
-const unsubscribeHandler: () => void = () => {
-  return;
-};
-
-interface Unsubscribe {
-  h3Index: string;
-  handler: typeof unsubscribeHandler;
-}
-
-export class AuctioneerService implements FacilityServiceInterface {
-  protected waku: WakuService;
-
-  protected unsubscribes = new Map<string, Unsubscribe>();
-  public locsManaged = new Map<string, string[]>();
-  public facilityToLoc = new Map<string, string>();
+export class AuctioneerService extends AbstractFacilityService {
+  constructor() {
+    super();
+  }
 
   /**
    * Start the bid / ask service for a specified facility.
    */
   public async start(facilityId: string, h3Index: string): Promise<void> {
-    if (!this.waku) this.waku = WakuService.getInstance();
-
     //store Maps
     this.facilityToLoc.set(facilityId, h3Index);
     if (this.locsManaged.has(h3Index)) {
