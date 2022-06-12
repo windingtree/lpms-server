@@ -66,6 +66,10 @@ export let serviceProviderDataDomain: TypedDataDomain;
 export let staysDataDomain: TypedDataDomain;
 export let provider: BaseProvider;
 
+export let serviceProviderRegistryAddress: string;
+export let lineRegistryAddress: string;
+export let staysAddress: string;
+
 // configure from the RPC
 (async () => {
   provider = new providers.JsonRpcProvider(
@@ -78,16 +82,16 @@ export let provider: BaseProvider;
     lineRegistry,
     provider
   );
-  const serviceProviderRegistry =
+  serviceProviderRegistryAddress =
     await lineRegistryContract.serviceProviderRegistry();
-  const stays = await lineRegistryContract.terms(
+  staysAddress = await lineRegistryContract.terms(
     utils.formatBytes32String(videreConfig.line)
   );
 
   log.green(`Chain ID: ${chainId}`);
   log.green(`Line registry: ${lineRegistry}`);
-  log.green(`Service Provider registry: ${serviceProviderRegistry}`);
-  log.green(`Stays: ${stays}`);
+  log.green(`Service Provider registry: ${serviceProviderRegistryAddress}`);
+  log.green(`Stays: ${staysAddress}`);
 
   // line registry
   lineRegistryDataDomain = {
@@ -101,7 +105,7 @@ export let provider: BaseProvider;
   serviceProviderDataDomain = {
     name: videreConfig.line,
     version: String(videreConfig.version),
-    verifyingContract: serviceProviderRegistry,
+    verifyingContract: serviceProviderRegistryAddress,
     chainId: Number(chainId)
   };
 
@@ -109,7 +113,7 @@ export let provider: BaseProvider;
   staysDataDomain = {
     name: videreConfig.line,
     version: String(videreConfig.version),
-    verifyingContract: stays,
+    verifyingContract: staysAddress,
     chainId: Number(chainId)
   };
 })();

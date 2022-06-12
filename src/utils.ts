@@ -1,6 +1,6 @@
 import { eip712 } from '@windingtree/videre-sdk';
 import { BigNumber, utils, Wallet } from 'ethers';
-import { staysDataDomain } from './config';
+import { staysDataDomain, videreConfig } from './config';
 import { Timestamp } from './proto/timestamp';
 import { providers } from 'ethers';
 import {
@@ -9,6 +9,7 @@ import {
 } from '../typechain-videre';
 import walletService from './services/WalletService';
 import { ServiceRole, walletAccountsIndexes } from './types';
+import { serviceProviderRegistryAddress } from './config';
 
 export function convertDaysToSeconds(days: number) {
   return days * 60 * 60 * 24;
@@ -24,6 +25,8 @@ export function getCurrentTimestamp(): Timestamp {
   };
 }
 
+// this will check to make sure that the facility has agreed to the line
+// *terms*.
 export async function checkFacilityRegister(
   facilityId: string
 ): Promise<boolean> {
@@ -32,30 +35,27 @@ export async function checkFacilityRegister(
   );
   const lineRegistry = String(process.env.APP_VERIFYING_CONTRACT);
 
-  return await LineRegistry__factory.connect(lineRegistry, provider).exists(
+  return await LineRegistry__factory.connect(lineRegistry, provider).can(
+    utils.formatBytes32String(videreConfig.line),
     facilityId
   );
 }
 
+// this function makes sure that the bidder is authorized to bid on
+// behalf of the facilityId.
 export async function verifyFacilityBidder(
   facilityId: string
 ): Promise<boolean> {
   const provider = new providers.JsonRpcProvider(
     String(process.env.APP_NETWORK_PROVIDER)
   );
-  const lineRegistry = String(process.env.APP_VERIFYING_CONTRACT);
-
-  const serviceProviderRegistry = await LineRegistry__factory.connect(
-    lineRegistry,
-    provider
-  ).serviceProviderRegistry();
 
   const bidderAddress = await walletService.getWalletAccountByRole(
     ServiceRole.BIDDER
   );
 
   return await ServiceProviderRegistry__factory.connect(
-    serviceProviderRegistry,
+    serviceProviderRegistryAddress,
     provider
   ).can(
     facilityId,
