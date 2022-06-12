@@ -59,6 +59,7 @@ export const videreConfig: VidereConfig = {
 
 export let lineRegistryDataDomain: TypedDataDomain;
 export let serviceProviderDataDomain: TypedDataDomain;
+export let staysDataDomain: TypedDataDomain;
 export let provider: BaseProvider;
 
 // configure from the RPC
@@ -69,10 +70,13 @@ export let provider: BaseProvider;
   const chainId = (await provider.getNetwork()).chainId;
 
   const lineRegistry = String(process.env.APP_VERIFYING_CONTRACT);
-  const serviceProviderRegistry = await LineRegistry__factory.connect(
+  const lineRegistryContract = LineRegistry__factory.connect(
     lineRegistry,
     provider
-  ).serviceProviderRegistry();
+  );
+  const serviceProviderRegistry =
+    await lineRegistryContract.serviceProviderRegistry();
+  const stays = await lineRegistryContract.terms(videreConfig.line);
 
   log.green(`Chain ID: ${chainId}`);
   log.green(`Line registry: ${lineRegistry}`);
@@ -91,6 +95,14 @@ export let provider: BaseProvider;
     name: videreConfig.line,
     version: String(videreConfig.version),
     verifyingContract: serviceProviderRegistry,
+    chainId: Number(chainId)
+  };
+
+  // stays contract
+  staysDataDomain = {
+    name: videreConfig.line,
+    version: String(videreConfig.version),
+    verifyingContract: stays,
     chainId: Number(chainId)
   };
 })();
