@@ -8,7 +8,7 @@ import {
   ServiceProviderRegistry__factory
 } from '../typechain-videre';
 import walletService from './services/WalletService';
-import { walletAccountsIndexes } from './types';
+import { ServiceRole, walletAccountsIndexes } from './types';
 
 export function convertDaysToSeconds(days: number) {
   return days * 60 * 60 * 24;
@@ -51,7 +51,7 @@ export async function verifyFacilityBidder(
   ).serviceProviderRegistry();
 
   const bidderAddress = await walletService.getWalletAccountByRole(
-    walletAccountsIndexes.BIDDER
+    ServiceRole.BIDDER
   );
 
   return await ServiceProviderRegistry__factory.connect(

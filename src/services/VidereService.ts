@@ -7,18 +7,35 @@ import { geoToH3 } from 'h3-js';
 import { constants } from '@windingtree/videre-sdk/dist/cjs/utils';
 import { AbstractFacilityService } from './interfaces/AbstractFacilityService';
 import { checkFacilityRegister, verifyFacilityBidder } from '../utils';
+import { defaultActivateFacilities } from '../config';
 
 export class VidereService {
   private services = new Map<string, PingPongService | AuctioneerService>();
   private facilityIds = new Set<string>();
 
   public async start(): Promise<void> {
-    for (const id of await facilityRepository.getAllFacilityIds()) {
-      try {
-        await this.startFacility(id);
-      } catch (e) {
-        // log error
-        console.log(e);
+    const activeFacilityIds =
+      await facilityRepository.getAllActiveFacilityIds();
+
+    if (Array.isArray(activeFacilityIds)) {
+      for (const id of activeFacilityIds) {
+        try {
+          await this.startFacility(id);
+        } catch (e) {
+          // log error
+          console.log(e);
+        }
+      }
+    }
+
+    if (activeFacilityIds === null && defaultActivateFacilities) {
+      for (const id of await facilityRepository.getAllFacilityIds()) {
+        try {
+          await this.startFacility(id);
+        } catch (e) {
+          // log error
+          console.log(e);
+        }
       }
     }
   }
@@ -61,6 +78,7 @@ export class VidereService {
       await service.start(facilityId, h3Index);
     }
 
+    await facilityRepository.addActiveFacilityToIndex(facilityId);
     this.facilityIds.add(facilityId);
   }
 
@@ -69,6 +87,7 @@ export class VidereService {
       await service.stop(facilityId);
     }
 
+    await facilityRepository.delActiveFacilityFromIndex(facilityId);
     this.facilityIds.delete(facilityId);
   }
 
