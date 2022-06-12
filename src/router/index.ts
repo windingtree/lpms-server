@@ -859,6 +859,8 @@ router.delete(
  */
 router.post(
   '/facility/:facilityId/activate-service',
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
   facilityController.activateServices
 );
 
@@ -904,5 +906,7 @@ router.post(
  */
 router.post(
   '/facility/:facilityId/deactivate-service',
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
   facilityController.deactivateServices
 );
