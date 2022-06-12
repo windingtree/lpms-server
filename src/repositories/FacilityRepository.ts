@@ -54,6 +54,44 @@ export class FacilityRepository {
     }
   }
 
+  // --- activate facility index management
+
+  public async getAllActiveFacilityIds(): Promise<string[] | null> {
+    try {
+      return await this.db.get<string, string[]>('active_facilities', {
+        valueEncoding: 'json'
+      });
+    } catch (e) {
+      if (e.status !== 404) {
+        throw e;
+      }
+    }
+    return null;
+  }
+
+  public async addActiveFacilityToIndex(facilityId: string) {
+    const facilityIds = await this.getAllActiveFacilityIds();
+
+    if (facilityIds && facilityIds.length > 0) {
+      const ids = new Set<string>(facilityIds);
+      ids.add(facilityId);
+      await this.db.put('active_facilities', Array.from(ids));
+    } else {
+      await this.db.put('active_facilities', [facilityId]);
+    }
+  }
+
+  public async delActiveFacilityFromIndex(facilityId: string) {
+    const facilityIds = await this.getAllActiveFacilityIds();
+
+    if (facilityIds && facilityIds.length > 0) {
+      const ids = new Set<string>(facilityIds);
+      if (ids.delete(facilityId)) {
+        await this.db.put('active_facilities', Array.from(ids));
+      }
+    }
+  }
+
   // --- facility level getters / setters / del
 
   public async setFacilityKey(
