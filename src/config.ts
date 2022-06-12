@@ -2,7 +2,7 @@ import type { TypedDataDomain } from '@ethersproject/abstract-signer';
 import { BaseProvider } from '@ethersproject/providers';
 import { VidereConfig } from '@windingtree/videre-sdk';
 import dotenv from 'dotenv';
-import { providers } from 'ethers';
+import { providers, utils } from 'ethers';
 import { LineRegistry__factory } from '../typechain-videre';
 import log from './services/LogService';
 
@@ -80,11 +80,14 @@ export let provider: BaseProvider;
   );
   const serviceProviderRegistry =
     await lineRegistryContract.serviceProviderRegistry();
-  // const stays = await lineRegistryContract.terms(videreConfig.line);
+  const stays = await lineRegistryContract.terms(
+    utils.formatBytes32String(videreConfig.line)
+  );
 
   log.green(`Chain ID: ${chainId}`);
   log.green(`Line registry: ${lineRegistry}`);
   log.green(`Service Provider registry: ${serviceProviderRegistry}`);
+  log.green(`Stays: ${stays}`);
 
   // line registry
   lineRegistryDataDomain = {
@@ -103,10 +106,10 @@ export let provider: BaseProvider;
   };
 
   // stays contract
-  /*staysDataDomain = {
+  staysDataDomain = {
     name: videreConfig.line,
     version: String(videreConfig.version),
     verifyingContract: stays,
     chainId: Number(chainId)
-  };*/
+  };
 })();
