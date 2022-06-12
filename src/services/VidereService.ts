@@ -17,10 +17,13 @@ export class VidereService {
     const activeFacilityIds =
       await facilityRepository.getAllActiveFacilityIds();
 
+    console.log('Facility Ids:', activeFacilityIds);
+
     if (Array.isArray(activeFacilityIds)) {
       for (const id of activeFacilityIds) {
         try {
           await this.startFacility(id);
+          console.log(`Facility: ${id} has been started`);
         } catch (e) {
           // log error
           console.log(e);
@@ -38,6 +41,8 @@ export class VidereService {
         }
       }
     }
+
+    console.log('VidereService is started.');
   }
 
   public async addService(service: AbstractFacilityService): Promise<void> {

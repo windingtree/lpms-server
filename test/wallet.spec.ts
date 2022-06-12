@@ -9,6 +9,6 @@ import WalletService from '../src/services/WalletService';
 describe('WalletService', async () => {
   it('throws error when requesting wallet from uninitialized service', async () => {
     expect(await WalletService.getWalletByIndex(walletAccountsIndexes.BIDDER))
-      .to.not.throw;
+      .to.throw;
   });
 });
