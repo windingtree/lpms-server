@@ -47,9 +47,9 @@ export class UserService {
 
     await this.mainRepository.setUserDBIncrement(String(id));
 
-    if (login !== defaultManagerLogin && roles.includes(AppRole.MANAGER)) {
-      await this.deleteDefaultManagerAccount();
-    }
+    // if (login !== defaultManagerLogin && roles.includes(AppRole.MANAGER)) {
+    //   await this.deleteDefaultManagerAccount();
+    // }
   }
 
   public async getUserByLogin(login: string): Promise<User | null> {
