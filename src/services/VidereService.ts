@@ -98,3 +98,5 @@ export class VidereService {
     return geoToH3(loc.latitude, loc.longitude, constants.DefaultH3Resolution);
   }
 }
+
+export default new VidereService();

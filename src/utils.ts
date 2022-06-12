@@ -23,7 +23,9 @@ export function getCurrentTimestamp(): Timestamp {
 export async function checkFacilityRegister(
   facilityId: string
 ): Promise<boolean> {
-  const provider = new providers.JsonRpcProvider(String(process.env.RPC));
+  const provider = new providers.JsonRpcProvider(
+    String(process.env.APP_NETWORK_PROVIDER)
+  );
   const lineRegistry = String(process.env.APP_VERIFYING_CONTRACT);
 
   return await LineRegistry__factory.connect(lineRegistry, provider).exists(
@@ -34,7 +36,9 @@ export async function checkFacilityRegister(
 export async function verifyFacilityBidder(
   facilityId: string
 ): Promise<boolean> {
-  const provider = new providers.JsonRpcProvider(String(process.env.RPC));
+  const provider = new providers.JsonRpcProvider(
+    String(process.env.APP_NETWORK_PROVIDER)
+  );
   const lineRegistry = String(process.env.APP_VERIFYING_CONTRACT);
 
   const serviceProviderRegistry = await LineRegistry__factory.connect(

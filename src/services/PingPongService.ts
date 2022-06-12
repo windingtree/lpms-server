@@ -1,7 +1,6 @@
 import { utils } from 'ethers';
 import { eip712, utils as vUtils } from '@windingtree/videre-sdk';
 import log from './LogService';
-import WakuService from './WakuService';
 import WalletService from './WalletService';
 import { walletAccountsIndexes } from '../types';
 import { Ping, Pong } from '../proto/pingpong';
