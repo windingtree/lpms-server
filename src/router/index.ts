@@ -1,6 +1,6 @@
 import os from 'os';
 import { Router } from 'express';
-import { body, check } from 'express-validator';
+import { body, check, param } from 'express-validator';
 import multer from 'multer';
 import { AppRole } from '../types';
 import authMiddleware from '../middlewares/AuthMiddleware';
@@ -9,6 +9,7 @@ import userController from '../controllers/UserController';
 import storageController from '../controllers/StorageController';
 import facilityController from '../controllers/FacilityController';
 import walletController from '../controllers/WalletController';
+import facilityItemController from '../controllers/FacilityItemController';
 
 const router = Router();
 
@@ -819,6 +820,319 @@ router.delete(
 
 /**
  * @swagger
+ * /facility/{facilityId}/rule/{ruleKey}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: get rule of the facility
+ *     tags: [Facility service, rules]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: ruleKey
+ *         description: The facility rule key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ['notice_required', 'length_of_stay']
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.get(
+  '/facility/:facilityId/rule/:ruleKey',
+  authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityController.getRuleOfFacility
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/spaces/{itemId}/rule/{ruleKey}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: get rule of the item kind of space or otherItems
+ *     tags: [Facility service, rules]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemId
+ *         description: The item Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: ruleKey
+ *         description: The facility rule key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ["day_of_week", "occupancy", "length_of_stay"]
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.get(
+  '/facility/:facilityId/spaces/:itemId/rule/:ruleKey',
+  authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityController.getRuleOfItem
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/rule/{ruleKey}:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: add rule to the facility
+ *     tags: [Facility service, rules]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: ruleKey
+ *         description: The facility rule key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ['notice_required', 'length_of_stay']
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.post(
+  '/facility/:facilityId/rule/:ruleKey',
+  authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityController.createFacilityRule
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/spaces/{itemId}/rule/{ruleKey}:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: add rule to the facility
+ *     tags: [Facility service, rules]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemId
+ *         description: The item Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: ruleKey
+ *         description: The facility rule key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ['notice_required', 'length_of_stay']
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.post(
+  '/facility/:facilityId/spaces/:itemId/rule/:ruleKey',
+  authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityController.createItemRule
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/rule/{ruleKey}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: remove rule from the facility
+ *     tags: [Facility service, rules]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: ruleKey
+ *         description: The facility rule key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ['notice_required', 'length_of_stay']
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.delete(
+  '/facility/:facilityId/rule/:ruleKey',
+  authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityController.removeRuleOfFacility
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/spaces/{itemId}/rule/{ruleKey}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: remove rule of the item kind of space or otherItems
+ *     tags: [Facility service, rules]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemId
+ *         description: The item Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: ruleKey
+ *         description: The facility rule key
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: ['notice_required', 'length_of_stay']
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.delete(
+  '/facility/:facilityId/spaces/:itemId/rule/:ruleKey',
+  authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityController.removeRuleOfItem
+);
+
+/**
+ * @swagger
  * /facility/{facilityId}/activate-service:
  *   post:
  *     security:
@@ -909,4 +1223,478 @@ router.post(
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
   facilityController.deactivateServices
+);
+
+/**
+ * @swagger
+ * /facility/all:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: get all facilities
+ *     tags: [Facility service]
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               # @todo array of facilities
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.get(
+  '/facility/all',
+  //authMiddleware,
+  //roleMiddleware([AppRole.MANAGER]),
+  facilityController.getAll
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: get facility metadata
+ *     tags: [Facility service]
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               # @todo 1 facility
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.get(
+  '/facility/:facilityId',
+  //authMiddleware,
+  //roleMiddleware([AppRole.MANAGER]),
+  facilityController.getOne
+);
+
+/**
+ * @swagger
+ * /facility/create/{facilityId}/:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: create facility
+ *     tags: [Facility service]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.post(
+  '/facility/create/:facilityId/',
+  //authMiddleware,
+  //roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityController.create
+);
+
+/**
+ * @swagger
+ * /facility/update/{facilityId}:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: update
+ *     tags: [Facility service]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.put(
+  '/facility/update/:facilityId/',
+  //authMiddleware,
+  //roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityController.update
+);
+
+/**
+ * @swagger
+ * /facility/update/{facilityId}:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: update
+ *     tags: [Facility service]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility Id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.delete(
+  '/facility/delete/:facilityId/',
+  //authMiddleware,
+  //roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityController.delete
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/{itemKey}/get/all:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: get all facilities
+ *     tags: [Facility service]
+ *     parameters:
+ *       - in: path
+ *          name: facilityId
+ *          description: The facility Id
+ *          required: true
+ *          schema:
+ *            type: string
+ *       - in: path
+ *         name: itemKey
+ *         description: The item key
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               # @todo array of items
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.get(
+  'facility/:facilityId/:itemKey/get/all',
+  //authMiddleware,
+  //roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityItemController.getAllItems
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/{itemKey}/get/{itemId}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: get item metadata
+ *     tags: [Facility service]
+ *     parameters:
+ *       - in: path
+ *          name: facilityId
+ *          description: The facility Id
+ *          required: true
+ *          schema:
+ *            type: string
+ *      - in: path
+ *         name: itemKey
+ *         description: The item key
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *          name: itemId
+ *          description: The item Id
+ *          required: true
+ *          schema:
+ *            type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               # @todo item metadata
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.get(
+  'facility/:facilityId/item/get/:itemId',
+  //authMiddleware,
+  //roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityItemController.getOneItem
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/{itemKey}/create/{itemId}:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: create item metadata
+ *     tags: [Facility service]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility id
+ *         required: true
+ *         schema:
+ *           type: string
+ *      - in: path
+ *         name: itemKey
+ *         description: The item key
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemId
+ *         description: The item id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.post(
+  'facility/:facilityId/item/create/:itemId',
+  //authMiddleware,
+  //roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityItemController.createItem
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/{itemKey}/update/{itemId}:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: update item metadata
+ *     tags: [Facility service]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility id
+ *         required: true
+ *         schema:
+ *           type: string
+ *      - in: path
+ *         name: itemKey
+ *         description: The item key
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemId
+ *         description: The item id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.put(
+  'facility/:facilityId/item/update/:itemId',
+  //authMiddleware,
+  //roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityItemController.updateItem
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/{itemKey}/delete/{itemId}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: update item metadata
+ *     tags: [Facility service]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility id
+ *         required: true
+ *         schema:
+ *           type: string
+ *      - in: path
+ *         name: itemKey
+ *         description: The item key
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemId
+ *         description: The item id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.delete(
+  'facility/:facilityId/item/delete/:itemId',
+  //authMiddleware,
+  //roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityItemController.deleteItem
 );
