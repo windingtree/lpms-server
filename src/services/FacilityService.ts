@@ -88,8 +88,13 @@ export class FacilityService {
     const items = new Set<ItemWithId>();
 
     for (const id of ids) {
-      const facility = await facilityRepository.getFacilityKey(id, 'metadata');
-      if (facility) {
+      const item = await facilityRepository.getItemKey(
+        facilityId,
+        key,
+        id,
+        'metadata'
+      );
+      if (item) {
         const item = await facilityRepository.getItemKey<Space>(
           facilityId,
           key,

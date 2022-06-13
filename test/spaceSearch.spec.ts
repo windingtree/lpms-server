@@ -14,6 +14,7 @@ import { SearchService } from '../src/services/SearchService';
 import { DayOfWeekLOSRule } from '../src/proto/lpms';
 import { FormattedDate } from '../src/services/DBService';
 import { convertDaysToSeconds } from '../src/utils';
+import { facility, space } from './common';
 
 describe('search service test', async () => {
   const facilityId = '0x1234567890';
@@ -36,136 +37,7 @@ describe('search service test', async () => {
   const formattedDate = fromDate.toFormat('yyyy-MM-dd') as FormattedDate;
 
   before(async () => {
-    const facility: Facility = {
-      name: 'Awesome ski chalet',
-      description: 'Some chalet in the best place of all! 🏔️',
-      location: {
-        latitude: 43.0335,
-        longitude: 42.6895
-      },
-      policies: {
-        timezone: 'Asia/Almaty',
-        currencyCode: 'xDAI',
-        checkInTimeOneof: { oneofKind: 'checkInTime', checkInTime: '1500' },
-        checkOutTimeOneof: { oneofKind: 'checkOutTime', checkOutTime: '1000' }
-      },
-      photos: [
-        { uri: '/image1.jpg', description: 'Chic guesthouse' },
-        { uri: '/image2.jpg', description: 'Winter Wonderland' }
-      ],
-      uris: [
-        {
-          uri: 'https://wonderland.somewhere/',
-          typeOneof: { oneofKind: 'type', type: ContactType.WORK }
-        }
-      ],
-      emails: [
-        {
-          email: 'example@example.com',
-          typeOneof: { oneofKind: 'type', type: ContactType.WORK }
-        }
-      ],
-      phones: [
-        {
-          number: '0123456789',
-          typeOneof: { oneofKind: 'type', type: ContactType.WORK }
-        }
-      ],
-      connectivity: {
-        wifiAvailableOneof: { oneofKind: 'wifiAvailable', wifiAvailable: true },
-        wifiForFreeOneof: { oneofKind: 'wifiForFree', wifiForFree: true }
-      }
-    };
-
     await facilityRepo.setFacilityKey(facilityId, 'metadata', facility);
-
-    const space: Space = {
-      uris: [
-        {
-          uri: 'https://wonderland.somewhere/',
-          typeOneof: { oneofKind: 'type', type: ContactType.WORK }
-        }
-      ],
-      maxNumberOfAdultOccupantsOneof: {
-        oneofKind: 'maxNumberOfAdultOccupants',
-        maxNumberOfAdultOccupants: 2
-      },
-      maxNumberOfChildOccupantsOneof: {
-        oneofKind: 'maxNumberOfChildOccupants',
-        maxNumberOfChildOccupants: 2
-      },
-      maxNumberOfOccupantsOneof: {
-        oneofKind: 'maxNumberOfOccupants',
-        maxNumberOfOccupants: 2
-      },
-      privateHomeOneof: { oneofKind: 'privateHome', privateHome: false },
-      suiteOneof: { oneofKind: 'suite', suite: false },
-      tierOneof: { oneofKind: 'tier', tier: SpaceTier.DEFAULT_STANDARD },
-      views: {
-        viewOfValleyOneof: { oneofKind: 'viewOfValley', viewOfValley: true },
-        viewOfBeachOneof: { oneofKind: 'viewOfBeach', viewOfBeach: false },
-        viewOfCityOneof: { oneofKind: 'viewOfCity', viewOfCity: false },
-        viewOfGardenOneof: { oneofKind: 'viewOfGarden', viewOfGarden: false },
-        viewOfLakeOneof: { oneofKind: 'viewOfLake', viewOfLake: false },
-        viewOfLandmarkOneof: {
-          oneofKind: 'viewOfLandmark',
-          viewOfLandmark: false
-        },
-        viewOfOceanOneof: { oneofKind: 'viewOfOcean', viewOfOcean: false },
-        viewOfPoolOneof: { oneofKind: 'viewOfPool', viewOfPool: false }
-      },
-      totalLivingAreas: {
-        sleeping: {
-          numberOfBedsOneof: { oneofKind: 'numberOfBeds', numberOfBeds: 1 },
-          kingBedsOneof: { oneofKind: 'kingBeds', kingBeds: 1 },
-          queenBedsOneof: {
-            oneofKind: 'queenBedsException',
-            queenBedsException: Exception.UNSPECIFIED_REASON
-          },
-          doubleBedsOneof: {
-            oneofKind: 'doubleBedsException',
-            doubleBedsException: Exception.UNSPECIFIED_REASON
-          },
-          singleOrTwinBedsOneof: {
-            oneofKind: 'singleOrTwinBedsException',
-            singleOrTwinBedsException: Exception.UNSPECIFIED_REASON
-          },
-          bunkBedsOneof: {
-            oneofKind: 'bunkBedsException',
-            bunkBedsException: Exception.UNSPECIFIED_REASON
-          },
-          sofaBedsOneof: {
-            oneofKind: 'sofaBedsException',
-            sofaBedsException: Exception.UNSPECIFIED_REASON
-          },
-          otherBedsOneof: { oneofKind: 'otherBeds', otherBeds: 0 },
-          cribsOneof: { oneofKind: 'cribs', cribs: false },
-          cribsAvailableOneof: {
-            oneofKind: 'cribsAvailableException',
-            cribsAvailableException: Exception.UNSPECIFIED_REASON
-          },
-          cribCountOneof: {
-            oneofKind: 'cribCountException',
-            cribCountException: Exception.UNSPECIFIED_REASON
-          },
-          rollAwayBedsOneof: { oneofKind: 'rollAwayBeds', rollAwayBeds: false },
-          rollAwayBedsAvailableOneof: {
-            oneofKind: 'rollAwayBedsAvailableException',
-            rollAwayBedsAvailableException: Exception.UNSPECIFIED_REASON
-          },
-          rollAwayBedCountOneof: {
-            oneofKind: 'rollAwayBedCountException',
-            rollAwayBedCountException: Exception.UNSPECIFIED_REASON
-          }
-        },
-        features: {
-          inSpaceWifiAvailableOneof: {
-            oneofKind: 'inSpaceWifiAvailable',
-            inSpaceWifiAvailable: true
-          }
-        }
-      }
-    };
 
     await facilityRepo.addToIndex(facilityId, 'spaces', spaceId);
     await facilityRepo.setItemKey(

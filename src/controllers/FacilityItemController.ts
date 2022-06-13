@@ -67,7 +67,7 @@ export class FacilityItemController {
         facilityId,
         itemKey as FacilityIndexKey,
         itemId,
-        ['metadata', metadata]
+        [['metadata', metadata]]
       );
 
       return res.json({ success: true });
@@ -103,7 +103,7 @@ export class FacilityItemController {
         facilityId,
         itemKey as FacilityIndexKey,
         itemId,
-        ['metadata', metadata]
+        [['metadata', metadata]]
       );
 
       return res.json({ success: true });

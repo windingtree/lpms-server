@@ -1466,7 +1466,7 @@ router.delete(
  *         description: Some server error
  */
 router.get(
-  'facility/:facilityId/:itemKey/get/all',
+  '/facility/:facilityId/:itemKey/get/all',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1518,7 +1518,7 @@ router.get(
  *         description: Some server error
  */
 router.get(
-  'facility/:facilityId/item/get/:itemId',
+  '/facility/:facilityId/:itemKey/get/:itemId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1578,7 +1578,7 @@ router.get(
  *         description: Some server error
  */
 router.post(
-  'facility/:facilityId/item/create/:itemId',
+  '/facility/:facilityId/:itemKey/create/:itemId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1638,7 +1638,7 @@ router.post(
  *         description: Some server error
  */
 router.put(
-  'facility/:facilityId/item/update/:itemId',
+  '/facility/:facilityId/:itemKey/update/:itemId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1692,7 +1692,7 @@ router.put(
  *         description: Some server error
  */
 router.delete(
-  'facility/:facilityId/item/delete/:itemId',
+  '/facility/:facilityId/:itemKey/delete/:itemId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
