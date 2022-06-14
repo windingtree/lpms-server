@@ -53,7 +53,7 @@ describe('facility rule test', async () => {
 
   it('create facility', async () => {
     await requestWithSupertest
-      .post(`/api/facility/create/${facilityId}`)
+      .post(`/api/facility/${facilityId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
       .send(facilityRequestBody)
@@ -62,7 +62,7 @@ describe('facility rule test', async () => {
 
   it('create facility with incorrect id', async () => {
     await requestWithSupertest
-      .post(`/api/facility/create/0x1231212`)
+      .post(`/api/facility/0x1231212`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
       .send(facilityRequestBody)
@@ -71,7 +71,7 @@ describe('facility rule test', async () => {
 
   it('get all facilities', async () => {
     const res = await requestWithSupertest
-      .get(`/api/facility/all`)
+      .get(`/api/facility`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json');
 
@@ -88,7 +88,7 @@ describe('facility rule test', async () => {
   });
 
   it('should throw error not found with random facility id', async () => {
-    const res = await requestWithSupertest
+    await requestWithSupertest
       .get(
         `/api/facility/1x1234567890123456789012345678901234567890123456789012345678901234`
       )
@@ -101,7 +101,7 @@ describe('facility rule test', async () => {
     const updatedFacility = JSON.parse(JSON.stringify(facilityRequestBody)); //clone
     updatedFacility.metadata.name += ' updated';
     await requestWithSupertest
-      .put(`/api/facility/update/${facilityId}`)
+      .put(`/api/facility/${facilityId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
       .send(updatedFacility)
@@ -121,7 +121,7 @@ describe('facility rule test', async () => {
 
   it('create space', async () => {
     await requestWithSupertest
-      .post(`/api/facility/${facilityId}/spaces/create/${spaceId}`)
+      .post(`/api/facility/${facilityId}/spaces/${spaceId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
       .send(spaceRequestBody)
@@ -130,7 +130,7 @@ describe('facility rule test', async () => {
 
   it('get spaces', async () => {
     const res = await requestWithSupertest
-      .get(`/api/facility/${facilityId}/spaces/get/all`)
+      .get(`/api/facility/${facilityId}/spaces`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
       .send(spaceRequestBody)
@@ -141,7 +141,7 @@ describe('facility rule test', async () => {
 
   it('get space', async () => {
     const res = await requestWithSupertest
-      .get(`/api/facility/${facilityId}/spaces/get/${spaceId}`)
+      .get(`/api/facility/${facilityId}/spaces/${spaceId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
       .expect(200);
@@ -154,7 +154,7 @@ describe('facility rule test', async () => {
   it('should throw error not found with random space id', async () => {
     await requestWithSupertest
       .get(
-        `/api/facility/${facilityId}/spaces/get/1x1234567890123456789012345678901234567890123456789012345678901234`
+        `/api/facility/${facilityId}/spaces/1x1234567890123456789012345678901234567890123456789012345678901234`
       )
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
@@ -165,7 +165,7 @@ describe('facility rule test', async () => {
     const updatedSpace = JSON.parse(JSON.stringify(spaceRequestBody)); //clone
     updatedSpace.metadata.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants = 3;
     await requestWithSupertest
-      .put(`/api/facility/${facilityId}/spaces/update/${spaceId}`)
+      .put(`/api/facility/${facilityId}/spaces/${spaceId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
       .send(updatedSpace)
@@ -174,7 +174,7 @@ describe('facility rule test', async () => {
 
   it('check update space', async () => {
     const res = await requestWithSupertest
-      .get(`/api/facility/${facilityId}/spaces/get/${spaceId}`)
+      .get(`/api/facility/${facilityId}/spaces/${spaceId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
       .expect(200);
@@ -443,7 +443,7 @@ describe('facility rule test', async () => {
 
   it('remove space', async () => {
     await requestWithSupertest
-      .delete(`/api/facility/${facilityId}/spaces/delete/${spaceId}`)
+      .delete(`/api/facility/${facilityId}/spaces/${spaceId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
       .send(spaceRequestBody)
@@ -452,7 +452,7 @@ describe('facility rule test', async () => {
 
   it('remove facility', async () => {
     await requestWithSupertest
-      .delete(`/api/facility/delete/${facilityId}`)
+      .delete(`/api/facility/${facilityId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
       .expect(200);

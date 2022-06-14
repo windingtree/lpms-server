@@ -1133,7 +1133,7 @@ router.delete(
 
 /**
  * @swagger
- * /facility/{facilityId}/activate-service:
+ * /facility/{facilityId}/activate:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -1172,7 +1172,7 @@ router.delete(
  *         description: Some server error
  */
 router.post(
-  '/facility/:facilityId/activate-service',
+  '/facility/:facilityId/activate',
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
   facilityController.activateServices
@@ -1180,7 +1180,7 @@ router.post(
 
 /**
  * @swagger
- * /facility/{facilityId}/deactivate-service:
+ * /facility/{facilityId}/deactivate:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -1219,7 +1219,7 @@ router.post(
  *         description: Some server error
  */
 router.post(
-  '/facility/:facilityId/deactivate-service',
+  '/facility/:facilityId/deactivate',
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
   facilityController.deactivateServices
@@ -1227,7 +1227,7 @@ router.post(
 
 /**
  * @swagger
- * /facility/all:
+ * /facility:
  *   get:
  *     security:
  *       - bearerAuth: []
@@ -1251,7 +1251,7 @@ router.post(
  *         description: Some server error
  */
 router.get(
-  '/facility/all',
+  '/facility',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   facilityController.getAll
@@ -1291,7 +1291,7 @@ router.get(
 
 /**
  * @swagger
- * /facility/create/{facilityId}/:
+ * /facility/{facilityId}:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -1330,7 +1330,7 @@ router.get(
  *         description: Some server error
  */
 router.post(
-  '/facility/create/:facilityId/',
+  '/facility/:facilityId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1339,11 +1339,11 @@ router.post(
 
 /**
  * @swagger
- * /facility/update/{facilityId}:
+ * /facility/{facilityId}:
  *   put:
  *     security:
  *       - bearerAuth: []
- *     summary: update
+ *     summary: update the facility Id metadata
  *     tags: [Facility service]
  *     requestBody:
  *       required: true
@@ -1378,7 +1378,7 @@ router.post(
  *         description: Some server error
  */
 router.put(
-  '/facility/update/:facilityId/',
+  '/facility/:facilityId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1387,8 +1387,8 @@ router.put(
 
 /**
  * @swagger
- * /facility/update/{facilityId}:
- *   put:
+ * /facility/{facilityId}:
+ *   delete:
  *     security:
  *       - bearerAuth: []
  *     summary: update
@@ -1420,7 +1420,7 @@ router.put(
  *         description: Some server error
  */
 router.delete(
-  '/facility/delete/:facilityId/',
+  '/facility/:facilityId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1429,7 +1429,7 @@ router.delete(
 
 /**
  * @swagger
- * /facility/{facilityId}/{itemKey}/get/all:
+ * /facility/{facilityId}/{itemKey}:
  *   get:
  *     security:
  *       - bearerAuth: []
@@ -1466,7 +1466,7 @@ router.delete(
  *         description: Some server error
  */
 router.get(
-  '/facility/:facilityId/:itemKey/get/all',
+  '/facility/:facilityId/:itemKey',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1475,7 +1475,7 @@ router.get(
 
 /**
  * @swagger
- * /facility/{facilityId}/{itemKey}/get/{itemId}:
+ * /facility/{facilityId}/{itemKey}/{itemId}:
  *   get:
  *     security:
  *       - bearerAuth: []
@@ -1518,7 +1518,7 @@ router.get(
  *         description: Some server error
  */
 router.get(
-  '/facility/:facilityId/:itemKey/get/:itemId',
+  '/facility/:facilityId/:itemKey/:itemId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1527,7 +1527,7 @@ router.get(
 
 /**
  * @swagger
- * /facility/{facilityId}/{itemKey}/create/{itemId}:
+ * /facility/{facilityId}/{itemKey}/{itemId}:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -1578,7 +1578,7 @@ router.get(
  *         description: Some server error
  */
 router.post(
-  '/facility/:facilityId/:itemKey/create/:itemId',
+  '/facility/:facilityId/:itemKey/:itemId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1587,7 +1587,7 @@ router.post(
 
 /**
  * @swagger
- * /facility/{facilityId}/{itemKey}/update/{itemId}:
+ * /facility/{facilityId}/{itemKey}/{itemId}:
  *   put:
  *     security:
  *       - bearerAuth: []
@@ -1638,7 +1638,7 @@ router.post(
  *         description: Some server error
  */
 router.put(
-  '/facility/:facilityId/:itemKey/update/:itemId',
+  '/facility/:facilityId/:itemKey/:itemId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
@@ -1647,11 +1647,11 @@ router.put(
 
 /**
  * @swagger
- * /facility/{facilityId}/{itemKey}/delete/{itemId}:
+ * /facility/{facilityId}/{itemKey}/{itemId}:
  *   delete:
  *     security:
  *       - bearerAuth: []
- *     summary: update item metadata
+ *     summary: delete item metadata
  *     tags: [Facility service]
  *     parameters:
  *       - in: path
@@ -1692,7 +1692,7 @@ router.put(
  *         description: Some server error
  */
 router.delete(
-  '/facility/:facilityId/:itemKey/delete/:itemId',
+  '/facility/:facilityId/:itemKey/:itemId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
