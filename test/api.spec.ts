@@ -251,7 +251,7 @@ describe('facility rule test', async () => {
   });
 
   it('remove space rule', async () => {
-    const res = await requestWithSupertest
+    await requestWithSupertest
       .delete(
         `/api/facility/${facilityId}/spaces/${spaceId}/rule/notice_required`
       )
@@ -283,7 +283,7 @@ describe('facility rule test', async () => {
       numSpaces: 10
     };
     ///facility/:facilityId/space/:spaceId/availability
-    const res = await requestWithSupertest
+    await requestWithSupertest
       .post(`/api/facility/${facilityId}/space/${spaceId}/availability`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
