@@ -1,5 +1,5 @@
-import type { NextFunction, Request, Response } from 'express';
-import type {
+import { NextFunction, Request, Response } from 'express';
+import {
   FacilityIndexKey,
   FormattedDate,
   ModifiersKey,
@@ -16,6 +16,7 @@ import {
 } from '../repositories/ModifierRepository';
 import videreService from '../services/VidereService';
 import facilityService from '../services/FacilityService';
+import walletService from '../services/WalletService';
 import facilityRepository from '../repositories/FacilityRepository';
 import { Facility } from '../proto/facility';
 import { validationResult } from 'express-validator';
@@ -23,6 +24,8 @@ import {
   FacilityRuleRepository,
   SpaceRuleRepository
 } from '../repositories/RuleRepository';
+import { getServiceProviderId } from '../utils';
+import { walletAccountsIndexes } from '../types';
 
 export class FacilityController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
@@ -55,16 +58,21 @@ export class FacilityController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-      const { facilityId } = req.params;
+      const { salt } = req.params;
       const { metadata } = req.body;
 
-      if (await facilityRepository.getFacilityKey(facilityId, 'metadata')) {
-        throw ApiError.BadRequest(`facility: ${facilityId} already exist`);
-      }
+      const facilityId = getServiceProviderId(
+        salt,
+        await walletService.getWalletAddressByIndex(walletAccountsIndexes.API)
+      );
+
+      await facilityService.saveFacilityMetadata(
+        facilityId,
+        metadata,
+        undefined,
+        undefined,
+        salt
+      );
 
       await facilityService.setFacilityDbKeys(facilityId, [
         ['metadata', metadata as Facility]
@@ -89,6 +97,23 @@ export class FacilityController {
         throw ApiError.BadRequest(`facility: ${facilityId} not exist`);
       }
 
+      const spaces = await facilityService.getFacilityDbKeyValues(
+        facilityId,
+        'spaces'
+      );
+
+      const otherItems = await facilityService.getFacilityDbKeyValues(
+        facilityId,
+        'otherItems'
+      );
+
+      await facilityService.saveFacilityMetadata(
+        facilityId,
+        metadata,
+        spaces,
+        otherItems
+      );
+
       await facilityService.setFacilityDbKeys(facilityId, [
         ['metadata', metadata as Facility]
       ]);
@@ -111,7 +136,21 @@ export class FacilityController {
         throw ApiError.BadRequest(`facility: ${facilityId} not exist`);
       }
 
-      await facilityService.delFacilityMetadata(facilityId);
+      const stubs = await facilityService.getFacilityDbKeyValues(
+        facilityId,
+        'stubs'
+      );
+
+      if (stubs && stubs.length > 0) {
+        // Deactivate and delist the facility
+        await videreService.stopFacility(facilityId);
+        await facilityRepository.delFacilityFromIndex(facilityId);
+      } else {
+        // Delete the facility and associated scope
+        await videreService.stopFacility(facilityId);
+        await facilityRepository.deAllFacilityKeys(facilityId);
+        await facilityRepository.delFacilityFromIndex(facilityId);
+      }
 
       return res.json({ success: true });
     } catch (e) {

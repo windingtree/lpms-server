@@ -1330,10 +1330,9 @@ router.get(
  *         description: Some server error
  */
 router.post(
-  '/facility/:facilityId',
+  '/facility/:salt',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
   facilityController.create
 );
 

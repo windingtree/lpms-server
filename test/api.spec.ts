@@ -51,7 +51,7 @@ describe('facility rule test', async () => {
     expect(accessToken).to.be.a('string');
   });
 
-  it('create facility', async () => {
+  it.skip('create facility', async () => {
     await requestWithSupertest
       .post(`/api/facility/${facilityId}`)
       .set('Authorization', `Bearer ${accessToken}`)
@@ -60,7 +60,7 @@ describe('facility rule test', async () => {
       .expect(200);
   });
 
-  it('create facility with incorrect id', async () => {
+  it.skip('create facility with incorrect id', async () => {
     await requestWithSupertest
       .post(`/api/facility/0x1231212`)
       .set('Authorization', `Bearer ${accessToken}`)
@@ -78,7 +78,7 @@ describe('facility rule test', async () => {
     expect(res.body.length).to.not.equal(0);
   });
 
-  it('get 1 facility', async () => {
+  it.skip('get 1 facility', async () => {
     const res = await requestWithSupertest
       .get(`/api/facility/${facilityId}`)
       .set('Authorization', `Bearer ${accessToken}`)
@@ -97,7 +97,7 @@ describe('facility rule test', async () => {
       .expect(404);
   });
 
-  it('update facility', async () => {
+  it.skip('update facility', async () => {
     const updatedFacility = JSON.parse(JSON.stringify(facilityRequestBody)); //clone
     updatedFacility.metadata.name += ' updated';
     await requestWithSupertest
@@ -108,7 +108,7 @@ describe('facility rule test', async () => {
       .expect(200);
   });
 
-  it('check update facility', async () => {
+  it.skip('check update facility', async () => {
     const res = await requestWithSupertest
       .get(`/api/facility/${facilityId}`)
       .set('Authorization', `Bearer ${accessToken}`)
@@ -450,7 +450,7 @@ describe('facility rule test', async () => {
       .expect(200);
   });
 
-  it('remove facility', async () => {
+  it.skip('remove facility', async () => {
     await requestWithSupertest
       .delete(`/api/facility/${facilityId}`)
       .set('Authorization', `Bearer ${accessToken}`)

@@ -116,3 +116,11 @@ export async function generateBidLine(
     )
   };
 }
+
+export const getServiceProviderId = (salt: string, address: string): string => {
+  const encoder = new utils.AbiCoder();
+  return utils.solidityKeccak256(
+    ['bytes'],
+    [encoder.encode(['bytes32', 'address'], [salt, address])]
+  );
+};

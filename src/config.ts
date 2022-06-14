@@ -1,9 +1,12 @@
 import type { TypedDataDomain } from '@ethersproject/abstract-signer';
-import { BaseProvider } from '@ethersproject/providers';
 import { VidereConfig } from '@windingtree/videre-sdk';
 import dotenv from 'dotenv';
 import { providers, utils } from 'ethers';
-import { LineRegistry__factory } from '../typechain-videre';
+import {
+  LineRegistry__factory,
+  ServiceProviderRegistry__factory,
+  ServiceProviderRegistry
+} from '../typechain-videre';
 import log from './services/LogService';
 
 dotenv.config();
@@ -64,24 +67,36 @@ export const videreConfig: VidereConfig = {
 export let lineRegistryDataDomain: TypedDataDomain;
 export let serviceProviderDataDomain: TypedDataDomain;
 export let staysDataDomain: TypedDataDomain;
-export let provider: BaseProvider;
+
+export const provider = new providers.JsonRpcProvider(
+  String(process.env.APP_NETWORK_PROVIDER)
+);
+export const lineRegistry = String(process.env.APP_VERIFYING_CONTRACT);
+export const lineRegistryContract = LineRegistry__factory.connect(
+  lineRegistry,
+  provider
+);
 
 export let serviceProviderRegistryAddress: string;
 export let lineRegistryAddress: string;
 export let staysAddress: string;
 
-// configure from the RPC
-(async () => {
-  provider = new providers.JsonRpcProvider(
-    String(process.env.APP_NETWORK_PROVIDER)
-  );
-  const chainId = (await provider.getNetwork()).chainId;
-
-  const lineRegistry = String(process.env.APP_VERIFYING_CONTRACT);
-  const lineRegistryContract = LineRegistry__factory.connect(
-    lineRegistry,
+export const getServiceProviderContract = (): ServiceProviderRegistry => {
+  if (!serviceProviderRegistryAddress) {
+    throw new Error(
+      'Address of the ServiceProviderRegistry not initialized yet'
+    );
+  }
+  return ServiceProviderRegistry__factory.connect(
+    serviceProviderRegistryAddress,
     provider
   );
+};
+
+// configure from the RPC
+(async () => {
+  const chainId = (await provider.getNetwork()).chainId;
+
   serviceProviderRegistryAddress =
     await lineRegistryContract.serviceProviderRegistry();
   staysAddress = await lineRegistryContract.terms(

@@ -1,23 +1,41 @@
+import { utils, Wallet } from 'ethers';
+import { utils as vUtils, eip712 } from '@windingtree/videre-sdk';
+import { SignedMessage } from '@windingtree/videre-sdk/dist/cjs/utils';
 import { Facility, Item, Space } from '../proto/facility';
+import { ServiceProviderData } from '../proto/storage';
+import facilityRepository, {
+  FacilityRepository
+} from '../repositories/FacilityRepository';
 import {
   FacilityIndexKey,
   FacilityKey,
   FacilitySpaceValues,
   FacilityValues
 } from './DBService';
-import facilityRepository, {
-  FacilityRepository
-} from '../repositories/FacilityRepository';
+import walletService from '../services/WalletService';
+import IpfsApiService from '../services/IpfsApiService';
+import { walletAccountsIndexes } from '../types';
+import {
+  lineRegistryDataDomain,
+  web3StorageKey,
+  provider,
+  getServiceProviderContract
+} from '../config';
 
-type FacilityWithId = {
+export type FacilityWithId = {
   id: string;
   facility: Facility;
 };
 
-type ItemWithId = {
+export type ItemWithId = {
   id: string;
   item: Space | Item;
 };
+
+export const genRole = (facilityId: string, role: number): string =>
+  utils.keccak256(
+    utils.defaultAbiCoder.encode(['bytes32', 'uint256'], [facilityId, role])
+  );
 
 export class FacilityService {
   private repository: FacilityRepository;
@@ -25,6 +43,97 @@ export class FacilityService {
   constructor() {
     this.repository = facilityRepository;
   }
+
+  static signMetadata = async (
+    data: ServiceProviderData & SignedMessage,
+    signer: Wallet
+  ): Promise<Uint8Array> => {
+    const signedMessage = await vUtils.createSignedMessage(
+      lineRegistryDataDomain,
+      eip712.storage.ServiceProviderData,
+      data,
+      signer
+    );
+
+    return ServiceProviderData.toBinary(signedMessage);
+  };
+
+  public saveFacilityMetadata = async (
+    facilityId: string,
+    facility: Facility,
+    spaces?: ItemWithId[],
+    otherItems?: ItemWithId[],
+    salt?: string
+  ): Promise<void> => {
+    // Build raw service provider metadata
+    const serviceProviderData: ServiceProviderData = {
+      serviceProvider: utils.arrayify(facilityId),
+      payload: Facility.toBinary(facility),
+      items: [
+        ...(spaces
+          ? spaces.map((s) => ({
+              item: utils.arrayify(s.id),
+              payload: Space.toBinary(s.item as Space)
+            }))
+          : []),
+        ...(otherItems
+          ? otherItems.map((s) => ({
+              item: utils.arrayify(s.id),
+              payload: Item.toBinary(s.item as Item)
+            }))
+          : [])
+      ],
+      terms: []
+    };
+
+    const signer = await walletService.getWalletByIndex(
+      walletAccountsIndexes.API
+    );
+
+    // Sign metadata with API key
+    const signedMetadata = await FacilityService.signMetadata(
+      serviceProviderData as ServiceProviderData & SignedMessage,
+      signer
+    );
+
+    // Upload signed metadata to the IPFS
+    const storage = new IpfsApiService(web3StorageKey);
+    const file = IpfsApiService.getFileFromBuffer(
+      signedMetadata,
+      `${facilityId}.bin`
+    );
+    const storageIds = await storage.deployFilesToIpfs([file]);
+    const metadataUri = storageIds[0];
+
+    // Check the API key balance
+    // @todo Check with estimation
+    const balance = await signer.getBalance();
+
+    if (balance.isZero()) {
+      throw new Error('API address has zero balance');
+    }
+
+    // Create or update `dataURI`
+    const wallet = signer.connect(provider);
+    const contract = getServiceProviderContract().connect(wallet);
+
+    if (!(await contract.exists(facilityId))) {
+      // enroll the service provider in the ServiceProviderRegistry
+      if (!salt) {
+        throw new Error('Salt string is required for a facility registration');
+      }
+
+      const tx = await contract.enroll(salt, metadataUri);
+      await tx.wait(2);
+    } else {
+      // Update `dataURI` for existed provider
+      await contract['file(bytes32,bytes32,string)'](
+        facilityId,
+        utils.formatBytes32String('dataURI'),
+        metadataUri
+      );
+    }
+  };
 
   public async getAllFacilities(): Promise<FacilityWithId[]> {
     const ids = await facilityRepository.getAllFacilityIds();
