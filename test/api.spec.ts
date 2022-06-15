@@ -69,7 +69,7 @@ describe('facility rule test', async () => {
       .expect(400);
   });
 
-  it('get all facilities', async () => {
+  it.skip('get all facilities', async () => {
     const res = await requestWithSupertest
       .get(`/api/facility`)
       .set('Authorization', `Bearer ${accessToken}`)
