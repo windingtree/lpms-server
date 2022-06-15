@@ -64,7 +64,11 @@ export default class WakuService {
     wakuMessage: WakuMessage
   ): T | undefined {
     if (!wakuMessage.payload) return;
-    return protoMessageInstance.fromBinary(wakuMessage.payload);
+    try {
+      return protoMessageInstance.fromBinary(wakuMessage.payload);
+    } catch (e) {
+      return;
+    }
   }
 
   public async makeWakuObserver(
