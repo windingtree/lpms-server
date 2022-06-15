@@ -26,6 +26,7 @@ import {
 } from '../repositories/RuleRepository';
 import { getServiceProviderId } from '../utils';
 import { walletAccountsIndexes } from '../types';
+import stubService from '../services/StubService';
 
 export class FacilityController {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
@@ -538,6 +539,54 @@ export class FacilityController {
       next(e);
     }
   };
+
+  async getAllFacilityStubs(req: Request, res: Response, next: NextFunction) {
+    try {
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
+      const { facilityId } = req.params;
+
+      const page = req.query.page ?? 1;
+      const perPage = req.query.perPage ?? 10;
+
+      const stubs = await stubService.getFacilityStubs(
+        facilityId,
+        page as number,
+        perPage as number
+      );
+
+      return res.json(stubs);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async getFacilityStubsByDate(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    try {
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
+      const { facilityId, date } = req.params;
+
+      const stubs = await stubService.getFacilityStubsByDate(
+        facilityId,
+        date as FormattedDate
+      );
+
+      return res.json(stubs);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export default new FacilityController();

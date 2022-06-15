@@ -5,6 +5,7 @@ import facilityRepository from '../repositories/FacilityRepository';
 import { Space } from '../proto/facility';
 import { validationResult } from 'express-validator';
 import { FacilityIndexKey } from '../services/DBService';
+import stubService from '../services/StubService';
 
 export class FacilityItemController {
   getAllItems = async (req: Request, res: Response, next: NextFunction) => {
@@ -145,6 +146,28 @@ export class FacilityItemController {
       next(e);
     }
   };
+
+  async getStubsByDate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const errors = validationResult(req);
+
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
+      const { facilityId, itemId } = req.params;
+      const { date } = req.body;
+
+      const stubs = await stubService.getSpaceStubsByDate(
+        facilityId,
+        itemId,
+        date
+      );
+
+      return res.json(stubs);
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export default new FacilityItemController();

@@ -340,7 +340,7 @@ export default router;
  *           type: string
  *       - in: path
  *         name: date
- *         description: Availability date formatted as SQL date: "yyyy-MM-dd"
+ *         description: Availability date formatted as SQL date - "yyyy-MM-dd"
  *         required: true
  *         schema:
  *           type: string
@@ -404,7 +404,7 @@ router.get(
  *           type: string
  *       - in: path
  *         name: date
- *         description: Availability date formatted as SQL date: "yyyy-MM-dd"
+ *         description: Availability date formatted as SQL date - "yyyy-MM-dd"
  *         required: true
  *         schema:
  *           type: string
@@ -454,14 +454,14 @@ router.post(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
  *       - in: path
  *         name: spaceId
  *         required: true
- *         description: The facility space Id
+ *         description: The facility space id
  *         schema:
  *           type: string
  *     responses:
@@ -498,7 +498,7 @@ router.post(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -543,7 +543,7 @@ router.get(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -556,7 +556,7 @@ router.get(
  *           enum: ["spaces", "otherItems"]
  *       - in: path
  *         name: itemId
- *         description: The item Id
+ *         description: The item id
  *         required: true
  *         schema:
  *           type: string
@@ -608,7 +608,7 @@ router.get(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -662,7 +662,7 @@ router.post(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -675,7 +675,7 @@ router.post(
  *           enum: ["spaces", "otherItems"]
  *       - in: path
  *         name: itemId
- *         description: The item Id
+ *         description: The item id
  *         required: true
  *         schema:
  *           type: string
@@ -722,7 +722,7 @@ router.post(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -769,7 +769,7 @@ router.delete(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -782,7 +782,7 @@ router.delete(
  *           enum: ["spaces", "otherItems"]
  *       - in: path
  *         name: itemId
- *         description: The item Id
+ *         description: The item id
  *         required: true
  *         schema:
  *           type: string
@@ -874,13 +874,13 @@ router.get(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
  *       - in: path
  *         name: itemId
- *         description: The item Id
+ *         description: The item id
  *         required: true
  *         schema:
  *           type: string
@@ -932,7 +932,7 @@ router.get(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -986,13 +986,13 @@ router.post(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
  *       - in: path
  *         name: itemId
- *         description: The item Id
+ *         description: The item id
  *         required: true
  *         schema:
  *           type: string
@@ -1040,7 +1040,7 @@ router.post(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -1088,13 +1088,13 @@ router.delete(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
  *       - in: path
  *         name: itemId
- *         description: The item Id
+ *         description: The item id
  *         required: true
  *         schema:
  *           type: string
@@ -1148,7 +1148,7 @@ router.delete(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -1195,7 +1195,7 @@ router.post(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -1306,7 +1306,7 @@ router.get(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -1353,7 +1353,7 @@ router.post(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -1395,7 +1395,7 @@ router.put(
  *     parameters:
  *       - in: path
  *         name: facilityId
- *         description: The facility Id
+ *         description: The facility id
  *         required: true
  *         schema:
  *           type: string
@@ -1436,11 +1436,11 @@ router.delete(
  *     tags: [Facility service]
  *     parameters:
  *       - in: path
- *          name: facilityId
- *          description: The facility Id
- *          required: true
- *          schema:
- *            type: string
+ *         name: facilityId
+ *         description: The facility id
+ *         required: true
+ *         schema:
+ *           type: string
  *       - in: path
  *         name: itemKey
  *         description: The item key
@@ -1482,23 +1482,23 @@ router.get(
  *     tags: [Facility service]
  *     parameters:
  *       - in: path
- *          name: facilityId
- *          description: The facility Id
- *          required: true
- *          schema:
- *            type: string
- *      - in: path
+ *         name: facilityId
+ *         description: The facility id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
  *         name: itemKey
  *         description: The item key
  *         required: true
  *         schema:
  *           type: string
  *       - in: path
- *          name: itemId
- *          description: The item Id
- *          required: true
- *          schema:
- *            type: string
+ *         name: itemId
+ *         description: The item id
+ *         required: true
+ *         schema:
+ *           type: string
  *     responses:
  *       200:
  *         description: OK
@@ -1545,7 +1545,7 @@ router.get(
  *         required: true
  *         schema:
  *           type: string
- *      - in: path
+ *       - in: path
  *         name: itemKey
  *         description: The item key
  *         required: true
@@ -1605,7 +1605,7 @@ router.post(
  *         required: true
  *         schema:
  *           type: string
- *      - in: path
+ *       - in: path
  *         name: itemKey
  *         description: The item key
  *         required: true
@@ -1659,7 +1659,7 @@ router.put(
  *         required: true
  *         schema:
  *           type: string
- *      - in: path
+ *       - in: path
  *         name: itemKey
  *         description: The item key
  *         required: true
@@ -1695,5 +1695,158 @@ router.delete(
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  facilityItemController.deleteItem
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/stub:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: get all facility stubs (page, )
+ *     tags: [Facility service]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: page
+ *         description: page, default = 1
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: perPage
+ *         description: elements of page, default 10
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.get(
+  '/facility/:facilityId/stub',
+  //authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  facilityController.getAllFacilityStubs
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/stub/:date:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: create item metadata
+ *     tags: [Facility service]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: date
+ *         description: date YYYY-MM-DD
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.get(
+  '/facility/:facilityId/stub/:date',
+  //authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  facilityController.getFacilityStubsByDate
+);
+
+/**
+ * @swagger
+ * /facility/{facilityId}/space/{itemId}/stub/{date}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     summary: stubs of space by date
+ *     tags: [Facility service]
+ *     parameters:
+ *       - in: path
+ *         name: facilityId
+ *         description: The facility id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: itemId
+ *         description: The item id
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: path
+ *         name: date
+ *         description: date YYYY-MM-DD
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: OK
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *       401:
+ *         description: User is not Auth
+ *       403:
+ *         description: Access denied
+ *       404:
+ *         description: Not Found
+ *       500:
+ *         description: Some server error
+ */
+router.get(
+  '/facility/:facilityId/space/:itemId/stub/:date',
+  //authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityItemController.deleteItem
 );
