@@ -13,9 +13,9 @@ export class StubService {
       'stubs'
     )) as string[];
 
+    const lastPage = Math.ceil(ids.length / perPage);
     ids = ids.slice((page - 1) * perPage, page * perPage);
     const stubs = await StubService.getStubsByIds(facilityId, ids);
-    const lastPage = Math.ceil(ids.length / perPage);
 
     return {
       stubs,
