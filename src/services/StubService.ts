@@ -14,8 +14,13 @@ export class StubService {
     )) as string[];
 
     ids = ids.slice((page - 1) * perPage, page * perPage);
+    const stubs = await StubService.getStubsByIds(facilityId, ids);
+    const lastPage = Math.ceil(ids.length / perPage);
 
-    return await StubService.getStubsByIds(facilityId, ids);
+    return {
+      stubs,
+      lastPage
+    };
   }
 
   public async getFacilityStubsByDate(facilityId: string, date: FormattedDate) {

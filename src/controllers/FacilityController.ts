@@ -552,13 +552,13 @@ export class FacilityController {
       const page = req.query.page || 1;
       const perPage = req.query.perPage || 10;
 
-      const stubs = await stubService.getFacilityStubs(
+      const result = await stubService.getFacilityStubs(
         facilityId,
         page as number,
         perPage as number
       );
 
-      return res.json(stubs);
+      return res.json(result);
     } catch (e) {
       next(e);
     }
