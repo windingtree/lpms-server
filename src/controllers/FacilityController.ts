@@ -549,8 +549,8 @@ export class FacilityController {
       }
       const { facilityId } = req.params;
 
-      const page = req.query.page ?? 1;
-      const perPage = req.query.perPage ?? 10;
+      const page = req.query.page || 1;
+      const perPage = req.query.perPage || 10;
 
       const stubs = await stubService.getFacilityStubs(
         facilityId,
