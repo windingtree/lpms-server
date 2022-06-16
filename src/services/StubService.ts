@@ -5,7 +5,7 @@ import { StubStorage } from '../proto/lpms';
 import { FacilityRepository } from '../repositories/FacilityRepository';
 
 export class StubService {
-  public async getFacilityStubs(facilityId: string, index = 1, perPage = 10) {
+  public async getFacilityStubs(facilityId: string, index = 0, perPage = 10) {
     const facilityRepository = new FacilityRepository();
 
     let ids = (await facilityRepository.getFacilityKey(
