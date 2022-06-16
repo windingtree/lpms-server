@@ -90,7 +90,7 @@ describe('facility rule test', async () => {
   it('should throw error not found with random facility id', async () => {
     await requestWithSupertest
       .get(
-        `/api/facility/1x1234567890123456789012345678901234567890123456789012345678901234`
+        `/api/facility/0x1234567890123456789012345678901234567890123456789012345678901211`
       )
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
@@ -154,7 +154,7 @@ describe('facility rule test', async () => {
   it('should throw error not found with random space id', async () => {
     await requestWithSupertest
       .get(
-        `/api/facility/${facilityId}/spaces/1x1234567890123456789012345678901234567890123456789012345678901234`
+        `/api/facility/${facilityId}/spaces/0x1234567890123456789012345678901234567890123456789012345678901222`
       )
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
