@@ -17,16 +17,6 @@ export function convertDaysToSeconds(days: number) {
   return days * 60 * 60 * 24;
 }
 
-//todo relocate to videre-sdk
-export function getCurrentTimestamp(): Timestamp {
-  const timeMS = Date.now();
-
-  return {
-    seconds: BigInt(Math.floor(timeMS / 1000)),
-    nanos: (timeMS % 1000) * 1e6
-  };
-}
-
 // this will check to make sure that the facility has agreed to the line
 // *terms*.
 export async function checkFacilityRegister(

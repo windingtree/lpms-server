@@ -6,8 +6,8 @@ import { walletAccountsIndexes } from '../types';
 import { Ping, Pong } from '../proto/pingpong';
 
 import { lineRegistryDataDomain, videreConfig } from '../config';
-import { getCurrentTimestamp } from '../utils';
 import { AbstractFacilityService } from './interfaces/AbstractFacilityService';
+import { getCurrentTimestamp } from '@windingtree/videre-sdk/dist/cjs/utils';
 
 export class PingPongService extends AbstractFacilityService {
   constructor() {
