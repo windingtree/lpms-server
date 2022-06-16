@@ -2,8 +2,6 @@ import {
   FacilityRuleRepository,
   SpaceRuleRepository
 } from '../src/repositories/RuleRepository';
-import { Exception, Facility, Space, SpaceTier } from '../src/proto/facility';
-import { ContactType } from '../src/proto/contact';
 import { FacilityRepository } from '../src/repositories/FacilityRepository';
 import { SpaceAvailabilityRepository } from '../src/repositories/SpaceAvailabilityRepository';
 import { SpaceStubRepository } from '../src/repositories/SpaceStubRepository';
@@ -17,9 +15,12 @@ import { convertDaysToSeconds } from '../src/utils';
 import { facility, space } from './common';
 
 describe('search service test', async () => {
-  const facilityId = '0x1234567890';
-  const spaceId = '0x1234567890';
-  const spaceId2 = '0x1234567891';
+  const facilityId =
+    '0x1234567890123456789012345678901234567890123456789012345678901222';
+  const spaceId =
+    '0x1234567890123456789012345678901234567890123456789012345678901233';
+  const spaceId2 =
+    '0x1234567890123456789012345678901234567890123456789012345678901244';
   const facilityRepo = new FacilityRepository();
   const facilityRuleRepository = new FacilityRuleRepository(facilityId);
   const spaceRuleRepository = new SpaceRuleRepository(facilityId, spaceId);

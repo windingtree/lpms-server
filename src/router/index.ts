@@ -366,6 +366,7 @@ export default router;
 router.get(
   '/facility/:facilityId/space/:spaceId/availability/:date',
   authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.getSpaceAvailability
 );
 
@@ -428,6 +429,7 @@ router.get(
 router.post(
   '/facility/:facilityId/space/:spaceId/availability/:date',
   authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.createSpaceAvailability
 );
 
@@ -484,6 +486,7 @@ router.post(
 router.post(
   '/facility/:facilityId/space/:spaceId/availability',
   authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.createDefaultSpaceAvailability
 );
 
@@ -529,6 +532,7 @@ router.post(
 router.get(
   '/facility/:facilityId/modifier/:modifierKey',
   authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.getModifierOfFacility
 );
 
@@ -587,6 +591,7 @@ router.get(
 router.get(
   '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
   authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.getModifierOfItem
 );
 
@@ -641,6 +646,7 @@ router.get(
 router.post(
   '/facility/:facilityId/modifier/:modifierKey',
   authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.createFacilityModifier
 );
 
@@ -708,6 +714,7 @@ router.post(
 router.post(
   '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
   authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.createItemModifier
 );
 
@@ -755,6 +762,7 @@ router.post(
 router.delete(
   '/facility/:facilityId/modifier/:modifierKey',
   authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.removeModifierOfFacility
 );
 
@@ -815,6 +823,7 @@ router.delete(
 router.delete(
   '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
   authMiddleware,
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.removeModifierOfItem
 );
 
@@ -1175,6 +1184,7 @@ router.post(
   '/facility/:facilityId/activate',
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.activateServices
 );
 
@@ -1222,6 +1232,7 @@ router.post(
   '/facility/:facilityId/deactivate',
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.deactivateServices
 );
 
@@ -1286,6 +1297,7 @@ router.get(
   '/facility/:facilityId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').isString().isLength({ min: 66, max: 66 }),
   facilityController.get
 );
 
