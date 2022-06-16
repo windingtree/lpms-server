@@ -24,6 +24,10 @@ export class FacilityItemController {
 
   getOneItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, itemKey, itemId } = req.params;
       const item = await facilityRepository.getItemKey<Space>(
         facilityId,

@@ -41,6 +41,10 @@ export class FacilityController {
 
   get = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId } = req.params;
       const facility = await facilityRepository.getFacilityKey(
         facilityId,
@@ -59,6 +63,10 @@ export class FacilityController {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { salt } = req.params;
       const { metadata } = req.body;
 
@@ -166,6 +174,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, spaceId, date } = req.params;
 
       const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
@@ -192,6 +204,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, spaceId, date } = req.params;
       const { numSpaces } = req.body;
 
@@ -217,6 +233,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, spaceId } = req.params;
       const { numSpaces } = req.body;
 
@@ -236,6 +256,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, modifierKey } = req.params;
 
       const repository = new FacilityModifierRepository(facilityId);
@@ -262,6 +286,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, itemKey, itemId, modifierKey } = req.params;
 
       const repository = new ItemModifierRepository(
@@ -299,6 +327,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, modifierKey } = req.params;
       const modifier = req.body;
 
@@ -321,6 +353,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, itemKey, itemId, modifierKey } = req.params;
       const modifier = req.body;
 
@@ -348,6 +384,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, modifierKey } = req.params;
 
       const repository = new FacilityModifierRepository(facilityId);
@@ -366,6 +406,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, itemKey, itemId, modifierKey } = req.params;
 
       const repository = new ItemModifierRepository(
@@ -389,6 +433,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, ruleKey } = req.params;
 
       const repository = new FacilityRuleRepository(facilityId);
@@ -409,6 +457,10 @@ export class FacilityController {
   // Returns rule of the item: `spaces` or `otherItems`
   getRuleOfItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, itemId, ruleKey } = req.params;
 
       const repository = new SpaceRuleRepository(facilityId, itemId);
@@ -434,6 +486,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, ruleKey } = req.params;
       const rule = req.body;
 
@@ -450,6 +506,10 @@ export class FacilityController {
   // Creates a rule for the item: spaces or otherItems
   createItemRule = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, itemId, ruleKey } = req.params;
       const rule = req.body;
 
@@ -470,6 +530,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, ruleKey } = req.params;
 
       const repository = new FacilityRuleRepository(facilityId);
@@ -484,6 +548,10 @@ export class FacilityController {
   // Removes rule of the item: `spaces` or `otherItems`
   delRuleOfItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId, itemId, ruleKey } = req.params;
 
       const repository = new SpaceRuleRepository(facilityId, itemId);
@@ -503,6 +571,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId } = req.params;
 
       await videreService.startFacility(facilityId);
@@ -520,6 +592,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Validation error', errors.array()));
+      }
       const { facilityId } = req.params;
 
       await videreService.stopFacility(facilityId);

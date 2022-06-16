@@ -10,6 +10,7 @@ import storageController from '../controllers/StorageController';
 import facilityController from '../controllers/FacilityController';
 import walletController from '../controllers/WalletController';
 import facilityItemController from '../controllers/FacilityItemController';
+import { validateBytes32StringRule } from '../rules/Bytes32StringRules';
 
 const router = Router();
 
@@ -366,7 +367,7 @@ export default router;
 router.get(
   '/facility/:facilityId/space/:spaceId/availability/:date',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.getSpaceAvailability
 );
 
@@ -429,7 +430,7 @@ router.get(
 router.post(
   '/facility/:facilityId/space/:spaceId/availability/:date',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.createSpaceAvailability
 );
 
@@ -486,7 +487,7 @@ router.post(
 router.post(
   '/facility/:facilityId/space/:spaceId/availability',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.createDefaultSpaceAvailability
 );
 
@@ -532,7 +533,7 @@ router.post(
 router.get(
   '/facility/:facilityId/modifier/:modifierKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.getModifierOfFacility
 );
 
@@ -591,7 +592,7 @@ router.get(
 router.get(
   '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.getModifierOfItem
 );
 
@@ -646,7 +647,7 @@ router.get(
 router.post(
   '/facility/:facilityId/modifier/:modifierKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.createFacilityModifier
 );
 
@@ -714,7 +715,7 @@ router.post(
 router.post(
   '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.createItemModifier
 );
 
@@ -762,7 +763,7 @@ router.post(
 router.delete(
   '/facility/:facilityId/modifier/:modifierKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.removeModifierOfFacility
 );
 
@@ -823,7 +824,7 @@ router.delete(
 router.delete(
   '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.removeModifierOfItem
 );
 
@@ -868,7 +869,7 @@ router.delete(
 router.get(
   '/facility/:facilityId/rule/:ruleKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.getRuleOfFacility
 );
 
@@ -920,7 +921,7 @@ router.get(
 router.get(
   '/facility/:facilityId/spaces/:itemId/rule/:ruleKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.getRuleOfItem
 );
 
@@ -974,7 +975,7 @@ router.get(
 router.post(
   '/facility/:facilityId/rule/:ruleKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.createFacilityRule
 );
 
@@ -1034,7 +1035,7 @@ router.post(
 router.post(
   '/facility/:facilityId/spaces/:itemId/rule/:ruleKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.createItemRule
 );
 
@@ -1082,7 +1083,7 @@ router.post(
 router.delete(
   '/facility/:facilityId/rule/:ruleKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.delRuleOfFacility
 );
 
@@ -1136,7 +1137,7 @@ router.delete(
 router.delete(
   '/facility/:facilityId/spaces/:itemId/rule/:ruleKey',
   authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.delRuleOfItem
 );
 
@@ -1184,7 +1185,7 @@ router.post(
   '/facility/:facilityId/activate',
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.activateServices
 );
 
@@ -1232,7 +1233,7 @@ router.post(
   '/facility/:facilityId/deactivate',
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.deactivateServices
 );
 
@@ -1263,8 +1264,8 @@ router.post(
  */
 router.get(
   '/facility',
-  //authMiddleware,
-  //roleMiddleware([AppRole.MANAGER]),
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
   facilityController.getAll
 );
 
@@ -1295,9 +1296,9 @@ router.get(
  */
 router.get(
   '/facility/:facilityId',
-  //authMiddleware,
-  //roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.get
 );
 
@@ -1343,8 +1344,8 @@ router.get(
  */
 router.post(
   '/facility/:salt',
-  //authMiddleware,
-  //roleMiddleware([AppRole.MANAGER]),
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
   facilityController.create
 );
 
@@ -1390,9 +1391,9 @@ router.post(
  */
 router.put(
   '/facility/:facilityId',
-  //authMiddleware,
-  //roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.update
 );
 
@@ -1432,9 +1433,9 @@ router.put(
  */
 router.delete(
   '/facility/:facilityId',
-  //authMiddleware,
-  //roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.delete
 );
 
@@ -1478,9 +1479,9 @@ router.delete(
  */
 router.get(
   '/facility/:facilityId/:itemKey',
-  //authMiddleware,
-  //roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityItemController.getAllItems
 );
 
@@ -1530,9 +1531,9 @@ router.get(
  */
 router.get(
   '/facility/:facilityId/:itemKey/:itemId',
-  //authMiddleware,
-  //roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityItemController.getOneItem
 );
 
@@ -1590,9 +1591,9 @@ router.get(
  */
 router.post(
   '/facility/:facilityId/:itemKey/:itemId',
-  //authMiddleware,
-  //roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityItemController.createItem
 );
 
@@ -1650,9 +1651,9 @@ router.post(
  */
 router.put(
   '/facility/:facilityId/:itemKey/:itemId',
-  //authMiddleware,
-  //roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityItemController.updateItem
 );
 
@@ -1704,9 +1705,9 @@ router.put(
  */
 router.delete(
   '/facility/:facilityId/:itemKey/:itemId',
-  //authMiddleware,
-  //roleMiddleware([AppRole.MANAGER]),
-  param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityItemController.delItem
 );
 
@@ -1758,8 +1759,8 @@ router.delete(
  */
 router.get(
   '/facility/:facilityId/stub',
-  //authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  authMiddleware,
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.getAllFacilityStubs
 );
 
@@ -1805,8 +1806,8 @@ router.get(
  */
 router.get(
   '/facility/:facilityId/stub/:date',
-  //authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  authMiddleware,
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityController.getFacilityStubsByDate
 );
 
@@ -1858,7 +1859,7 @@ router.get(
  */
 router.get(
   '/facility/:facilityId/space/:itemId/stub/:date',
-  //authMiddleware,
-  param('facilityId').isString().isLength({ min: 66, max: 66 }),
+  authMiddleware,
+  param('facilityId').custom((v) => validateBytes32StringRule(v)),
   facilityItemController.delItem
 );
