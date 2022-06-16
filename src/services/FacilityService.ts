@@ -124,14 +124,15 @@ export class FacilityService {
       }
 
       const tx = await contract.enroll(salt, metadataUri);
-      await tx.wait(2);
+      await tx.wait(1);
     } else {
       // Update `dataURI` for existed provider
-      await contract['file(bytes32,bytes32,string)'](
+      const tx = await contract['file(bytes32,bytes32,string)'](
         facilityId,
         utils.formatBytes32String('dataURI'),
         metadataUri
       );
+      await tx.wait(1);
     }
   };
 
