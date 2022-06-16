@@ -12,7 +12,7 @@ import { web3StorageKey, lineRegistryDataDomain } from '../config';
 import { walletAccountsIndexes } from '../types';
 import { Facility, Item, ItemType, Space } from '../proto/facility';
 import facilityService from '../services/FacilityService';
-import { FacilitySpaceValues } from 'src/services/DBService';
+import { FacilitySpaceValues } from '../services/DBService';
 const { readFile } = promises;
 
 export class StorageController {
