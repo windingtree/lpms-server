@@ -1,28 +1,20 @@
 import { eip712 } from '@windingtree/videre-sdk';
-import { BigNumber, utils, Wallet } from 'ethers';
-import { staysDataDomain, videreConfig } from './config';
+import { BigNumber, providers, utils, Wallet } from 'ethers';
+import {
+  serviceProviderRegistryAddress,
+  staysDataDomain,
+  videreConfig
+} from './config';
 import { Timestamp } from './proto/timestamp';
-import { providers } from 'ethers';
 import {
   LineRegistry__factory,
   ServiceProviderRegistry__factory
 } from '../typechain-videre';
 import walletService from './services/WalletService';
 import { ServiceRole, walletAccountsIndexes } from './types';
-import { serviceProviderRegistryAddress } from './config';
 
 export function convertDaysToSeconds(days: number) {
   return days * 60 * 60 * 24;
-}
-
-//todo relocate to videre-sdk
-export function getCurrentTimestamp(): Timestamp {
-  const timeMS = Date.now();
-
-  return {
-    seconds: BigInt(Math.floor(timeMS / 1000)),
-    nanos: (timeMS % 1000) * 1e6
-  };
 }
 
 // this will check to make sure that the facility has agreed to the line
@@ -116,3 +108,9 @@ export async function generateBidLine(
     )
   };
 }
+
+export const getServiceProviderId = (salt: string, address: string): string => {
+  return utils.keccak256(
+    utils.defaultAbiCoder.encode(['bytes32', 'address'], [salt, address])
+  );
+};

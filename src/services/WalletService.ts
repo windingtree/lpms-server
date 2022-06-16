@@ -1,5 +1,5 @@
 import { ethers, utils, Wallet } from 'ethers';
-import { walletAccount, walletAccounts } from '../types';
+import { walletAccount, walletAccounts, walletAccountsIndexes } from '../types';
 import { walletPassphrase } from '../config';
 import DBService from './DBService';
 import { Level } from 'level';
@@ -71,6 +71,13 @@ export class WalletService {
     const address = addresses.find((v) => v.role === role);
 
     return address?.address || '';
+  }
+
+  public async getWalletAddressByIndex(
+    role: walletAccountsIndexes
+  ): Promise<string> {
+    const account = await this.getWalletByIndex(role);
+    return await account.getAddress();
   }
 }
 

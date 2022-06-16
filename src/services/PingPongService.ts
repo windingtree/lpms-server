@@ -8,10 +8,9 @@ import { Facility as FacilityMetadata } from '../proto/facility';
 import facilityRepository, {
   FacilityRepository
 } from '../repositories/FacilityRepository';
-
 import { lineRegistryDataDomain, videreConfig } from '../config';
-import { getCurrentTimestamp } from '../utils';
 import { AbstractFacilityService } from './interfaces/AbstractFacilityService';
+import { getCurrentTimestamp } from '@windingtree/videre-sdk/dist/cjs/utils';
 import { LatLng } from '../proto/latlng';
 
 export class PingPongService extends AbstractFacilityService {
