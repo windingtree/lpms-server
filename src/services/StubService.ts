@@ -5,7 +5,7 @@ import { StubStorage } from '../proto/lpms';
 import { FacilityRepository } from '../repositories/FacilityRepository';
 
 export class StubService {
-  public async getFacilityStubs(facilityId: string, page = 1, perPage = 10) {
+  public async getFacilityStubs(facilityId: string, index = 1, perPage = 10) {
     const facilityRepository = new FacilityRepository();
 
     let ids = (await facilityRepository.getFacilityKey(
@@ -14,7 +14,7 @@ export class StubService {
     )) as string[];
 
     const lastPage = Math.ceil(ids.length / perPage);
-    ids = ids.slice((page - 1) * perPage, page * perPage);
+    ids = ids.slice(index * perPage, (index + 1) * perPage);
     const stubs = await StubService.getStubsByIds(facilityId, ids);
 
     return {

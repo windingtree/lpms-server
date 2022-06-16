@@ -113,7 +113,7 @@ export class FacilityItemController {
     }
   };
 
-  deleteItem = async (req: Request, res: Response, next: NextFunction) => {
+  delItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {

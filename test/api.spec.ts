@@ -207,14 +207,12 @@ describe('facility rule test', async () => {
     expect(res.body.value).to.be.equal(60 * 60);
   });
 
-  it('request space rule but get facility rule', async () => {
-    const res = await requestWithSupertest
+  it('should throw not found space rule', async () => {
+    await requestWithSupertest
       .get(`/api/facility/${facilityId}/spaces/${spaceId}/rule/notice_required`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
-      .expect(200);
-
-    expect(res.body.value).to.be.equal(60 * 60);
+      .expect(404);
   });
 
   it('create space rule', async () => {

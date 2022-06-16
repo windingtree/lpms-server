@@ -39,7 +39,7 @@ export class FacilityController {
     }
   };
 
-  getOne = async (req: Request, res: Response, next: NextFunction) => {
+  get = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { facilityId } = req.params;
       const facility = await facilityRepository.getFacilityKey(
@@ -149,7 +149,7 @@ export class FacilityController {
       } else {
         // Delete the facility and associated scope
         await videreService.stopFacility(facilityId);
-        await facilityRepository.deAllFacilityKeys(facilityId);
+        await facilityRepository.delAllFacilityKeys(facilityId);
         await facilityRepository.delFacilityFromIndex(facilityId);
       }
 
@@ -413,17 +413,11 @@ export class FacilityController {
 
       const repository = new SpaceRuleRepository(facilityId, itemId);
 
-      let rule = await repository.getRule(ruleKey as RulesItemKey);
-
-      if (!rule) {
-        // If item does not contain such rule then try to lookup the facility
-        const facilityRepository = new FacilityRuleRepository(facilityId);
-        rule = await facilityRepository.getRule(ruleKey as RulesItemKey);
-      }
+      const rule = await repository.getRule(ruleKey as RulesItemKey);
 
       if (!rule) {
         throw ApiError.NotFound(
-          `Unable to get "${rule}": ${itemId} of the facility: ${facilityId}`
+          `Unable to get "${ruleKey}": ${itemId} of the facility: ${facilityId}`
         );
       }
 
@@ -470,7 +464,7 @@ export class FacilityController {
   };
 
   // Removes a rule from the facility
-  removeRuleOfFacility = async (
+  delRuleOfFacility = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -488,11 +482,7 @@ export class FacilityController {
   };
 
   // Removes rule of the item: `spaces` or `otherItems`
-  removeRuleOfItem = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+  delRuleOfItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { facilityId, itemId, ruleKey } = req.params;
 
@@ -549,12 +539,12 @@ export class FacilityController {
       }
       const { facilityId } = req.params;
 
-      const page = req.query.page || 1;
+      const index = req.query.index || 0;
       const perPage = req.query.perPage || 10;
 
       const result = await stubService.getFacilityStubs(
         facilityId,
-        page as number,
+        index as number,
         perPage as number
       );
 

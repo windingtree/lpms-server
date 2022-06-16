@@ -123,7 +123,7 @@ export class FacilityRepository {
     await this.dbService.getFacilityDB(facilityId).del(key);
   }
 
-  public async deAllFacilityKeys(facilityId: string): Promise<void> {
+  public async delAllFacilityKeys(facilityId: string): Promise<void> {
     await this.dbService.getFacilityDB(facilityId).clear();
   }
 

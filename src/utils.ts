@@ -1,15 +1,17 @@
 import { eip712 } from '@windingtree/videre-sdk';
-import { BigNumber, utils, Wallet } from 'ethers';
-import { staysDataDomain, videreConfig } from './config';
+import { BigNumber, providers, utils, Wallet } from 'ethers';
+import {
+  serviceProviderRegistryAddress,
+  staysDataDomain,
+  videreConfig
+} from './config';
 import { Timestamp } from './proto/timestamp';
-import { providers } from 'ethers';
 import {
   LineRegistry__factory,
   ServiceProviderRegistry__factory
 } from '../typechain-videre';
 import walletService from './services/WalletService';
 import { ServiceRole, walletAccountsIndexes } from './types';
-import { serviceProviderRegistryAddress } from './config';
 
 export function convertDaysToSeconds(days: number) {
   return days * 60 * 60 * 24;
@@ -118,9 +120,7 @@ export async function generateBidLine(
 }
 
 export const getServiceProviderId = (salt: string, address: string): string => {
-  const encoder = new utils.AbiCoder();
-  return utils.solidityKeccak256(
-    ['bytes'],
-    [encoder.encode(['bytes32', 'address'], [salt, address])]
+  return utils.keccak256(
+    utils.defaultAbiCoder.encode(['bytes32', 'address'], [salt, address])
   );
 };

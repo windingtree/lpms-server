@@ -1074,7 +1074,7 @@ router.delete(
   '/facility/:facilityId/rule/:ruleKey',
   authMiddleware,
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
-  facilityController.removeRuleOfFacility
+  facilityController.delRuleOfFacility
 );
 
 /**
@@ -1128,7 +1128,7 @@ router.delete(
   '/facility/:facilityId/spaces/:itemId/rule/:ruleKey',
   authMiddleware,
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
-  facilityController.removeRuleOfItem
+  facilityController.delRuleOfItem
 );
 
 /**
@@ -1286,7 +1286,7 @@ router.get(
   '/facility/:facilityId',
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
-  facilityController.getOne
+  facilityController.get
 );
 
 /**
@@ -1695,7 +1695,7 @@ router.delete(
   //authMiddleware,
   //roleMiddleware([AppRole.MANAGER]),
   param('facilityId').isString().isLength({ min: 66, max: 66 }), //todo how to check it?
-  facilityItemController.deleteItem
+  facilityItemController.delItem
 );
 
 /**
@@ -1714,8 +1714,8 @@ router.delete(
  *         schema:
  *           type: string
  *       - in: query
- *         name: page
- *         description: page, default = 1
+ *         name: index
+ *         description: index, default = 0
  *         required: true
  *         schema:
  *           type: string
@@ -1848,5 +1848,5 @@ router.get(
   '/facility/:facilityId/space/:itemId/stub/:date',
   //authMiddleware,
   param('facilityId').isString().isLength({ min: 66, max: 66 }),
-  facilityItemController.deleteItem
+  facilityItemController.delItem
 );
