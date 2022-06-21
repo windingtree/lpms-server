@@ -1308,53 +1308,6 @@ router.get(
  *   post:
  *     security:
  *       - bearerAuth: []
- *     summary: create facility
- *     tags: [Facility service]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *     parameters:
- *       - in: path
- *         name: facilityId
- *         description: The facility id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: OK
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 success:
- *                   type: boolean
- *       401:
- *         description: User is not Auth
- *       403:
- *         description: Access denied
- *       404:
- *         description: Not Found
- *       500:
- *         description: Some server error
- */
-router.post(
-  '/facility/:salt',
-  authMiddleware,
-  roleMiddleware([AppRole.MANAGER]),
-  facilityController.create
-);
-
-/**
- * @swagger
- * /facility/{facilityId}:
- *   put:
- *     security:
- *       - bearerAuth: []
  *     summary: update the facility Id metadata
  *     tags: [Facility service]
  *     requestBody:
@@ -1389,7 +1342,7 @@ router.post(
  *       500:
  *         description: Some server error
  */
-router.put(
+router.post(
   '/facility/:facilityId',
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
