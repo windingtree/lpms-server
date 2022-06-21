@@ -47,6 +47,13 @@ export default class WakuService {
     });
   }
 
+  public async stop(): Promise<void> {
+    if (this.isConnected) {
+      await this.waku.stop();
+      this.isConnected = false;
+    }
+  }
+
   public async sendMessage<T extends object>(
     protoMessageInstance: MessageType<T>,
     message: T,
