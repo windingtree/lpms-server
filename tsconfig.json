@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "esnext",
     "target": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "noImplicitAny": false,
     "sourceMap": true,
-    "outDir": "./dist/cjs",
+    "outDir": "./dist/esm",
     "declaration": true,
     "baseUrl": ".",
     "experimentalDecorators": true,
