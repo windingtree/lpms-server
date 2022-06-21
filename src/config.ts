@@ -1,4 +1,5 @@
-import type { TypedDataDomain } from '@ethersproject/abstract-signer';
+import { resolve } from 'path';
+import { TypedDataDomain } from '@ethersproject/abstract-signer';
 import { VidereConfig } from '@windingtree/videre-sdk';
 import dotenv from 'dotenv';
 import { providers, utils } from 'ethers';
@@ -7,11 +8,14 @@ import {
   ServiceProviderRegistry__factory,
   ServiceProviderRegistry
 } from '../typechain-videre';
-import log from './services/LogService';
 
-dotenv.config();
+dotenv.config({
+  ...(process.env.NODE_ENV === 'development'
+    ? { path: resolve(process.cwd(), '.env.local') }
+    : {})
+});
 
-const checkEnvVariables = (vars: string[]): void =>
+export const checkEnvVariables = (vars: string[]): void =>
   vars.forEach((variable) => {
     if (!process.env[variable] || process.env[variable] === '') {
       throw new Error(`${variable} must be provided in the ENV`);
@@ -59,14 +63,18 @@ export const wakuConfig = {
     ]
   }
 };
+
 export const videreConfig: VidereConfig = {
   line: String(process.env.APP_LINE),
   version: Number(process.env.APP_VERSION)
 };
 
-export let lineRegistryDataDomain: TypedDataDomain;
-export let serviceProviderDataDomain: TypedDataDomain;
-export let staysDataDomain: TypedDataDomain;
+let chainId: number;
+let serviceProviderRegistryAddress: string;
+let staysAddress: string;
+let lineRegistryDataDomain: TypedDataDomain;
+let serviceProviderDataDomain: TypedDataDomain;
+let staysDataDomain: TypedDataDomain;
 
 export const provider = new providers.JsonRpcProvider(
   String(process.env.APP_NETWORK_PROVIDER)
@@ -77,58 +85,80 @@ export const lineRegistryContract = LineRegistry__factory.connect(
   provider
 );
 
-export let serviceProviderRegistryAddress: string;
-export let lineRegistryAddress: string;
-export let staysAddress: string;
-
-export const getServiceProviderContract = (): ServiceProviderRegistry => {
-  if (!serviceProviderRegistryAddress) {
-    throw new Error(
-      'Address of the ServiceProviderRegistry not initialized yet'
-    );
+export const getChainId = async (): Promise<number> => {
+  if (chainId) {
+    return chainId;
   }
-  return ServiceProviderRegistry__factory.connect(
-    serviceProviderRegistryAddress,
-    provider
-  );
+  const network = await provider.getNetwork();
+  chainId = network.chainId;
+  return Number(chainId);
 };
 
-// configure from the RPC
-(async () => {
-  const chainId = (await provider.getNetwork()).chainId;
-
+export const getServiceProviderRegistryAddress = async () => {
+  if (serviceProviderRegistryAddress) {
+    return serviceProviderRegistryAddress;
+  }
   serviceProviderRegistryAddress =
     await lineRegistryContract.serviceProviderRegistry();
+  return serviceProviderRegistryAddress;
+};
+
+export const getServiceProviderContract =
+  async (): Promise<ServiceProviderRegistry> => {
+    return ServiceProviderRegistry__factory.connect(
+      await getServiceProviderRegistryAddress(),
+      provider
+    );
+  };
+
+export const getStaysAddress = async (): Promise<string> => {
+  if (staysAddress) {
+    return staysAddress;
+  }
   staysAddress = await lineRegistryContract.terms(
     utils.formatBytes32String(videreConfig.line)
   );
+  return staysAddress;
+};
 
-  log.green(`Chain ID: ${chainId}`);
-  log.green(`Line registry: ${lineRegistry}`);
-  log.green(`Service Provider registry: ${serviceProviderRegistryAddress}`);
-  log.green(`Stays: ${staysAddress}`);
+export const getLineRegistryDataDomain = async () => {
+  if (lineRegistryDataDomain) {
+    return lineRegistryDataDomain;
+  }
 
-  // line registry
   lineRegistryDataDomain = {
     name: videreConfig.line,
     version: String(videreConfig.version),
     verifyingContract: lineRegistry,
-    chainId: Number(chainId)
+    chainId: await getChainId()
   };
+  return lineRegistryDataDomain;
+};
 
-  // service provider registry
+export const getServiceProviderDataDomain = async () => {
+  if (serviceProviderDataDomain) {
+    return serviceProviderDataDomain;
+  }
+
   serviceProviderDataDomain = {
     name: videreConfig.line,
     version: String(videreConfig.version),
-    verifyingContract: serviceProviderRegistryAddress,
-    chainId: Number(chainId)
+    verifyingContract: await getServiceProviderRegistryAddress(),
+    chainId: await getChainId()
   };
+  return serviceProviderDataDomain;
+};
 
-  // stays contract
+export const getStaysDataDomain = async () => {
+  if (staysDataDomain) {
+    return staysDataDomain;
+  }
+
   staysDataDomain = {
     name: videreConfig.line,
     version: String(videreConfig.version),
-    verifyingContract: staysAddress,
-    chainId: Number(chainId)
+    verifyingContract: await getStaysAddress(),
+    chainId: await getChainId()
   };
-})();
+  return staysDataDomain;
+};
