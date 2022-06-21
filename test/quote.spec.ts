@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { expect } from './chai-setup';
+import chai from './chai-setup';
 import { DateTime } from 'luxon';
 import { FormattedDate } from '../src/services/DBService';
 import { Ask } from '../src/proto/ask';
@@ -21,6 +21,8 @@ import quoteService, {
   QuoteService
 } from '../src/services/QuoteService';
 import { BigNumber, BigNumberish } from 'ethers';
+
+const expect = chai.expect;
 
 const createDate = (year: number, month: number, day: number): Date => ({
   year,

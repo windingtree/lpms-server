@@ -7,6 +7,7 @@ import WakuService from './services/WakuService';
 import videreService from './services/VidereService';
 import pingPongService from './services/PingPongService';
 import auctioneerService from './services/AuctioneerService';
+import IpfsService from './services/IpfsService';
 
 process.on('unhandledRejection', async (error) => {
   console.log(error);
@@ -17,6 +18,7 @@ process.on('unhandledRejection', async (error) => {
 const main = async (): Promise<void> => {
   const server = new ServerService(port);
   const wakuService = WakuService.getInstance();
+  const ipfsService = IpfsService.getInstance();
 
   await bootstrapService.bootstrap();
 
@@ -27,6 +29,7 @@ const main = async (): Promise<void> => {
   await server.start();
 
   await wakuService.start();
+  await ipfsService.start();
 
   await videreService.addService(pingPongService);
   await videreService.addService(auctioneerService);
@@ -36,5 +39,7 @@ const main = async (): Promise<void> => {
 export default main().catch(async (error) => {
   console.log(error);
   await DBService.getInstance().close();
+  await WakuService.getInstance().stop();
+  await IpfsService.getInstance().stop();
   process.exit(1);
 });
