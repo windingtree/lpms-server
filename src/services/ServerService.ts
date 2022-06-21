@@ -100,4 +100,15 @@ export default class ServerService {
       }
     });
   }
+
+  async stop(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      try {
+        this.server.once('close', resolve);
+        this.server.close();
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
 }
