@@ -8,7 +8,7 @@ import { ServiceProviderData } from '@windingtree/stays-models/dist/cjs/proto/st
 import { utils as vUtils, eip712 } from '@windingtree/videre-sdk';
 import IpfsApiService from '../services/IpfsApiService';
 import walletService from '../services/WalletService';
-import { web3StorageKey, lineRegistryDataDomain } from '../config';
+import { web3StorageKey, getLineRegistryDataDomain } from '../config';
 import { walletAccountsIndexes } from '../types';
 import { Facility, Item, ItemType, Space } from '../proto/facility';
 import facilityService from '../services/FacilityService';
@@ -21,7 +21,7 @@ export class StorageController {
     signer: Wallet
   ): Promise<Uint8Array> => {
     const signedMessage = await vUtils.createSignedMessage(
-      lineRegistryDataDomain,
+      await getLineRegistryDataDomain(),
       eip712.storage.ServiceProviderData,
       data,
       signer
