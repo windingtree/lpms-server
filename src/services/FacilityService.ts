@@ -13,11 +13,10 @@ import {
   FacilityValues
 } from './DBService';
 import walletService from '../services/WalletService';
-import IpfsApiService from '../services/IpfsApiService';
+import IpfsService from '../services/IpfsService';
 import { walletAccountsIndexes } from '../types';
 import {
   lineRegistryDataDomain,
-  web3StorageKey,
   provider,
   getServiceProviderContract
 } from '../config';
@@ -97,8 +96,8 @@ export class FacilityService {
     );
 
     // Upload signed metadata to the IPFS
-    const storage = new IpfsApiService(web3StorageKey);
-    const file = IpfsApiService.getFileFromBuffer(
+    const storage = IpfsService.getInstance();
+    const file = IpfsService.getFileFromBuffer(
       signedMetadata,
       `${facilityId}.bin`
     );

@@ -6,9 +6,9 @@ import { promises } from 'fs';
 import { utils } from 'ethers';
 import { ServiceProviderData } from '@windingtree/stays-models/dist/cjs/proto/storage';
 import { utils as vUtils, eip712 } from '@windingtree/videre-sdk';
-import IpfsApiService from '../services/IpfsApiService';
+import IpfsService from '../services/IpfsService';
 import walletService from '../services/WalletService';
-import { web3StorageKey, lineRegistryDataDomain } from '../config';
+import { lineRegistryDataDomain } from '../config';
 import { walletAccountsIndexes } from '../types';
 import { Facility, Item, ItemType, Space } from '../proto/facility';
 import facilityService from '../services/FacilityService';
@@ -36,8 +36,8 @@ export class StorageController {
       if (!multerFile) {
         return next(new Error('File not uploaded'));
       }
-      const storage = new IpfsApiService(web3StorageKey);
-      const file = await IpfsApiService.getFileFromMulter(multerFile);
+      const storage = IpfsService.getInstance();
+      const file = await IpfsService.getFileFromMulter(multerFile);
       const result = await storage.deployFilesToIpfs([file]);
       return res.json(result);
     } catch (e) {
@@ -128,8 +128,8 @@ export class StorageController {
         signer
       );
 
-      const storage = new IpfsApiService(web3StorageKey);
-      const file = IpfsApiService.getFileFromBuffer(
+      const storage = IpfsService.getInstance();
+      const file = IpfsService.getFileFromBuffer(
         signedMetadata,
         multerFile.originalname
       );
