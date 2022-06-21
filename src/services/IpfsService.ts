@@ -1,6 +1,7 @@
 import { promises } from 'fs';
 import { File } from '@web-std/file';
 import { IPFS, create } from 'ipfs-core';
+import log from './LogService';
 const { readFile } = promises;
 
 export default class IpfsService {
@@ -15,15 +16,6 @@ export default class IpfsService {
       );
     }
     IpfsService._instance = this;
-
-    (async () => {
-      this.ipfs = await create({
-        config: {}
-      });
-      const version = await this.ipfs.version();
-      console.log('IPFS Version:', version.version);
-      console.log(await this.ipfs.repo.stat());
-    })();
   }
 
   public static getInstance(): IpfsService {
@@ -37,8 +29,8 @@ export default class IpfsService {
   public async start(): Promise<void> {
     this.ipfs = await create({ config: {} });
     const version = await this.ipfs.version();
-    console.log('IPFS Version', version.version);
-    console.log(await this.ipfs.repo.stat());
+    log.green(`IPFS Version: ${version.version}`);
+    log.green(JSON.stringify(await this.ipfs.repo.stat()));
   }
 
   public async stop(): Promise<void> {
