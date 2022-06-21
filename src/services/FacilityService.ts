@@ -16,7 +16,7 @@ import walletService from '../services/WalletService';
 import IpfsApiService from '../services/IpfsApiService';
 import { walletAccountsIndexes } from '../types';
 import {
-  lineRegistryDataDomain,
+  getLineRegistryDataDomain,
   web3StorageKey,
   provider,
   getServiceProviderContract
@@ -49,7 +49,7 @@ export class FacilityService {
     signer: Wallet
   ): Promise<Uint8Array> => {
     const signedMessage = await vUtils.createSignedMessage(
-      lineRegistryDataDomain,
+      await getLineRegistryDataDomain(),
       eip712.storage.ServiceProviderData,
       data,
       signer
@@ -62,8 +62,7 @@ export class FacilityService {
     facilityId: string,
     facility: Facility,
     spaces?: ItemWithId[],
-    otherItems?: ItemWithId[],
-    salt?: string
+    otherItems?: ItemWithId[]
   ): Promise<void> => {
     // Build raw service provider metadata
     const serviceProviderData: ServiceProviderData = {
@@ -105,26 +104,20 @@ export class FacilityService {
     const storageIds = await storage.deployFilesToIpfs([file]);
     const metadataUri = storageIds[0];
 
+    const wallet = signer.connect(provider);
+
     // Check the API key balance
     // @todo Check with estimation
-    const balance = await signer.getBalance();
+    const balance = await wallet.getBalance();
 
     if (balance.isZero()) {
       throw new Error('API address has zero balance');
     }
 
-    // Create or update `dataURI`
-    const wallet = signer.connect(provider);
-    const contract = getServiceProviderContract().connect(wallet);
+    const contract = (await getServiceProviderContract()).connect(wallet);
 
     if (!(await contract.exists(facilityId))) {
-      // enroll the service provider in the ServiceProviderRegistry
-      if (!salt) {
-        throw new Error('Salt string is required for a facility registration');
-      }
-
-      const tx = await contract.enroll(salt, metadataUri);
-      await tx.wait(1);
+      throw new Error(`Facility with Id ${facilityId} does not register yet`);
     } else {
       // Update `dataURI` for existed provider
       const tx = await contract['file(bytes32,bytes32,string)'](
@@ -132,7 +125,7 @@ export class FacilityService {
         utils.formatBytes32String('dataURI'),
         metadataUri
       );
-      await tx.wait(1);
+      await tx.wait();
     }
   };
 
