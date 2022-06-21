@@ -1,11 +1,10 @@
 import { eip712 } from '@windingtree/videre-sdk';
 import { BigNumber, providers, utils, Wallet } from 'ethers';
 import {
-  serviceProviderRegistryAddress,
-  staysDataDomain,
+  getServiceProviderRegistryAddress,
+  getStaysDataDomain,
   videreConfig
 } from './config';
-import { Timestamp } from './proto/timestamp';
 import {
   LineRegistry__factory,
   ServiceProviderRegistry__factory
@@ -47,7 +46,7 @@ export async function verifyFacilityBidder(
   );
 
   return await ServiceProviderRegistry__factory.connect(
-    serviceProviderRegistryAddress,
+    await getServiceProviderRegistryAddress(),
     provider
   ).can(
     facilityId,
@@ -86,25 +85,29 @@ export async function generateBidLine(
       }
     ],
     signature: utils.arrayify(
-      await wallet._signTypedData(staysDataDomain, eip712.bidask.Bid, {
-        salt: salt,
-        limit: limit,
-        expiry: expiry,
-        which: which,
-        params: params,
-        items: items,
-        terms: [],
-        options: {
-          items: [],
-          terms: []
-        },
-        cost: [
-          {
-            gem: gem,
-            wad: wad
-          }
-        ]
-      })
+      await wallet._signTypedData(
+        await getStaysDataDomain(),
+        eip712.bidask.Bid,
+        {
+          salt: salt,
+          limit: limit,
+          expiry: expiry,
+          which: which,
+          params: params,
+          items: items,
+          terms: [],
+          options: {
+            items: [],
+            terms: []
+          },
+          cost: [
+            {
+              gem: gem,
+              wad: wad
+            }
+          ]
+        }
+      )
     )
   };
 }
