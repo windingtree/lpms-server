@@ -16,7 +16,6 @@ import {
 } from '../repositories/ModifierRepository';
 import videreService from '../services/VidereService';
 import facilityService from '../services/FacilityService';
-import walletService from '../services/WalletService';
 import facilityRepository from '../repositories/FacilityRepository';
 import { Facility } from '../proto/facility';
 import { validationResult } from 'express-validator';
@@ -24,8 +23,6 @@ import {
   FacilityRuleRepository,
   SpaceRuleRepository
 } from '../repositories/RuleRepository';
-import { getServiceProviderId } from '../utils';
-import { walletAccountsIndexes } from '../types';
 import stubService from '../services/StubService';
 
 export class FacilityController {
@@ -61,38 +58,6 @@ export class FacilityController {
     }
   };
 
-  create = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-      const { salt } = req.params;
-      const { metadata } = req.body;
-
-      const facilityId = getServiceProviderId(
-        salt,
-        await walletService.getWalletAddressByIndex(walletAccountsIndexes.API)
-      );
-
-      await facilityService.saveFacilityMetadata(
-        facilityId,
-        metadata,
-        undefined,
-        undefined,
-        salt
-      );
-
-      await facilityService.setFacilityDbKeys(facilityId, [
-        ['metadata', metadata as Facility]
-      ]);
-
-      return res.json({ success: true });
-    } catch (e) {
-      next(e);
-    }
-  };
-
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const errors = validationResult(req);
@@ -101,10 +66,6 @@ export class FacilityController {
       }
       const { facilityId } = req.params;
       const { metadata } = req.body;
-
-      if (!(await facilityRepository.getFacilityKey(facilityId, 'metadata'))) {
-        throw ApiError.BadRequest(`facility: ${facilityId} not exist`);
-      }
 
       const spaces = await facilityService.getFacilityDbKeyValues(
         facilityId,
