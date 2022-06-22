@@ -111,6 +111,16 @@ export const sendEther = async (
   await tx.wait();
 };
 
+export const snapshot = async () => {
+  const provider = getProvider('http://127.0.0.1:8545/');
+  return await provider.send('evm_snapshot', []);
+};
+
+export const revert = async (id: string) => {
+  const provider = getProvider('http://127.0.0.1:8545/');
+  return await provider.send('evm_revert', [id]);
+};
+
 export const setupAuth = async (request: SuperTest<Test>): Promise<string> => {
   const managerLogin = utils.formatBytes32String(Math.random().toString());
   const managerPass = utils.formatBytes32String(Math.random().toString());

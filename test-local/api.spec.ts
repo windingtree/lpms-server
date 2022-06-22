@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import supertest, { SuperTest, Test } from 'supertest';
 import ServerService from '../src/services/ServerService';
-import { setupFacility, setupAuth } from './setup';
+import { setupFacility, setupAuth, snapshot, revert } from './setup';
 import { facility } from '../test/common';
 
 describe('Local tests', () => {
@@ -9,12 +9,14 @@ describe('Local tests', () => {
   let requestWithSupertest: SuperTest<Test>;
   let facilityId: string;
   let accessToken: string;
+  let snapshotId: string;
 
   const facilityRequestBody = {
     metadata: facility
   };
 
   before(async () => {
+    snapshotId = await snapshot();
     facilityId = await setupFacility();
     appService = new ServerService(3006);
     await appService.start();
@@ -24,6 +26,7 @@ describe('Local tests', () => {
 
   after(async () => {
     await appService.stop();
+    await revert(snapshotId);
   });
 
   describe('Facility', () => {
