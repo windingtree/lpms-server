@@ -1,6 +1,5 @@
 import DBService, {
   DBLevel,
-  FacilityIndexKey,
   FacilityItemValues,
   FacilityValues,
   LevelDefaultTyping,
@@ -33,30 +32,6 @@ abstract class RuleRepository {
   }
 }
 
-abstract class ItemRuleRepository extends RuleRepository {
-  protected db: AbstractSublevel<
-    AbstractSublevel<
-      AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
-      LevelDefaultTyping,
-      string,
-      FacilityItemValues
-    >,
-    LevelDefaultTyping,
-    RulesItemKey,
-    Rules
-  >;
-
-  protected constructor(
-    facilityId: string,
-    indexKey: FacilityIndexKey,
-    itemId: string
-  ) {
-    super();
-
-    this.db = this.dbService.getItemRulesDB(facilityId, indexKey, itemId);
-  }
-}
-
 export class FacilityRuleRepository extends RuleRepository {
   protected db: AbstractSublevel<
     AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
@@ -72,13 +47,22 @@ export class FacilityRuleRepository extends RuleRepository {
   }
 }
 
-export class SpaceRuleRepository extends ItemRuleRepository {
+export class ItemRuleRepository extends RuleRepository {
+  protected db: AbstractSublevel<
+    AbstractSublevel<
+      AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
+      LevelDefaultTyping,
+      string,
+      FacilityItemValues
+    >,
+    LevelDefaultTyping,
+    RulesItemKey,
+    Rules
+  >;
+
   constructor(facilityId: string, itemId: string) {
-    super(facilityId, 'spaces', itemId);
-  }
-}
-export class OtherItemRuleRepository extends ItemRuleRepository {
-  constructor(facilityId: string, itemId: string) {
-    super(facilityId, 'otherItems', itemId);
+    super();
+
+    this.db = this.dbService.getItemRulesDB(facilityId, 'items', itemId);
   }
 }
