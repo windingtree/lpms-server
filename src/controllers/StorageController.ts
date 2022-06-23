@@ -10,9 +10,9 @@ import IpfsService from '../services/IpfsService';
 import walletService from '../services/WalletService';
 import { getLineRegistryDataDomain } from '../config';
 import { walletAccountsIndexes } from '../types';
-import { Facility, Item, ItemType, Space } from '../proto/facility';
+import { Facility, Item } from '../proto/facility';
 import facilityService from '../services/FacilityService';
-import { FacilitySpaceValues } from '../services/DBService';
+import { Item as ItemMetadata } from '../proto/facility';
 const { readFile } = promises;
 
 export class StorageController {
@@ -66,7 +66,7 @@ export class StorageController {
         serviceProviderData.serviceProvider
       );
 
-      // Extract ans save/update facility from metadata
+      // Extract and save/update facility from metadata
       await facilityService.setFacilityDbKeys(serviceProviderId, [
         [
           'metadata',
@@ -75,44 +75,22 @@ export class StorageController {
       ]);
 
       // Extract spaces from metadata
-      const spaces: Record<string, [string, FacilitySpaceValues][]> = {};
-      const otherItems: Record<string, [string, Item][]> = {};
+      const items: Record<string, [string, ItemMetadata][]> = {};
 
       for (const item of serviceProviderData.items) {
         const itemId = utils.hexlify(item.item);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { type, payload, ...generic } = Item.fromBinary(item.payload);
 
-        if (type === ItemType.SPACE) {
-          spaces[itemId] = [
-            ['metadata', generic as Item],
-            [
-              'metadata_impl',
-              (payload ? Space.fromBinary(payload) : {}) as Space
-            ]
-          ];
-        } else {
-          otherItems[itemId] = [['metadata', generic as Item]];
-        }
+        items[itemId] = [['metadata', generic as Item]];
       }
 
-      // Add/update spaces to DB
+      // Add/update items to DB
       await Promise.all(
-        Object.entries(spaces).map(([itemId, entries]) =>
+        Object.entries(items).map(([itemId, entries]) =>
           facilityService.setItemDbKeys(
             serviceProviderId,
-            'spaces',
-            itemId,
-            entries
-          )
-        )
-      );
-
-      // Add/update other items to DB
-      await Promise.all(
-        Object.entries(otherItems).map(([itemId, entries]) =>
-          facilityService.setItemDbKeys(
-            serviceProviderId,
-            'otherItems',
+            'items',
             itemId,
             entries
           )
