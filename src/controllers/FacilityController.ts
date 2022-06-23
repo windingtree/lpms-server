@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import {
-  FacilityIndexKey,
   FormattedDate,
   ModifiersKey,
   ModifiersValues,
@@ -21,7 +20,7 @@ import { Facility } from '../proto/facility';
 import { validationResult } from 'express-validator';
 import {
   FacilityRuleRepository,
-  SpaceRuleRepository
+  ItemRuleRepository
 } from '../repositories/RuleRepository';
 import stubService from '../services/StubService';
 
@@ -67,22 +66,12 @@ export class FacilityController {
       const { facilityId } = req.params;
       const { metadata } = req.body;
 
-      const spaces = await facilityService.getFacilityDbKeyValues(
+      const items = await facilityService.getFacilityDbKeyValues(
         facilityId,
-        'spaces'
+        'items'
       );
 
-      const otherItems = await facilityService.getFacilityDbKeyValues(
-        facilityId,
-        'otherItems'
-      );
-
-      await facilityService.saveFacilityMetadata(
-        facilityId,
-        metadata,
-        spaces,
-        otherItems
-      );
+      await facilityService.saveFacilityMetadata(facilityId, metadata, items);
 
       await facilityService.setFacilityDbKeys(facilityId, [
         ['metadata', metadata as Facility]
@@ -240,7 +229,7 @@ export class FacilityController {
     }
   };
 
-  // Returns modifier of the item: `spaces` or `otherItems`
+  // Returns modifier of the item
   getModifierOfItem = async (
     req: Request,
     res: Response,
@@ -253,11 +242,7 @@ export class FacilityController {
       }
       const { facilityId, itemKey, itemId, modifierKey } = req.params;
 
-      const repository = new ItemModifierRepository(
-        facilityId,
-        itemKey as FacilityIndexKey,
-        itemId
-      );
+      const repository = new ItemModifierRepository(facilityId, itemId);
 
       let modifier = await repository.getModifier(modifierKey as ModifiersKey);
 
@@ -307,7 +292,7 @@ export class FacilityController {
     }
   };
 
-  // Creates a modifier for the item: spaces or otherItems
+  // Creates a modifier for the item
   createItemModifier = async (
     req: Request,
     res: Response,
@@ -318,14 +303,10 @@ export class FacilityController {
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest('Validation error', errors.array()));
       }
-      const { facilityId, itemKey, itemId, modifierKey } = req.params;
+      const { facilityId, itemId, modifierKey } = req.params;
       const modifier = req.body;
 
-      const repository = new ItemModifierRepository(
-        facilityId,
-        itemKey as FacilityIndexKey,
-        itemId
-      );
+      const repository = new ItemModifierRepository(facilityId, itemId);
 
       await repository.setModifier(
         modifierKey as ModifiersKey,
@@ -360,7 +341,7 @@ export class FacilityController {
     }
   };
 
-  // Removes modifier of the item: `spaces` or `otherItems`
+  // Removes modifier of the item
   removeModifierOfItem = async (
     req: Request,
     res: Response,
@@ -371,13 +352,9 @@ export class FacilityController {
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest('Validation error', errors.array()));
       }
-      const { facilityId, itemKey, itemId, modifierKey } = req.params;
+      const { facilityId, itemId, modifierKey } = req.params;
 
-      const repository = new ItemModifierRepository(
-        facilityId,
-        itemKey as FacilityIndexKey,
-        itemId
-      );
+      const repository = new ItemModifierRepository(facilityId, itemId);
 
       await repository.delModifier(modifierKey as ModifiersKey);
 
@@ -415,7 +392,7 @@ export class FacilityController {
     }
   };
 
-  // Returns rule of the item: `spaces` or `otherItems`
+  // Returns rule of the item
   getRuleOfItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const errors = validationResult(req);
@@ -424,7 +401,7 @@ export class FacilityController {
       }
       const { facilityId, itemId, ruleKey } = req.params;
 
-      const repository = new SpaceRuleRepository(facilityId, itemId);
+      const repository = new ItemRuleRepository(facilityId, itemId);
 
       const rule = await repository.getRule(ruleKey as RulesItemKey);
 
@@ -464,7 +441,7 @@ export class FacilityController {
     }
   };
 
-  // Creates a rule for the item: spaces or otherItems
+  // Creates a rule for the item
   createItemRule = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const errors = validationResult(req);
@@ -474,7 +451,7 @@ export class FacilityController {
       const { facilityId, itemId, ruleKey } = req.params;
       const rule = req.body;
 
-      const repository = new SpaceRuleRepository(facilityId, itemId);
+      const repository = new ItemRuleRepository(facilityId, itemId);
 
       await repository.setRule(ruleKey as RulesItemKey, rule as Rules);
 
@@ -506,7 +483,7 @@ export class FacilityController {
     }
   };
 
-  // Removes rule of the item: `spaces` or `otherItems`
+  // Removes rule of the item
   delRuleOfItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const errors = validationResult(req);
@@ -515,7 +492,7 @@ export class FacilityController {
       }
       const { facilityId, itemId, ruleKey } = req.params;
 
-      const repository = new SpaceRuleRepository(facilityId, itemId);
+      const repository = new ItemRuleRepository(facilityId, itemId);
 
       await repository.delRule(ruleKey as RulesItemKey);
 
