@@ -2,11 +2,11 @@ import { Ask } from '../proto/ask';
 import facilityRepository, {
   FacilityRepository
 } from '../repositories/FacilityRepository';
-import { Facility, Space } from '../proto/facility';
+import { Facility, Item, Space } from '../proto/facility';
 import { DateTime, Interval } from 'luxon';
 import {
   FacilityRuleRepository,
-  SpaceRuleRepository
+  ItemRuleRepository
 } from '../repositories/RuleRepository';
 import { DayOfWeekLOSRule, NoticeRequiredRule } from '../proto/lpms';
 import { FormattedDate, Rules, RulesItemKey } from './DBService';
@@ -41,27 +41,32 @@ export class SearchService {
         ? this.facility.policies.checkInTimeOneof.checkInTime
         : '1500'; //todo think about default checkin time
 
-    const spacesIds = await facilityRepository.getFacilityKey(
+    const spaces = await facilityRepository.getFacilityKey(
       this.facilityId,
       'spaces'
     );
 
-    if (Array.isArray(spacesIds)) {
-      const set = new Set();
+    if (Array.isArray(spaces)) {
+      const set = new Set<{ metadata: Space; id: string }>();
 
-      for (const v of spacesIds) {
-        const space = await facilityRepository.getItemKey<Space>(
+      for (const v of spaces) {
+        const space = await facilityRepository.getItemKey<Item>(
           this.facilityId,
-          'spaces',
+          'items',
           v,
           'metadata'
         );
 
-        if (space === null) {
+        if (space === null || !space.payload) {
           throw ApiError.NotFound(`Unable to find "metadata" for space: ${v}`);
+        } else {
+          try {
+            const metadata = Space.fromBinary(space.payload);
+            set.add({ metadata, id: v });
+          } catch (e) {
+            throw ApiError.BadRequest(`Corrupt "metadata" for space: ${v}`);
+          }
         }
-
-        set.add({ space, id: v });
       }
 
       return this.findSpaces(Array.from(set));
@@ -138,7 +143,7 @@ export class SearchService {
     dates: DateTime[],
     spaceId: string
   ): Promise<boolean> {
-    const spaceRuleRepository = new SpaceRuleRepository(
+    const spaceRuleRepository = new ItemRuleRepository(
       this.facilityId,
       spaceId
     );
@@ -192,7 +197,7 @@ export class SearchService {
 
   private async getRule<T extends Rules>(
     ruleName: RulesItemKey,
-    spaceRuleRepository: SpaceRuleRepository,
+    spaceRuleRepository: ItemRuleRepository,
     weekDay: null | string = null
   ): Promise<T | null> {
     let rule = await spaceRuleRepository.getRule<T>(ruleName);
