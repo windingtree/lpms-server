@@ -1,13 +1,13 @@
 import DBService, {
   DBLevel,
   DefaultOrDateItemKey,
-  FacilityItemValues,
   FacilityValues,
   FormattedDate,
   LevelDefaultTyping
 } from '../services/DBService';
 import { AbstractSublevel } from 'abstract-level';
 import { Rates } from '../proto/lpms';
+import { Item as ItemMetadata } from '../proto/facility';
 
 export class ItemRateRepository {
   protected dbService = DBService.getInstance();
@@ -16,7 +16,7 @@ export class ItemRateRepository {
       AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
       LevelDefaultTyping,
       string,
-      FacilityItemValues
+      ItemMetadata
     >,
     LevelDefaultTyping,
     DefaultOrDateItemKey,

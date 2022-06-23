@@ -1,11 +1,11 @@
 import DBService, {
   DBLevel,
-  FacilityItemValues,
   FacilityValues,
   LevelDefaultTyping,
   Rules,
   RulesItemKey
 } from '../services/DBService';
+import { Item as ItemMetadata } from '../proto/facility';
 import { AbstractSublevel } from 'abstract-level';
 
 abstract class RuleRepository {
@@ -53,7 +53,7 @@ export class ItemRuleRepository extends RuleRepository {
       AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
       LevelDefaultTyping,
       string,
-      FacilityItemValues
+      ItemMetadata
     >,
     LevelDefaultTyping,
     RulesItemKey,
