@@ -1,6 +1,6 @@
 import {
   FacilityRuleRepository,
-  SpaceRuleRepository
+  ItemRuleRepository
 } from '../src/repositories/RuleRepository';
 import { FacilityRepository } from '../src/repositories/FacilityRepository';
 import { SpaceAvailabilityRepository } from '../src/repositories/SpaceAvailabilityRepository';
@@ -13,6 +13,7 @@ import { DayOfWeekLOSRule } from '../src/proto/lpms';
 import { FormattedDate } from '../src/services/DBService';
 import { convertDaysToSeconds } from '../src/utils';
 import { facility, space } from './common';
+import { Space } from '../src/proto/facility';
 
 describe('search service test', async () => {
   const facilityId =
@@ -23,7 +24,7 @@ describe('search service test', async () => {
     '0x1234567890123456789012345678901234567890123456789012345678901244';
   const facilityRepo = new FacilityRepository();
   const facilityRuleRepository = new FacilityRuleRepository(facilityId);
-  const spaceRuleRepository = new SpaceRuleRepository(facilityId, spaceId);
+  const spaceRuleRepository = new ItemRuleRepository(facilityId, spaceId);
   const spaceAvailabilityRepository = new SpaceAvailabilityRepository(
     facilityId,
     spaceId
@@ -43,25 +44,29 @@ describe('search service test', async () => {
     await facilityRepo.addToIndex(facilityId, 'spaces', spaceId);
     await facilityRepo.setItemKey(
       facilityId,
-      'spaces',
+      'items',
       spaceId,
       'metadata',
       space
     );
 
-    space.maxNumberOfAdultOccupantsOneof = {
+    const spaceMetadata = Space.fromBinary(space.payload as Uint8Array);
+
+    spaceMetadata.maxNumberOfAdultOccupantsOneof = {
       oneofKind: 'maxNumberOfAdultOccupants',
       maxNumberOfAdultOccupants: 1
     };
-    space.maxNumberOfChildOccupantsOneof = {
+    spaceMetadata.maxNumberOfChildOccupantsOneof = {
       oneofKind: 'maxNumberOfChildOccupants',
       maxNumberOfChildOccupants: 0
     };
 
+    space.payload = Space.toBinary(spaceMetadata);
+
     await facilityRepo.addToIndex(facilityId, 'spaces', spaceId2);
     await facilityRepo.setItemKey(
       facilityId,
-      'spaces',
+      'items',
       spaceId2,
       'metadata',
       space
@@ -228,8 +233,8 @@ describe('search service test', async () => {
     await facilityRepo.delFacilityKey(facilityId, 'metadata');
     await facilityRepo.delFromIndex(facilityId, 'spaces', spaceId);
     await facilityRepo.delFromIndex(facilityId, 'spaces', spaceId2);
-    await facilityRepo.delItemKey(facilityId, 'spaces', spaceId, 'metadata');
-    await facilityRepo.delItemKey(facilityId, 'spaces', spaceId2, 'metadata');
+    await facilityRepo.delItemKey(facilityId, 'items', spaceId, 'metadata');
+    await facilityRepo.delItemKey(facilityId, 'items', spaceId2, 'metadata');
 
     await spaceAvailabilityRepository.delAvailability('default');
     await spaceAvailabilityRepository2.delAvailability('default');
