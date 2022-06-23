@@ -2,9 +2,9 @@ import type { NextFunction, Request, Response } from 'express';
 import ApiError from '../exceptions/ApiError';
 import facilityService from '../services/FacilityService';
 import facilityRepository from '../repositories/FacilityRepository';
-import { Space } from '../proto/facility';
+import { Item } from '../proto/facility';
 import { validationResult } from 'express-validator';
-import { FacilityIndexKey } from '../services/DBService';
+import { FacilitySubLevels } from '../services/DBService';
 import stubService from '../services/StubService';
 
 export class FacilityItemController {
@@ -13,7 +13,7 @@ export class FacilityItemController {
       const { facilityId, itemKey } = req.params;
       const items = await facilityService.getFacilityDbKeyValues(
         facilityId,
-        itemKey as FacilityIndexKey
+        itemKey as FacilitySubLevels
       );
 
       return res.json(items);
@@ -29,9 +29,9 @@ export class FacilityItemController {
         return next(ApiError.BadRequest('Validation error', errors.array()));
       }
       const { facilityId, itemKey, itemId } = req.params;
-      const item = await facilityRepository.getItemKey<Space>(
+      const item = await facilityRepository.getItemKey<Item>(
         facilityId,
-        itemKey as FacilityIndexKey,
+        itemKey as FacilitySubLevels,
         itemId,
         'metadata'
       );
@@ -56,9 +56,9 @@ export class FacilityItemController {
       const { metadata } = req.body;
 
       if (
-        await facilityRepository.getItemKey<Space>(
+        await facilityRepository.getItemKey<Item>(
           facilityId,
-          itemKey as FacilityIndexKey,
+          itemKey as FacilitySubLevels,
           itemId,
           'metadata'
         )
@@ -70,7 +70,7 @@ export class FacilityItemController {
 
       await facilityService.setItemDbKeys(
         facilityId,
-        itemKey as FacilityIndexKey,
+        itemKey as FacilitySubLevels,
         itemId,
         [['metadata', metadata]]
       );
@@ -92,9 +92,9 @@ export class FacilityItemController {
       const { metadata } = req.body;
 
       if (
-        !(await facilityRepository.getItemKey<Space>(
+        !(await facilityRepository.getItemKey<Item>(
           facilityId,
-          itemKey as FacilityIndexKey,
+          itemKey as FacilitySubLevels,
           itemId,
           'metadata'
         ))
@@ -106,7 +106,7 @@ export class FacilityItemController {
 
       await facilityService.setItemDbKeys(
         facilityId,
-        itemKey as FacilityIndexKey,
+        itemKey as FacilitySubLevels,
         itemId,
         [['metadata', metadata]]
       );
@@ -127,9 +127,9 @@ export class FacilityItemController {
       const { facilityId, itemKey, itemId } = req.params;
 
       if (
-        !(await facilityRepository.getItemKey<Space>(
+        !(await facilityRepository.getItemKey<Item>(
           facilityId,
-          itemKey as FacilityIndexKey,
+          itemKey as FacilitySubLevels,
           itemId,
           'metadata'
         ))
@@ -141,7 +141,7 @@ export class FacilityItemController {
 
       await facilityService.delItemMetadata(
         facilityId,
-        itemKey as FacilityIndexKey,
+        itemKey as FacilitySubLevels,
         itemId
       );
 
