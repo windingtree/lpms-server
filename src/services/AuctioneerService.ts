@@ -3,7 +3,7 @@ import { eip712, utils as vUtils } from '@windingtree/videre-sdk';
 import WalletService from './WalletService';
 import { walletAccountsIndexes } from '../types';
 import log from './LogService';
-import { staysDataDomain, videreConfig } from '../config';
+import { getStaysDataDomain, videreConfig } from '../config';
 import { generateBidLine } from '../utils';
 import { AbstractFacilityService } from './interfaces/AbstractFacilityService';
 import { AskWrapper, BidLine, Bids, BidWrapper } from '../proto/bidask';
@@ -82,7 +82,7 @@ export class AuctioneerService extends AbstractFacilityService {
               this.waku.sendMessage(
                 BidWrapper,
                 await vUtils.createSignedMessage<BidWrapper>(
-                  staysDataDomain,
+                  await getStaysDataDomain(),
                   eip712.bidask.BidWrapper,
                   {
                     serviceProvider: utils.arrayify(facilityId),

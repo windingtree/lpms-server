@@ -30,7 +30,7 @@ export default class IpfsService {
     this.ipfs = await create({ config: {} });
     const version = await this.ipfs.version();
     log.green(`IPFS Version: ${version.version}`);
-    log.green(JSON.stringify(await this.ipfs.repo.stat()));
+    console.log(await this.ipfs.repo.stat());
   }
 
   public async stop(): Promise<void> {
