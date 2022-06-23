@@ -3,8 +3,7 @@ import { Level } from 'level';
 import { Token, User } from '../types';
 import {
   Facility as FacilityMetadata,
-  Item as ItemMetadata,
-  Space as SpaceMetadata
+  Item as ItemMetadata
 } from '../proto/facility';
 import {
   Availability,
@@ -37,8 +36,7 @@ export type FacilityKey = 'metadata';
 export type FacilitySubLevels = 'stubs' | 'items';
 export type FacilityIndexKey = FacilitySubLevels | 'spaces';
 export type FacilityValues = FacilityMetadata | string[];
-export type FacilitySpaceValues = ItemMetadata | SpaceMetadata;
-export type FacilityItemValues = ItemMetadata | FacilitySpaceValues;
+export type FacilityItemValues = ItemMetadata;
 export type FormattedDate = `${number}-${number}-${number}`;
 export type DefaultOrDateItemKey = 'default' | FormattedDate;
 export type FacilityStubKey = string | FormattedDate;
