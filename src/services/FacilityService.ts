@@ -1,17 +1,12 @@
 import { utils, Wallet } from 'ethers';
 import { utils as vUtils, eip712 } from '@windingtree/videre-sdk';
 import { SignedMessage } from '@windingtree/videre-sdk/dist/cjs/utils';
-import { Facility, Item, Space } from '../proto/facility';
+import { Facility, Item } from '../proto/facility';
 import { ServiceProviderData } from '../proto/storage';
 import facilityRepository, {
   FacilityRepository
 } from '../repositories/FacilityRepository';
-import {
-  FacilityIndexKey,
-  FacilityKey,
-  FacilitySpaceValues,
-  FacilityValues
-} from './DBService';
+import { FacilityKey, FacilitySubLevels, FacilityValues } from './DBService';
 import walletService from '../services/WalletService';
 import IpfsService from '../services/IpfsService';
 import { walletAccountsIndexes } from '../types';
@@ -28,7 +23,7 @@ export type FacilityWithId = {
 
 export type ItemWithId = {
   id: string;
-  item: Space | Item;
+  item: Item;
 };
 
 export const genRole = (facilityId: string, role: number): string =>
@@ -60,24 +55,17 @@ export class FacilityService {
   public saveFacilityMetadata = async (
     facilityId: string,
     facility: Facility,
-    spaces?: ItemWithId[],
-    otherItems?: ItemWithId[]
+    items?: ItemWithId[]
   ): Promise<void> => {
     // Build raw service provider metadata
     const serviceProviderData: ServiceProviderData = {
       serviceProvider: utils.arrayify(facilityId),
       payload: Facility.toBinary(facility),
       items: [
-        ...(spaces
-          ? spaces.map((s) => ({
-              item: utils.arrayify(s.id),
-              payload: Space.toBinary(s.item as Space)
-            }))
-          : []),
-        ...(otherItems
-          ? otherItems.map((s) => ({
-              item: utils.arrayify(s.id),
-              payload: Item.toBinary(s.item as Item)
+        ...(items
+          ? items.map((i) => ({
+              item: utils.arrayify(i.id),
+              payload: Item.toBinary(i.item as Item)
             }))
           : [])
       ],
@@ -116,9 +104,9 @@ export class FacilityService {
     const contract = (await getServiceProviderContract()).connect(wallet);
 
     if (!(await contract.exists(facilityId))) {
-      throw new Error(`Facility with Id ${facilityId} does not register yet`);
+      throw new Error(`Facility with Id ${facilityId} not registered`);
     } else {
-      // Update `dataURI` for existed provider
+      // Update `dataURI` for existing provider
       const tx = await contract['file(bytes32,bytes32,string)'](
         facilityId,
         utils.formatBytes32String('dataURI'),
@@ -146,7 +134,7 @@ export class FacilityService {
 
   public async setFacilityDbKeys(
     facilityId: string,
-    entries: [FacilityIndexKey | FacilityKey, FacilityValues][]
+    entries: [FacilitySubLevels | FacilityKey, FacilityValues][]
   ): Promise<void> {
     await this.repository.addFacilityToIndex(facilityId);
 
@@ -159,12 +147,10 @@ export class FacilityService {
 
   public async setItemDbKeys(
     facilityId: string,
-    itemType: FacilityIndexKey,
+    itemType: FacilitySubLevels,
     itemId: string,
-    entries: [string, Item | FacilitySpaceValues][]
+    entries: [string, Item][]
   ): Promise<void> {
-    await this.repository.addToIndex(facilityId, itemType, itemId);
-
     await Promise.all(
       entries.map(([key, value]) =>
         this.repository.setItemKey(facilityId, itemType, itemId, key, value)
@@ -179,7 +165,7 @@ export class FacilityService {
 
   public async getFacilityDbKeyValues(
     facilityId: string,
-    key: FacilityIndexKey
+    key: FacilitySubLevels
   ): Promise<ItemWithId[]> {
     const ids = await facilityRepository.getFacilityKey(facilityId, key);
 
@@ -196,18 +182,7 @@ export class FacilityService {
         id,
         'metadata'
       );
-      if (item) {
-        const item = await facilityRepository.getItemKey<Space>(
-          facilityId,
-          key,
-          id,
-          'metadata'
-        );
-        items.add({
-          id,
-          item: item as Space | Item
-        });
-      }
+      if (item) items.add({ id, item: item as Item });
     }
 
     return Array.from(items);
@@ -215,7 +190,7 @@ export class FacilityService {
 
   public async delItemMetadata(
     facilityId: string,
-    key: FacilityIndexKey,
+    key: FacilitySubLevels,
     id: string
   ): Promise<void> {
     await this.repository.delFromIndex(facilityId, key, id);
