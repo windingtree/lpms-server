@@ -36,7 +36,6 @@ export type FacilityKey = 'metadata';
 export type FacilitySubLevels = 'stubs' | 'items';
 export type FacilityIndexKey = FacilitySubLevels | 'spaces';
 export type FacilityValues = FacilityMetadata | string[];
-export type FacilityItemValues = ItemMetadata;
 export type FormattedDate = `${number}-${number}-${number}`;
 export type DefaultOrDateItemKey = 'default' | FormattedDate;
 export type FacilityStubKey = string | FormattedDate;
@@ -121,10 +120,9 @@ export default class DBService {
     itemId: string
   ) {
     const key = `${itemType}_${itemId}`;
-    return this.getFacilityDB(facilityId).sublevel<string, FacilityItemValues>(
-      key,
-      { valueEncoding: 'json' }
-    );
+    return this.getFacilityDB(facilityId).sublevel<string, ItemMetadata>(key, {
+      valueEncoding: 'json'
+    });
   }
 
   public getFacilityRulesDB(facilityId: string) {

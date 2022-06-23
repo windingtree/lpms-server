@@ -1,11 +1,11 @@
 import {
-  FacilityItemValues,
   LevelDefaultTyping,
   DBLevel,
   FacilityValues,
   SpaceStubKey,
   SpaceStubValues
 } from '../services/DBService';
+import { Item as ItemMetadata } from '../proto/facility';
 import { AbstractSublevel } from 'abstract-level';
 import { AbstractStubRepository } from './StubRepository';
 
@@ -15,7 +15,7 @@ export class SpaceStubRepository extends AbstractStubRepository {
       AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
       LevelDefaultTyping,
       string,
-      FacilityItemValues
+      ItemMetadata
     >,
     LevelDefaultTyping,
     SpaceStubKey,

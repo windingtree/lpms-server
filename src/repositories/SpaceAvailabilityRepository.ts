@@ -1,16 +1,16 @@
 import DBService, {
   FormattedDate,
   DefaultOrDateItemKey,
-  FacilityItemValues,
   LevelDefaultTyping
 } from '../services/DBService';
+import { Item as ItemMetadata } from '../proto/facility';
 import { AbstractLevel, AbstractSublevel } from 'abstract-level';
 import { Availability } from '../proto/lpms';
 
 export class SpaceAvailabilityRepository {
   private dbService: DBService;
   private db: AbstractSublevel<
-    AbstractLevel<LevelDefaultTyping, string, FacilityItemValues>,
+    AbstractLevel<LevelDefaultTyping, string, ItemMetadata>,
     LevelDefaultTyping,
     DefaultOrDateItemKey,
     Availability
