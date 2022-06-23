@@ -34,7 +34,8 @@ export type ModifiersValues =
   | LOSRateModifier;
 export type ModifiersKey = 'day_of_week' | 'occupancy' | 'length_of_stay';
 export type FacilityKey = 'metadata';
-export type FacilityIndexKey = 'stubs' | 'spaces' | 'otherItems';
+export type FacilitySubLevels = 'stubs' | 'items';
+export type FacilityIndexKey = FacilitySubLevels | 'spaces';
 export type FacilityValues = FacilityMetadata | string[];
 export type FacilitySpaceValues = ItemMetadata | SpaceMetadata;
 export type FacilityItemValues = ItemMetadata | FacilitySpaceValues;
@@ -156,14 +157,14 @@ export default class DBService {
   }
 
   public getSpaceAvailabilityDB(facilityId: string, itemId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', itemId).sublevel<
+    return this.getFacilityItemDB(facilityId, 'items', itemId).sublevel<
       DefaultOrDateItemKey,
       Availability
     >('availability', { valueEncoding: 'json' });
   }
 
-  public getSpaceStubsDB(facilityId: string, spaceId: string) {
-    return this.getFacilityItemDB(facilityId, 'spaces', spaceId).sublevel<
+  public getSpaceStubsDB(facilityId: string, itemId: string) {
+    return this.getFacilityItemDB(facilityId, 'items', itemId).sublevel<
       SpaceStubKey,
       SpaceStubValues
     >('stubs', { valueEncoding: 'json' });
