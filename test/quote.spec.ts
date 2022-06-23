@@ -10,10 +10,10 @@ import {
   LOSRateModifier,
   OccupancyRateModifier
 } from '../src/proto/lpms';
-import { SpaceRateRepository } from '../src/repositories/ItemRateRepository';
+import { ItemRateRepository } from '../src/repositories/ItemRateRepository';
 import {
   FacilityModifierRepository,
-  SpaceModifierRepository
+  ItemModifierRepository
 } from '../src/repositories/ModifierRepository';
 
 import quoteService, {
@@ -138,13 +138,13 @@ describe('QuoteService', () => {
 
   before(async () => {
     repos = {
-      rates: new SpaceRateRepository(facilityId, spaceId),
-      modifiers: new SpaceModifierRepository(facilityId, spaceId),
+      rates: new ItemRateRepository(facilityId, spaceId),
+      modifiers: new ItemModifierRepository(facilityId, spaceId),
       facilityModifiers: new FacilityModifierRepository(facilityId)
     };
     reposClear = {
-      rates: new SpaceRateRepository(facilityId + '1', spaceId + '1'),
-      modifiers: new SpaceModifierRepository(facilityId + '1', spaceId + '1'),
+      rates: new ItemRateRepository(facilityId + '1', spaceId + '1'),
+      modifiers: new ItemModifierRepository(facilityId + '1', spaceId + '1'),
       facilityModifiers: new FacilityModifierRepository(facilityId + '1')
     };
     await repos.rates.setRateDefault(normalRate);

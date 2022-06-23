@@ -1,16 +1,16 @@
 import {
   FacilityRuleRepository,
-  SpaceRuleRepository
+  ItemRuleRepository
 } from '../src/repositories/RuleRepository';
 import { NoticeRequiredRule, Rates } from '../src/proto/lpms';
 import { expect } from 'chai';
-import { SpaceRateRepository } from '../src/repositories/ItemRateRepository';
+import { ItemRateRepository } from '../src/repositories/ItemRateRepository';
 
 describe('facility repository rule test', async () => {
   const facilityId = '0x1234567890';
   const spaceId = '0x1234567890';
   const facilityRuleRepository = new FacilityRuleRepository(facilityId);
-  const spaceRuleRepository = new SpaceRuleRepository(facilityId, spaceId);
+  const spaceRuleRepository = new ItemRuleRepository(facilityId, spaceId);
 
   it('set rule', async () => {
     const rule: NoticeRequiredRule = {
@@ -50,7 +50,7 @@ describe('facility repository rule test', async () => {
 describe('repository rate test', async () => {
   const facilityId = '0x1234567890';
   const spaceId = '0x1234567890';
-  const spaceRuleRepository = new SpaceRateRepository(facilityId, spaceId);
+  const spaceRuleRepository = new ItemRateRepository(facilityId, spaceId);
 
   it('set rate', async () => {
     const rate: Rates = {
