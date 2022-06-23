@@ -5,7 +5,7 @@ import DBService, {
   FacilityValues
 } from '../services/DBService';
 import { Level } from 'level';
-import { Item } from '../proto/facility';
+import { Item, ItemType, Space } from '../proto/facility';
 
 export class FacilityRepository {
   private dbService: DBService;
@@ -188,6 +188,16 @@ export class FacilityRepository {
     key: string,
     value: Item
   ): Promise<void> {
+    // If a space:
+    // 1. Verify that the `payload` is correctly encoded
+    // 2. Add to the `spaces` index
+    if (value.type === ItemType.SPACE) {
+      // the following will throw if Space is not formatted correctly
+      Space.fromBinary(value.payload as Uint8Array);
+      // above hasn't thrown, let's add it to the index
+      await this.addToIndex(facilityId, 'spaces', itemId);
+    }
+
     await this.dbService
       .getFacilityItemDB(facilityId, idx, itemId)
       .put(key, value);
@@ -217,6 +227,19 @@ export class FacilityRepository {
     itemId: string,
     key: string
   ): Promise<void> {
+    // If a space:
+    // 1. Delete from the `spaces` index.
+    if (idx === 'items') {
+      const item: Item | null = await this.getItemKey(
+        facilityId,
+        idx,
+        itemId,
+        key
+      );
+      if (item && item.type === ItemType.SPACE) {
+        await this.delFromIndex(facilityId, 'spaces', itemId);
+      }
+    }
     await this.dbService.getFacilityItemDB(facilityId, idx, itemId).del(key);
   }
 }
