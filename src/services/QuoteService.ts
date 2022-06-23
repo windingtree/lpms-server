@@ -10,15 +10,15 @@ import {
   LOSRateModifier,
   OccupancyRateModifier
 } from '../proto/lpms';
-import { SpaceRateRepository } from '../repositories/ItemRateRepository';
+import { ItemRateRepository } from '../repositories/ItemRateRepository';
 import {
   FacilityModifierRepository,
-  SpaceModifierRepository
+  ItemModifierRepository
 } from '../repositories/ModifierRepository';
 
 export interface QuoteRepositories {
-  rates: SpaceRateRepository;
-  modifiers: SpaceModifierRepository;
+  rates: ItemRateRepository;
+  modifiers: ItemModifierRepository;
   facilityModifiers: FacilityModifierRepository;
 }
 
@@ -210,8 +210,8 @@ export class QuoteService {
     }
 
     const repositories: QuoteRepositories = {
-      rates: new SpaceRateRepository(facilityId, spaceId),
-      modifiers: new SpaceModifierRepository(facilityId, spaceId),
+      rates: new ItemRateRepository(facilityId, spaceId),
+      modifiers: new ItemModifierRepository(facilityId, spaceId),
       facilityModifiers: new FacilityModifierRepository(facilityId)
     };
     let total = BigNumber.from(0);
