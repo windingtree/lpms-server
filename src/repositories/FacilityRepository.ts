@@ -1,8 +1,8 @@
 import DBService, {
   FacilityKey,
+  FacilitySubLevels,
   FacilityIndexKey,
-  FacilityValues,
-  FacilitySpaceValues
+  FacilityValues
 } from '../services/DBService';
 import { Level } from 'level';
 import { Item } from '../proto/facility';
@@ -96,7 +96,7 @@ export class FacilityRepository {
 
   public async setFacilityKey(
     facilityId: string,
-    key: FacilityKey | FacilityIndexKey,
+    key: FacilityKey | FacilitySubLevels,
     value: FacilityValues
   ): Promise<void> {
     await this.dbService.getFacilityDB(facilityId).put(key, value);
@@ -104,7 +104,7 @@ export class FacilityRepository {
 
   public async getFacilityKey<T extends FacilityValues>(
     facilityId: string,
-    key: FacilityKey | FacilityIndexKey
+    key: FacilityKey | FacilitySubLevels
   ): Promise<T | null> {
     try {
       return (await this.dbService.getFacilityDB(facilityId).get(key)) as T;
@@ -118,7 +118,7 @@ export class FacilityRepository {
 
   public async delFacilityKey(
     facilityId: string,
-    key: FacilityKey | FacilityIndexKey
+    key: FacilityKey | FacilitySubLevels
   ): Promise<void> {
     await this.dbService.getFacilityDB(facilityId).del(key);
   }
@@ -179,23 +179,23 @@ export class FacilityRepository {
     }
   }
 
-  // --- item level (space and otherItems) getters / setters
+  // --- item level getters / setters
 
   public async setItemKey(
     facilityId: string,
-    idx: FacilityIndexKey,
+    idx: FacilitySubLevels,
     itemId: string,
     key: string,
-    value: Item | FacilitySpaceValues
+    value: Item
   ): Promise<void> {
     await this.dbService
       .getFacilityItemDB(facilityId, idx, itemId)
       .put(key, value);
   }
 
-  public async getItemKey<T extends Item | FacilitySpaceValues>(
+  public async getItemKey<T extends Item>(
     facilityId: string,
-    idx: FacilityIndexKey,
+    idx: FacilitySubLevels,
     itemId: string,
     key: string
   ): Promise<T | null> {
@@ -213,7 +213,7 @@ export class FacilityRepository {
 
   public async delItemKey(
     facilityId: string,
-    idx: FacilityIndexKey,
+    idx: FacilitySubLevels,
     itemId: string,
     key: string
   ): Promise<void> {
