@@ -8,7 +8,7 @@ import { Facility as FacilityMetadata } from '../proto/facility';
 import facilityRepository, {
   FacilityRepository
 } from '../repositories/FacilityRepository';
-import { lineRegistryDataDomain, videreConfig } from '../config';
+import { getLineRegistryDataDomain, videreConfig } from '../config';
 import { AbstractFacilityService } from './interfaces/AbstractFacilityService';
 import { getCurrentTimestamp } from '@windingtree/videre-sdk/dist/cjs/utils';
 import { LatLng } from '../proto/latlng';
@@ -57,7 +57,7 @@ export class PingPongService extends AbstractFacilityService {
               this.waku.sendMessage(
                 Pong,
                 await vUtils.createSignedMessage<Pong>(
-                  lineRegistryDataDomain,
+                  await getLineRegistryDataDomain(),
                   eip712.pingpong.Pong,
                   {
                     serviceProvider: utils.arrayify(facilityId),
