@@ -11,6 +11,7 @@ import facilityController from '../controllers/FacilityController';
 import walletController from '../controllers/WalletController';
 import facilityItemController from '../controllers/FacilityItemController';
 import { validateBytes32StringRule } from '../rules/Bytes32StringRules';
+import { descriptorMiddleware } from '../middlewares/ValidationMiddleware';
 
 const router = Router();
 const upload = multer({ dest: os.tmpdir() });
@@ -114,6 +115,7 @@ router.post(
   '/facility/:facilityId/modifier/:modifierKey',
   authMiddleware,
   param('facilityId').custom((v) => validateBytes32StringRule(v)),
+  descriptorMiddleware,
   facilityController.createFacilityModifier
 );
 
@@ -135,6 +137,7 @@ router.post(
   '/facility/:facilityId/:itemKey/:itemId/modifier/:modifierKey',
   authMiddleware,
   param('facilityId').custom((v) => validateBytes32StringRule(v)),
+  descriptorMiddleware,
   facilityController.createItemModifier
 );
 
@@ -158,6 +161,7 @@ router.post(
   '/facility/:facilityId/rule/:ruleKey',
   authMiddleware,
   param('facilityId').custom((v) => validateBytes32StringRule(v)),
+  descriptorMiddleware,
   facilityController.createFacilityRule
 );
 
@@ -179,6 +183,7 @@ router.post(
   '/facility/:facilityId/spaces/:itemId/rule/:ruleKey',
   authMiddleware,
   param('facilityId').custom((v) => validateBytes32StringRule(v)),
+  descriptorMiddleware,
   facilityController.createItemRule
 );
 
@@ -261,6 +266,7 @@ router.post(
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
   param('facilityId').custom((v) => validateBytes32StringRule(v)),
+  descriptorMiddleware,
   facilityItemController.createItem
 );
 
@@ -269,6 +275,7 @@ router.put(
   authMiddleware,
   roleMiddleware([AppRole.MANAGER]),
   param('facilityId').custom((v) => validateBytes32StringRule(v)),
+  descriptorMiddleware,
   facilityItemController.updateItem
 );
 

@@ -12,16 +12,161 @@ components:
   schemas:
     NoticeRequiredRule:
       type: object
+      required:
+        - value
       properties:
         value:
           type: number
-          default: 3600
-    DayOfWeekLOSRule: #todo
+    DayOfWeekLOSRule:
       type: object
       properties:
-        valueStr:
+        mon:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        tue:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        wed:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        thu:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        fri:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        sat:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        sun:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+    Number:
+      required:
+        - oneofKind
+        - fixed
+      properties:
+        oneofKind:
           type: string
-          default: 'asdf'
+          enum: ['fixed']
+        fixed:
+          type: number
+    Ratio:
+      required:
+        - oneofKind
+        - ratio
+      properties:
+        oneofKind:
+          type: string
+          enum: ['ratio']
+        ratio:
+          required:
+            - p
+            - q
+          properties:
+            p:
+              type: number
+            q:
+              type: number
+
+    ModifierElement:
+      oneOf:
+        - $ref: '#/components/schemas/Number'
+        - $ref: '#/components/schemas/Ratio'
+    DayOfWeekRateModifier:
+      type: object
+      properties:
+        mon:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        tue:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        wed:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        thu:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        fri:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        sat:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        sun:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+    OccupancyRateModifier:
+      required:
+        - valueOneof
+      properties:
+        valueOneof:
+          $ref: '#/components/schemas/ModifierElement'
+    LOSRateModifier:
+      required:
+        - los
+        - condition
+        - valueOneof
+      properties:
+        los:
+          type: number
+        condition:
+          type: number
+          description: 'LT = 0, LTE = 1, EQ = 2, GTE = 3, GT = 4'
+          enum: [0, 1, 2, 3, 4]
+        valueOneof:
+          $ref: '#/components/schemas/ModifierElement'
+
     Facility:
       type: object
       required:
@@ -64,10 +209,10 @@ components:
     Contact:
       type: object
       required:
-        - oneOfKind
+        - oneofKind
         - type
       properties:
-        oneOfKind:
+        oneofKind:
           type: string
           enum: ['type']
         type:
@@ -75,15 +220,14 @@ components:
           default: 2
     ContactOther:
       required:
-        - oneOfKind
+        - oneofKind
         - typeOther
       properties:
-        oneOfKind:
+        oneofKind:
           type: string
           enum: ['typeOther']
         typeOther:
           type: string
-          default: 2
     Email:
       type: object
       required:
@@ -449,7 +593,8 @@ components:
           enum: ['tier']
         tier:
           type: number
-          enum: [DEFAULT_STANDARD = 0, DELUXE = 1]
+          description: 'DEFAULT_STANDARD = 0, DELUXE = 1'
+          enum: [0, 1]
     TierException:
       type: object
       required:
@@ -1154,6 +1299,47 @@ components:
         inSpaceWifiAvailableException:
           type: number
           enum: [0]
+    Item:
+      type: object
+      required:
+        - name
+        - description
+        - photos
+        - type
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        type:
+          type: number
+          description: 'SPACE = 0, OTHER = 1'
+    SpaceItem:
+      type: object
+      required:
+        - name
+        - description
+        - photos
+        - type
+        - payload
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        type:
+          type: number
+          description: 'SPACE = 0, OTHER = 1'
+        payload:
+          $ref: '#/components/schemas/Space'
 
 servers:
   - url: http://localhost:5000/api
@@ -1178,6 +1364,18 @@ paths:
                 password:
                   type: string
                   description: user's password
+      responses:
+        200:
+          description: It's ok
+        400:
+          description: Handled Error
+        500:
+          description: Some server error
+
+  /user/refresh:
+    post:
+      summary: refresh access token
+      tags: [Auth service]
       responses:
         200:
           description: It's ok
@@ -1560,8 +1758,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+                oneOf:
+                  - $ref: '#/components/schemas/DayOfWeekRateModifier'
+                  - $ref: '#/components/schemas/OccupancyRateModifier'
+                  - $ref: '#/components/schemas/LOSRateModifier'
         401:
           description: User is not Auth
         403:
@@ -1580,8 +1780,16 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+              oneOf:
+                - $ref: '#/components/schemas/DayOfWeekRateModifier'
+                - $ref: '#/components/schemas/OccupancyRateModifier'
+                - $ref: '#/components/schemas/LOSRateModifier'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  day_of_week: '#/components/schemas/DayOfWeekRateModifier'
+                  occupancy: '#/components/schemas/OccupancyRateModifier'
+                  length_of_stay: '#/components/schemas/LOSRateModifier'
       parameters:
         - in: path
           name: facilityId
@@ -1691,8 +1899,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+                oneOf:
+                  - $ref: '#/components/schemas/DayOfWeekRateModifier'
+                  - $ref: '#/components/schemas/OccupancyRateModifier'
+                  - $ref: '#/components/schemas/LOSRateModifier'
         401:
           description: User is not Auth
         403:
@@ -1711,8 +1921,16 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+              oneOf:
+                - $ref: '#/components/schemas/DayOfWeekRateModifier'
+                - $ref: '#/components/schemas/OccupancyRateModifier'
+                - $ref: '#/components/schemas/LOSRateModifier'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  day_of_week: '#/components/schemas/DayOfWeekRateModifier'
+                  occupancy: '#/components/schemas/OccupancyRateModifier'
+                  length_of_stay: '#/components/schemas/LOSRateModifier'
       parameters:
         - in: path
           name: facilityId
@@ -1837,7 +2055,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                oneOf:
+                  - $ref: '#/components/schemas/NoticeRequiredRule'
+                  - $ref: '#/components/schemas/DayOfWeekLOSRule'
         401:
           description: User is not Auth
         403:
@@ -1860,7 +2080,7 @@ paths:
                 - $ref: '#/components/schemas/NoticeRequiredRule'
                 - $ref: '#/components/schemas/DayOfWeekLOSRule'
               discriminator:
-                propertyName: ruleKey
+                propertyName: descriptor
                 mapping:
                   notice_required: '#/components/schemas/NoticeRequiredRule'
                   length_of_stay: '#/components/schemas/DayOfWeekLOSRule'
@@ -1959,15 +2179,16 @@ paths:
           required: true
           schema:
             type: string
-            enum: ['day_of_week', 'occupancy', 'length_of_stay']
+            enum: ['notice_required', 'length_of_stay']
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+                oneOf:
+                  - $ref: '#/components/schemas/NoticeRequiredRule'
+                  - $ref: '#/components/schemas/DayOfWeekLOSRule'
         401:
           description: User is not Auth
         403:
@@ -1986,7 +2207,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              oneOf:
+                - $ref: '#/components/schemas/NoticeRequiredRule'
+                - $ref: '#/components/schemas/DayOfWeekLOSRule'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  notice_required: '#/components/schemas/NoticeRequiredRule'
+                  length_of_stay: '#/components/schemas/DayOfWeekLOSRule'
       parameters:
         - in: path
           name: facilityId
@@ -2324,8 +2552,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                # @todo array of items
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/SpaceItem'
+                    - $ref: '#/components/schemas/Item'
         401:
           description: User is not Auth
         403:
@@ -2366,8 +2597,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                # @todo item metadata
+                oneOf:
+                  - $ref: '#/components/schemas/SpaceItem'
+                  - $ref: '#/components/schemas/Item'
         401:
           description: User is not Auth
         403:
@@ -2386,7 +2618,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              oneOf:
+                - $ref: '#/components/schemas/SpaceItem'
+                - $ref: '#/components/schemas/Item'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  'space': '#/components/schemas/SpaceItem'
+                  'item': '#/components/schemas/Item'
       parameters:
         - in: path
           name: facilityId
@@ -2434,7 +2673,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              oneOf:
+                - $ref: '#/components/schemas/SpaceItem'
+                - $ref: '#/components/schemas/Item'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  'space': '#/components/schemas/SpaceItem'
+                  'item': '#/components/schemas/Item'
       parameters:
         - in: path
           name: facilityId
