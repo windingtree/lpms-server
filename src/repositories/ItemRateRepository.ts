@@ -1,7 +1,6 @@
 import DBService, {
   DBLevel,
   DefaultOrDateItemKey,
-  FacilityIndexKey,
   FacilityItemValues,
   FacilityValues,
   FormattedDate,
@@ -10,7 +9,7 @@ import DBService, {
 import { AbstractSublevel } from 'abstract-level';
 import { Rates } from '../proto/lpms';
 
-abstract class ItemRateRepository {
+export class ItemRateRepository {
   protected dbService = DBService.getInstance();
   protected db: AbstractSublevel<
     AbstractSublevel<
@@ -24,12 +23,8 @@ abstract class ItemRateRepository {
     Rates
   >;
 
-  protected constructor(
-    facilityId: string,
-    indexKey: FacilityIndexKey,
-    itemId: string
-  ) {
-    this.db = this.dbService.getItemRatesDB(facilityId, indexKey, itemId);
+  protected constructor(facilityId: string, itemId: string) {
+    this.db = this.dbService.getItemRatesDB(facilityId, 'items', itemId);
   }
 
   public async getRate(key: DefaultOrDateItemKey): Promise<Rates | null> {
@@ -53,17 +48,5 @@ abstract class ItemRateRepository {
 
   public async delRate(key: DefaultOrDateItemKey): Promise<void> {
     await this.db.del(key);
-  }
-}
-
-export class SpaceRateRepository extends ItemRateRepository {
-  constructor(facilityId: string, itemId: string) {
-    super(facilityId, 'spaces', itemId);
-  }
-}
-
-export class OtherItemRateRepository extends ItemRateRepository {
-  constructor(facilityId: string, itemId: string) {
-    super(facilityId, 'otherItems', itemId);
   }
 }

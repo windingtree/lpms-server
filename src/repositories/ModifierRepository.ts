@@ -4,7 +4,6 @@ import DBService, {
   LevelDefaultTyping,
   FacilityItemValues,
   FacilityValues,
-  FacilityIndexKey,
   ModifiersKey,
   ModifiersValues
 } from '../services/DBService';
@@ -51,10 +50,10 @@ export class ItemModifierRepository extends ModifierRepository {
     ModifiersValues
   >;
 
-  constructor(facilityId: string, indexKey: FacilityIndexKey, itemId: string) {
+  constructor(facilityId: string, itemId: string) {
     super();
 
-    this.db = this.dbService.getItemModifiersDB(facilityId, indexKey, itemId);
+    this.db = this.dbService.getItemModifiersDB(facilityId, 'items', itemId);
   }
 }
 
@@ -70,17 +69,5 @@ export class FacilityModifierRepository extends ModifierRepository {
     super();
 
     this.db = this.dbService.getFacilityModifiersDB(facilityId);
-  }
-}
-
-export class SpaceModifierRepository extends ItemModifierRepository {
-  constructor(facilityId: string, spaceId: string) {
-    super(facilityId, 'spaces', spaceId);
-  }
-}
-
-export class OtherItemsModifierRepository extends ItemModifierRepository {
-  constructor(facilityId: string, otherItemId: string) {
-    super(facilityId, 'otherItems', otherItemId);
   }
 }
