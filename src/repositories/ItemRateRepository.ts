@@ -23,7 +23,7 @@ export class ItemRateRepository {
     Rates
   >;
 
-  protected constructor(facilityId: string, itemId: string) {
+  constructor(facilityId: string, itemId: string) {
     this.db = this.dbService.getItemRatesDB(facilityId, 'items', itemId);
   }
 

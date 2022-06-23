@@ -96,7 +96,7 @@ export class FacilityRepository {
 
   public async setFacilityKey(
     facilityId: string,
-    key: FacilityKey | FacilitySubLevels,
+    key: FacilityKey | FacilityIndexKey,
     value: FacilityValues
   ): Promise<void> {
     await this.dbService.getFacilityDB(facilityId).put(key, value);
@@ -104,7 +104,7 @@ export class FacilityRepository {
 
   public async getFacilityKey<T extends FacilityValues>(
     facilityId: string,
-    key: FacilityKey | FacilitySubLevels
+    key: FacilityKey | FacilityIndexKey
   ): Promise<T | null> {
     try {
       return (await this.dbService.getFacilityDB(facilityId).get(key)) as T;
@@ -118,7 +118,7 @@ export class FacilityRepository {
 
   public async delFacilityKey(
     facilityId: string,
-    key: FacilityKey | FacilitySubLevels
+    key: FacilityKey | FacilityIndexKey
   ): Promise<void> {
     await this.dbService.getFacilityDB(facilityId).del(key);
   }
