@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.3
 info:
   title: LPMS-server api
   description: lpms server api with auth
@@ -9,6 +9,1337 @@ components:
       type: 'http'
       scheme: 'bearer'
       bearerFormat: 'JWT'
+  schemas:
+    NoticeRequiredRule:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: number
+    DayOfWeekLOSRule:
+      type: object
+      properties:
+        mon:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        tue:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        wed:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        thu:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        fri:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        sat:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+        sun:
+          type: object
+          properties:
+            min_length_of_stay:
+              type: number
+            max_length_of_stay:
+              type: number
+    Number:
+      required:
+        - oneofKind
+        - fixed
+      properties:
+        oneofKind:
+          type: string
+          enum: ['fixed']
+        fixed:
+          type: number
+    Ratio:
+      required:
+        - oneofKind
+        - ratio
+      properties:
+        oneofKind:
+          type: string
+          enum: ['ratio']
+        ratio:
+          required:
+            - p
+            - q
+          properties:
+            p:
+              type: number
+            q:
+              type: number
+
+    ModifierElement:
+      oneOf:
+        - $ref: '#/components/schemas/Number'
+        - $ref: '#/components/schemas/Ratio'
+    DayOfWeekRateModifier:
+      type: object
+      properties:
+        mon:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        tue:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        wed:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        thu:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        fri:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        sat:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+        sun:
+          required:
+            - valueOneof
+          properties:
+            valueOneof:
+              $ref: '#/components/schemas/ModifierElement'
+    OccupancyRateModifier:
+      required:
+        - valueOneof
+      properties:
+        valueOneof:
+          $ref: '#/components/schemas/ModifierElement'
+    LOSRateModifier:
+      required:
+        - los
+        - condition
+        - valueOneof
+      properties:
+        los:
+          type: number
+        condition:
+          type: number
+          description: 'LT = 0, LTE = 1, EQ = 2, GTE = 3, GT = 4'
+          enum: [0, 1, 2, 3, 4]
+        valueOneof:
+          $ref: '#/components/schemas/ModifierElement'
+
+    Facility:
+      type: object
+      required:
+        - name
+        - description
+        - emails
+        - phones
+        - uris
+        - photos
+        - location
+        - policies
+        - connectivity
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        emails:
+          type: array
+          items:
+            $ref: '#/components/schemas/Email'
+        phones:
+          type: array
+          items:
+            $ref: '#/components/schemas/Phone'
+        uris:
+          type: array
+          items:
+            $ref: '#/components/schemas/Uri'
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        location:
+          $ref: '#/components/schemas/Location'
+        policies:
+          $ref: '#/components/schemas/Policies'
+        connectivity:
+          $ref: '#/components/schemas/Connectivity'
+    Contact:
+      type: object
+      required:
+        - oneofKind
+        - type
+      properties:
+        oneofKind:
+          type: string
+          enum: ['type']
+        type:
+          type: number
+          default: 2
+    ContactOther:
+      required:
+        - oneofKind
+        - typeOther
+      properties:
+        oneofKind:
+          type: string
+          enum: ['typeOther']
+        typeOther:
+          type: string
+    Email:
+      type: object
+      required:
+        - email
+        - typeOneof
+      properties:
+        email:
+          type: string
+        typeOneof:
+          oneOf:
+            - $ref: '#/components/schemas/Contact'
+            - $ref: '#/components/schemas/ContactOther'
+    Phone:
+      type: object
+      required:
+        - number
+        - typeOneof
+      properties:
+        number:
+          type: string
+        typeOneof:
+          oneOf:
+            - $ref: '#/components/schemas/Contact'
+            - $ref: '#/components/schemas/ContactOther'
+    Uri:
+      type: object
+      required:
+        - uri
+        - typeOneof
+      properties:
+        uri:
+          type: string
+        typeOneof:
+          oneOf:
+            - $ref: '#/components/schemas/Contact'
+            - $ref: '#/components/schemas/ContactOther'
+    Photo:
+      type: object
+      required:
+        - uri
+        - description
+      properties:
+        uri:
+          type: string
+        description:
+          type: string
+    Location:
+      type: object
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          type: number
+        longitude:
+          type: number
+    Policies:
+      type: object
+      required:
+        - currencyCode
+        - timezone
+        - checkInTimeOneof
+        - checkOutTimeOneof
+      properties:
+        currencyCode:
+          type: string
+          default: 'xDAI'
+        timezone:
+          type: string
+          default: 'Etc/UTC'
+        checkInTimeOneof:
+          oneOf:
+            - $ref: '#/components/schemas/CheckIn'
+            - $ref: '#/components/schemas/CheckInException'
+        checkOutTimeOneof:
+          oneOf:
+            - $ref: '#/components/schemas/CheckOut'
+            - $ref: '#/components/schemas/CheckOutException'
+    CheckIn:
+      type: object
+      required:
+        - oneofKind
+        - checkInTime
+      properties:
+        oneofKind:
+          enum: ['checkInTime']
+        checkInTime:
+          type: string
+          default: '1500'
+          pattern: '^(2[0-3]|[01][0-9])?([0-5][0-9])$'
+    CheckInException:
+      type: object
+      required:
+        - oneofKind
+        - checkInTimeException
+      properties:
+        oneofKind:
+          enum: ['checkInTimeException']
+        checkInTimeException:
+          type: number
+          enum: [0]
+    CheckOut:
+      type: object
+      required:
+        - oneofKind
+        - checkOutTime
+      properties:
+        oneofKind:
+          enum: ['checkOutTime']
+        checkOutTime:
+          type: string
+          default: '1000'
+          pattern: '^(2[0-3]|[01][0-9])?([0-5][0-9])$'
+    CheckOutException:
+      type: object
+      required:
+        - oneofKind
+        - checkOutTimeException
+      properties:
+        oneofKind:
+          enum: ['checkOutTimeException']
+        checkOutTimeException:
+          type: number
+          enum: [0]
+    Connectivity:
+      required:
+        - wifiAvailableOneof
+        - wifiForFreeOneof
+      properties:
+        wifiAvailableOneof:
+          oneOf:
+            - $ref: '#/components/schemas/WifiAvailable'
+            - $ref: '#/components/schemas/WifiAvailableException'
+        wifiForFreeOneof:
+          oneOf:
+            - $ref: '#/components/schemas/WifiFree'
+            - $ref: '#/components/schemas/WifiFreeException'
+    WifiAvailable:
+      type: object
+      required:
+        - oneofKind
+        - wifiAvailable
+      properties:
+        oneofKind:
+          type: string
+          enum: ['wifiAvailable']
+        wifiAvailable:
+          type: boolean
+          default: true
+    WifiAvailableException:
+      type: object
+      required:
+        - oneofKind
+        - wifiAvailableException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['wifiAvailableException']
+        wifiAvailableException:
+          type: number
+          enum: [0]
+    WifiFree:
+      type: object
+      required:
+        - oneofKind
+        - wifiForFree
+      properties:
+        oneofKind:
+          type: string
+          enum: ['wifiForFree']
+        wifiForFree:
+          type: boolean
+          default: true
+    WifiFreeException:
+      type: object
+      required:
+        - oneofKind
+        - wifiForFreeException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['wifiForFreeException']
+        wifiForFreeException:
+          type: number
+          enum: [0]
+    Space:
+      type: object
+      required:
+        - uris
+        - maxNumberOfAdultOccupantsOneof
+        - maxNumberOfChildOccupantsOneof
+        - maxNumberOfOccupantsOneof
+        - privateHomeOneof
+        - suiteOneof
+        - tierOneof
+        - views
+        - totalLivingAreas
+      properties:
+        uris:
+          type: array
+          items:
+            $ref: '#/components/schemas/Uri'
+        maxNumberOfAdultOccupantsOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/MaxNumberOfAdultOccupants'
+            - $ref: '#/components/schemas/MaxNumberOfAdultOccupantsException'
+        maxNumberOfChildOccupantsOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/MaxNumberOfChildOccupants'
+            - $ref: '#/components/schemas/MaxNumberOfChildOccupantsException'
+        maxNumberOfOccupantsOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/MaxNumberOfOccupants'
+            - $ref: '#/components/schemas/MaxNumberOfOccupantsException'
+        privateHomeOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/PrivateHome'
+            - $ref: '#/components/schemas/PrivateHomeException'
+        suiteOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/Suite'
+            - $ref: '#/components/schemas/SuiteException'
+        tierOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/Tier'
+            - $ref: '#/components/schemas/TierException'
+        views:
+          $ref: '#/components/schemas/Views'
+        totalLivingAreas:
+          $ref: '#/components/schemas/TotalLivingAreas'
+
+    MaxNumberOfAdultOccupants:
+      type: object
+      required:
+        - oneofKind
+        - maxNumberOfAdultOccupants
+      properties:
+        oneofKind:
+          type: string
+          enum: ['maxNumberOfAdultOccupants']
+        maxNumberOfAdultOccupants:
+          type: number
+    MaxNumberOfAdultOccupantsException:
+      type: object
+      required:
+        - oneofKind
+        - maxNumberOfAdultOccupantsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['maxNumberOfAdultOccupantsException']
+        maxNumberOfAdultOccupantsException:
+          type: number
+          enum: [0]
+    MaxNumberOfChildOccupants:
+      type: object
+      required:
+        - oneofKind
+        - maxNumberOfChildOccupants
+      properties:
+        oneofKind:
+          type: string
+          enum: ['maxNumberOfChildOccupants']
+        maxNumberOfChildOccupants:
+          type: number
+    MaxNumberOfChildOccupantsException:
+      type: object
+      required:
+        - oneofKind
+        - maxNumberOfChildOccupantsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['maxNumberOfChildOccupantsException']
+        maxNumberOfChildOccupantsException:
+          type: number
+          enum: [0]
+    MaxNumberOfOccupants:
+      type: object
+      required:
+        - oneofKind
+        - maxNumberOfOccupants
+      properties:
+        oneofKind:
+          type: string
+          enum: ['maxNumberOfOccupants']
+        maxNumberOfOccupants:
+          type: number
+    MaxNumberOfOccupantsException:
+      type: object
+      required:
+        - oneofKind
+        - maxNumberOfOccupantsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['maxNumberOfOccupantsException']
+        maxNumberOfOccupantsException:
+          type: number
+          enum: [0]
+    PrivateHome:
+      type: object
+      required:
+        - oneofKind
+        - privateHome
+      properties:
+        oneofKind:
+          type: string
+          enum: ['privateHome']
+        privateHome:
+          type: boolean
+          default: false
+    PrivateHomeException:
+      type: object
+      required:
+        - oneofKind
+        - privateHomeException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['privateHomeException']
+        privateHomeException:
+          type: number
+          enum: [0]
+    Suite:
+      type: object
+      required:
+        - oneofKind
+        - suite
+      properties:
+        oneofKind:
+          type: string
+          enum: ['suite']
+        suite:
+          type: boolean
+          default: false
+    SuiteException:
+      type: object
+      required:
+        - oneofKind
+        - suiteException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['suiteException']
+        suiteException:
+          type: number
+          enum: [0]
+    Tier:
+      type: object
+      required:
+        - oneofKind
+        - tier
+      properties:
+        oneofKind:
+          type: string
+          enum: ['tier']
+        tier:
+          type: number
+          description: 'DEFAULT_STANDARD = 0, DELUXE = 1'
+          enum: [0, 1]
+    TierException:
+      type: object
+      required:
+        - oneofKind
+        - tierException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['tierException']
+        tierException:
+          type: number
+          enum: [0]
+    Views:
+      type: object
+      required:
+        - viewOfValleyOneof
+        - viewOfBeachOneof
+        - viewOfCityOneof
+        - viewOfGardenOneof
+        - viewOfLakeOneof
+        - viewOfLandmarkOneof
+        - viewOfOceanOneof
+        - viewOfPoolOneof
+      properties:
+        viewOfValleyOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/ViewOfValley'
+            - $ref: '#/components/schemas/ViewOfValleyException'
+        viewOfBeachOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/ViewOfBeach'
+            - $ref: '#/components/schemas/ViewOfBeachException'
+        viewOfCityOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/ViewOfCity'
+            - $ref: '#/components/schemas/ViewOfCityException'
+        viewOfGardenOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/ViewOfGarden'
+            - $ref: '#/components/schemas/ViewOfGardenException'
+        viewOfLakeOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/ViewOfLake'
+            - $ref: '#/components/schemas/ViewOfLakeException'
+        viewOfLandmarkOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/ViewOfLandmark'
+            - $ref: '#/components/schemas/ViewOfLandmarkException'
+        viewOfOceanOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/ViewOfOcean'
+            - $ref: '#/components/schemas/ViewOfOceanException'
+        viewOfPoolOneof:
+          type: object
+          oneOf:
+            - $ref: '#/components/schemas/ViewOfPool'
+            - $ref: '#/components/schemas/ViewOfPoolException'
+    ViewOfValley:
+      type: object
+      required:
+        - oneofKind
+        - viewOfValley
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfValley']
+        viewOfValley:
+          type: boolean
+          default: true
+    ViewOfBeach:
+      type: object
+      required:
+        - oneofKind
+        - viewOfBeach
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfBeach']
+        viewOfBeach:
+          type: boolean
+          default: false
+    ViewOfCity:
+      type: object
+      required:
+        - oneofKind
+        - viewOfCity
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfCity']
+        viewOfCity:
+          type: boolean
+          default: false
+    ViewOfGarden:
+      type: object
+      required:
+        - oneofKind
+        - viewOfGarden
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfGarden']
+        viewOfGarden:
+          type: boolean
+          default: false
+    ViewOfLake:
+      type: object
+      required:
+        - oneofKind
+        - viewOfLake
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfLake']
+        viewOfLake:
+          type: boolean
+          default: false
+    ViewOfLandmark:
+      type: object
+      required:
+        - oneofKind
+        - viewOfLandmark
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfLandmark']
+        viewOfLandmark:
+          type: boolean
+          default: false
+    ViewOfOcean:
+      type: object
+      required:
+        - oneofKind
+        - viewOfOcean
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfOcean']
+        viewOfOcean:
+          type: boolean
+          default: false
+    ViewOfPool:
+      type: object
+      required:
+        - oneofKind
+        - viewOfPool
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfPool']
+        viewOfPool:
+          type: boolean
+          default: false
+    ViewOfValleyException:
+      type: object
+      required:
+        - oneofKind
+        - viewOfValleyException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfValleyException']
+        viewOfValleyException:
+          type: number
+          enum: [0]
+    ViewOfBeachException:
+      type: object
+      required:
+        - oneofKind
+        - viewOfBeachException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfBeachException']
+        viewOfBeachException:
+          type: number
+          enum: [0]
+    ViewOfCityException:
+      type: object
+      required:
+        - oneofKind
+        - viewOfCityException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfCityException']
+        viewOfCityException:
+          type: number
+          enum: [0]
+    ViewOfGardenException:
+      type: object
+      required:
+        - oneofKind
+        - viewOfGardenException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfGardenException']
+        viewOfGardenException:
+          type: number
+          enum: [0]
+    ViewOfLakeException:
+      type: object
+      required:
+        - oneofKind
+        - viewOfLakeException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfLakeException']
+        viewOfLakeException:
+          type: number
+          enum: [0]
+    ViewOfLandmarkException:
+      type: object
+      required:
+        - oneofKind
+        - viewOfLandmarkException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfLandmarkException']
+        viewOfLandmarkException:
+          type: number
+          enum: [0]
+    ViewOfOceanException:
+      type: object
+      required:
+        - oneofKind
+        - viewOfOceanException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfOceanException']
+        viewOfOceanException:
+          type: number
+          enum: [0]
+    ViewOfPoolException:
+      type: object
+      required:
+        - oneofKind
+        - viewOfPoolException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['viewOfPoolException']
+        viewOfPoolException:
+          type: number
+          enum: [0]
+    TotalLivingAreas:
+      type: object
+      properties:
+        sleeping:
+          type: object
+          properties:
+            numberOfBeds:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/NumberOfBeds'
+                - $ref: '#/components/schemas/NumberOfBedsException'
+            kingBeds:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/KingBeds'
+                - $ref: '#/components/schemas/KingBedsException'
+            queenBeds:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/QueenBeds'
+                - $ref: '#/components/schemas/QueenBedsException'
+            doubleBeds:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/DoubleBeds'
+                - $ref: '#/components/schemas/DoubleBedsException'
+            singleOrTwinBeds:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/SingleOrTwinBeds'
+                - $ref: '#/components/schemas/SingleOrTwinBedsException'
+            bunkBeds:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/BunkBeds'
+                - $ref: '#/components/schemas/BunkBedsException'
+            sofaBeds:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/SofaBeds'
+                - $ref: '#/components/schemas/SofaBedsException'
+            otherBeds:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/OtherBeds'
+                - $ref: '#/components/schemas/OtherBedsException'
+            cribs:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/Cribs'
+                - $ref: '#/components/schemas/CribsException'
+            cribsAvailable:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/CribsAvailable'
+                - $ref: '#/components/schemas/CribsAvailableException'
+            cribCount:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/CribCount'
+                - $ref: '#/components/schemas/CribCountException'
+            rollAwayBeds:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/RollAwayBeds'
+                - $ref: '#/components/schemas/RollAwayBedsException'
+            rollAwayBedsAvailable:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/RollAwayBedsAvailable'
+                - $ref: '#/components/schemas/RollAwayBedsAvailableException'
+            rollAwayBedCount:
+              type: object
+              oneOf:
+                - $ref: '#/components/schemas/RollAwayBedCount'
+                - $ref: '#/components/schemas/RollAwayBedCountException'
+        features:
+          type: object
+          required:
+            - inSpaceWifiAvailableOneof
+          properties:
+            inSpaceWifiAvailableOneof:
+              oneOf:
+                - $ref: '#/components/schemas/InSpaceWifiAvailable'
+                - $ref: '#/components/schemas/InSpaceWifiAvailableException'
+
+    NumberOfBeds:
+      type: object
+      required:
+        - oneofKind
+        - numberOfBeds
+      properties:
+        oneofKind:
+          type: string
+          enum: ['numberOfBeds']
+        numberOfBeds:
+          type: number
+          default: 1
+    KingBeds:
+      type: object
+      required:
+        - oneofKind
+        - kingBeds
+      properties:
+        oneofKind:
+          type: string
+          enum: ['kingBeds']
+        kingBeds:
+          type: number
+          default: 1
+    QueenBeds:
+      type: object
+      required:
+        - oneofKind
+        - queenBeds
+      properties:
+        oneofKind:
+          type: string
+          enum: ['queenBeds']
+        queenBeds:
+          type: number
+          default: 0
+    DoubleBeds:
+      type: object
+      required:
+        - oneofKind
+        - doubleBeds
+      properties:
+        oneofKind:
+          type: string
+          enum: ['doubleBeds']
+        doubleBeds:
+          type: number
+          default: 0
+    SingleOrTwinBeds:
+      type: object
+      required:
+        - oneofKind
+        - singleOrTwinBeds
+      properties:
+        oneofKind:
+          type: string
+          enum: ['singleOrTwinBeds']
+        singleOrTwinBeds:
+          type: number
+          default: 0
+    BunkBeds:
+      type: object
+      required:
+        - oneofKind
+        - bunkBeds
+      properties:
+        oneofKind:
+          type: string
+          enum: ['bunkBeds']
+        bunkBeds:
+          type: number
+          default: 0
+    SofaBeds:
+      type: object
+      required:
+        - oneofKind
+        - sofaBeds
+      properties:
+        oneofKind:
+          type: string
+          enum: ['sofaBeds']
+        sofaBeds:
+          type: number
+          default: 0
+    OtherBeds:
+      type: object
+      required:
+        - oneofKind
+        - otherBeds
+      properties:
+        oneofKind:
+          type: string
+          enum: ['otherBeds']
+        otherBeds:
+          type: number
+          default: 0
+    Cribs:
+      type: object
+      required:
+        - oneofKind
+        - cribs
+      properties:
+        oneofKind:
+          type: string
+          enum: ['cribs']
+        cribs:
+          type: boolean
+          default: false
+    CribsAvailable:
+      type: object
+      required:
+        - oneofKind
+        - cribsAvailable
+      properties:
+        oneofKind:
+          type: string
+          enum: ['cribsAvailable']
+        cribsAvailable:
+          type: number
+          default: 0
+    CribCount:
+      type: object
+      required:
+        - oneofKind
+        - cribCount
+      properties:
+        oneofKind:
+          type: string
+          enum: ['cribCount']
+        cribCount:
+          type: number
+          default: 0
+    RollAwayBeds:
+      type: object
+      required:
+        - oneofKind
+        - rollAwayBeds
+      properties:
+        oneofKind:
+          type: string
+          enum: ['rollAwayBeds']
+        rollAwayBeds:
+          type: boolean
+          default: false
+    RollAwayBedsAvailable:
+      type: object
+      required:
+        - oneofKind
+        - rollAwayBedsAvailable
+      properties:
+        oneofKind:
+          type: string
+          enum: ['rollAwayBedsAvailable']
+        rollAwayBedsAvailable:
+          type: number
+          default: 0
+    RollAwayBedCount:
+      type: object
+      required:
+        - oneofKind
+        - rollAwayBedCount
+      properties:
+        oneofKind:
+          type: string
+          enum: ['rollAwayBedCount']
+        rollAwayBedCount:
+          type: number
+          default: 0
+
+    NumberOfBedsException:
+      type: object
+      required:
+        - oneofKind
+        - numberOfBedsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['numberOfBedsException']
+        numberOfBedsException:
+          type: number
+          enum: [0]
+    KingBedsException:
+      type: object
+      required:
+        - oneofKind
+        - kingBedsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['kingBedsException']
+        kingBedsException:
+          type: number
+          enum: [0]
+    QueenBedsException:
+      type: object
+      required:
+        - oneofKind
+        - queenBedsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['queenBedsException']
+        queenBedsException:
+          type: number
+          enum: [0]
+    DoubleBedsException:
+      type: object
+      required:
+        - oneofKind
+        - doubleBedsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['doubleBedsException']
+        doubleBedsException:
+          type: number
+          enum: [0]
+    SingleOrTwinBedsException:
+      type: object
+      required:
+        - oneofKind
+        - singleOrTwinBedsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['singleOrTwinBedsException']
+        singleOrTwinBedsException:
+          type: number
+          enum: [0]
+    BunkBedsException:
+      type: object
+      required:
+        - oneofKind
+        - bunkBedsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['bunkBedsException']
+        bunkBedsException:
+          type: number
+          enum: [0]
+    SofaBedsException:
+      type: object
+      required:
+        - oneofKind
+        - sofaBedsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['sofaBedsException']
+        sofaBedsException:
+          type: number
+          enum: [0]
+    OtherBedsException:
+      type: object
+      required:
+        - oneofKind
+        - otherBedsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['otherBedsException']
+        otherBedsException:
+          type: number
+          enum: [0]
+    CribsException:
+      type: object
+      required:
+        - oneofKind
+        - cribsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['cribsException']
+        cribsException:
+          type: number
+          enum: [0]
+    CribsAvailableException:
+      type: object
+      required:
+        - oneofKind
+        - cribsAvailableException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['cribsAvailableException']
+        cribsAvailableException:
+          type: number
+          enum: [0]
+    CribCountException:
+      type: object
+      required:
+        - oneofKind
+        - cribCountException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['cribCountException']
+        cribCountException:
+          type: number
+          enum: [0]
+    RollAwayBedsException:
+      type: object
+      required:
+        - oneofKind
+        - rollAwayBedsException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['rollAwayBedsException']
+        rollAwayBedsException:
+          type: number
+          enum: [0]
+    RollAwayBedsAvailableException:
+      type: object
+      required:
+        - oneofKind
+        - rollAwayBedsAvailableException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['rollAwayBedsAvailableException']
+        rollAwayBedsAvailableException:
+          type: number
+          enum: [0]
+    RollAwayBedCountException:
+      type: object
+      required:
+        - oneofKind
+        - rollAwayBedCountException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['rollAwayBedCountException']
+        rollAwayBedCountException:
+          type: number
+          enum: [0]
+
+    InSpaceWifiAvailable:
+      type: object
+      required:
+        - oneofKind
+        - inSpaceWifiAvailable
+      properties:
+        oneofKind:
+          type: string
+          enum: ['inSpaceWifiAvailable']
+        inSpaceWifiAvailable:
+          type: boolean
+          default: true
+    InSpaceWifiAvailableException:
+      type: object
+      required:
+        - oneofKind
+        - inSpaceWifiAvailableException
+      properties:
+        oneofKind:
+          type: string
+          enum: ['inSpaceWifiAvailableException']
+        inSpaceWifiAvailableException:
+          type: number
+          enum: [0]
+    Item:
+      type: object
+      required:
+        - name
+        - description
+        - photos
+        - type
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        type:
+          type: number
+          description: 'SPACE = 0, OTHER = 1'
+    SpaceItem:
+      type: object
+      required:
+        - name
+        - description
+        - photos
+        - type
+        - payload
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        type:
+          type: number
+          description: 'SPACE = 0, OTHER = 1'
+        payload:
+          $ref: '#/components/schemas/Space'
 
 servers:
   - url: http://localhost:5000/api
@@ -33,6 +1364,18 @@ paths:
                 password:
                   type: string
                   description: user's password
+      responses:
+        200:
+          description: It's ok
+        400:
+          description: Handled Error
+        500:
+          description: Some server error
+
+  /user/refresh:
+    post:
+      summary: refresh access token
+      tags: [Auth service]
       responses:
         200:
           description: It's ok
@@ -415,8 +1758,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+                oneOf:
+                  - $ref: '#/components/schemas/DayOfWeekRateModifier'
+                  - $ref: '#/components/schemas/OccupancyRateModifier'
+                  - $ref: '#/components/schemas/LOSRateModifier'
         401:
           description: User is not Auth
         403:
@@ -435,8 +1780,16 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+              oneOf:
+                - $ref: '#/components/schemas/DayOfWeekRateModifier'
+                - $ref: '#/components/schemas/OccupancyRateModifier'
+                - $ref: '#/components/schemas/LOSRateModifier'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  day_of_week: '#/components/schemas/DayOfWeekRateModifier'
+                  occupancy: '#/components/schemas/OccupancyRateModifier'
+                  length_of_stay: '#/components/schemas/LOSRateModifier'
       parameters:
         - in: path
           name: facilityId
@@ -546,8 +1899,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+                oneOf:
+                  - $ref: '#/components/schemas/DayOfWeekRateModifier'
+                  - $ref: '#/components/schemas/OccupancyRateModifier'
+                  - $ref: '#/components/schemas/LOSRateModifier'
         401:
           description: User is not Auth
         403:
@@ -566,8 +1921,16 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+              oneOf:
+                - $ref: '#/components/schemas/DayOfWeekRateModifier'
+                - $ref: '#/components/schemas/OccupancyRateModifier'
+                - $ref: '#/components/schemas/LOSRateModifier'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  day_of_week: '#/components/schemas/DayOfWeekRateModifier'
+                  occupancy: '#/components/schemas/OccupancyRateModifier'
+                  length_of_stay: '#/components/schemas/LOSRateModifier'
       parameters:
         - in: path
           name: facilityId
@@ -692,7 +2055,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                oneOf:
+                  - $ref: '#/components/schemas/NoticeRequiredRule'
+                  - $ref: '#/components/schemas/DayOfWeekLOSRule'
         401:
           description: User is not Auth
         403:
@@ -711,7 +2076,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              oneOf:
+                - $ref: '#/components/schemas/NoticeRequiredRule'
+                - $ref: '#/components/schemas/DayOfWeekLOSRule'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  notice_required: '#/components/schemas/NoticeRequiredRule'
+                  length_of_stay: '#/components/schemas/DayOfWeekLOSRule'
       parameters:
         - in: path
           name: facilityId
@@ -807,15 +2179,16 @@ paths:
           required: true
           schema:
             type: string
-            enum: ['day_of_week', 'occupancy', 'length_of_stay']
+            enum: ['notice_required', 'length_of_stay']
       responses:
         200:
           description: OK
           content:
             application/json:
               schema:
-                type: object
-                # @todo Add definition of DayOfWeekRateModifer, OccupancyRateModifier, LOSRateModifier
+                oneOf:
+                  - $ref: '#/components/schemas/NoticeRequiredRule'
+                  - $ref: '#/components/schemas/DayOfWeekLOSRule'
         401:
           description: User is not Auth
         403:
@@ -834,7 +2207,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              oneOf:
+                - $ref: '#/components/schemas/NoticeRequiredRule'
+                - $ref: '#/components/schemas/DayOfWeekLOSRule'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  notice_required: '#/components/schemas/NoticeRequiredRule'
+                  length_of_stay: '#/components/schemas/DayOfWeekLOSRule'
       parameters:
         - in: path
           name: facilityId
@@ -1009,8 +2389,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                # @todo array of facilities
+                type: array
+                items:
+                  $ref: '#/components/schemas/Facility'
         401:
           description: User is not Auth
         403:
@@ -1032,8 +2413,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                # @todo 1 facility
+                $ref: '#/components/schemas/Facility'
         401:
           description: User is not Auth
         403:
@@ -1052,7 +2432,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/Facility'
       parameters:
         - in: path
           name: facilityId
@@ -1120,7 +2500,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              $ref: '#/components/schemas/Facility'
       parameters:
         - in: path
           name: salt
@@ -1172,8 +2552,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                # @todo array of items
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/SpaceItem'
+                    - $ref: '#/components/schemas/Item'
         401:
           description: User is not Auth
         403:
@@ -1214,8 +2597,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                # @todo item metadata
+                oneOf:
+                  - $ref: '#/components/schemas/SpaceItem'
+                  - $ref: '#/components/schemas/Item'
         401:
           description: User is not Auth
         403:
@@ -1234,7 +2618,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              oneOf:
+                - $ref: '#/components/schemas/SpaceItem'
+                - $ref: '#/components/schemas/Item'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  'space': '#/components/schemas/SpaceItem'
+                  'item': '#/components/schemas/Item'
       parameters:
         - in: path
           name: facilityId
@@ -1282,7 +2673,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
+              oneOf:
+                - $ref: '#/components/schemas/SpaceItem'
+                - $ref: '#/components/schemas/Item'
+              discriminator:
+                propertyName: descriptor
+                mapping:
+                  'space': '#/components/schemas/SpaceItem'
+                  'item': '#/components/schemas/Item'
       parameters:
         - in: path
           name: facilityId

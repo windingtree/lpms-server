@@ -53,7 +53,7 @@ export class FacilityItemController {
         return next(ApiError.BadRequest('Validation error', errors.array()));
       }
       const { facilityId, itemKey, itemId } = req.params;
-      const { metadata } = req.body;
+      const metadata = req.body;
 
       if (
         await facilityRepository.getItemKey<Item>(
@@ -89,7 +89,7 @@ export class FacilityItemController {
       }
 
       const { facilityId, itemKey, itemId } = req.params;
-      const { metadata } = req.body;
+      const metadata = req.body;
 
       if (
         !(await facilityRepository.getItemKey<Item>(

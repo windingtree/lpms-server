@@ -10,6 +10,9 @@ import errorMiddleware from '../middlewares/ErrorMiddleware';
 import { debugEnabled } from '../config';
 import responseTime from 'response-time';
 import { MetricsService } from './MetricsService';
+import * as openApiValidator from 'express-openapi-validator';
+import path from 'path';
+import { validationMiddleware } from '../middlewares/ValidationMiddleware';
 
 export default class ServerService {
   protected PORT: number;
@@ -77,6 +80,16 @@ export default class ServerService {
     if (debugEnabled) {
       this.app.use(morgan('dev'));
     }
+
+    const apiSpec = path.join(path.resolve(), 'swagger/swagger.yaml');
+
+    this.app.use(
+      openApiValidator.middleware({
+        apiSpec
+      })
+    );
+
+    this.app.use(validationMiddleware);
 
     this.app.use('/api', router);
 

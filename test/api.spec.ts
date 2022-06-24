@@ -12,13 +12,24 @@ import {
   NoticeRequiredRule
 } from '../src/proto/lpms';
 import { SpaceAvailabilityRepository } from '../src/repositories/SpaceAvailabilityRepository';
+import { ItemType } from '../src/proto/facility';
 
 describe('facility rule test', async () => {
   const appService = await new ServerService(3006);
   const requestWithSupertest = await supertest(appService.getApp);
 
   const spaceRequestBody = {
-    metadata: space
+    descriptor: 'space',
+    type: ItemType.SPACE,
+    name: 'some name',
+    description: 'some description',
+    photos: [
+      {
+        uri: '/image1.jpg',
+        description: 'Chic guesthouse'
+      }
+    ],
+    payload: space
   };
 
   const facilityId =
@@ -85,7 +96,7 @@ describe('facility rule test', async () => {
       .expect(200);
 
     expect(
-      res.body.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
+      res.body.payload.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
     ).to.be.equal(2);
   });
 
@@ -101,7 +112,7 @@ describe('facility rule test', async () => {
 
   it('update space', async () => {
     const updatedSpace = JSON.parse(JSON.stringify(spaceRequestBody)); //clone
-    updatedSpace.metadata.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants = 3;
+    updatedSpace.payload.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants = 3;
     await requestWithSupertest
       .put(`/api/facility/${facilityId}/spaces/${spaceId}`)
       .set('Authorization', `Bearer ${accessToken}`)
@@ -118,7 +129,7 @@ describe('facility rule test', async () => {
       .expect(200);
 
     expect(
-      res.body.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
+      res.body.payload.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
     ).to.be.equal(3);
   });
 
@@ -131,7 +142,7 @@ describe('facility rule test', async () => {
       .post(`/api/facility/${facilityId}/rule/notice_required`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
-      .send(rule)
+      .send({ descriptor: 'notice_required', ...rule })
       .expect(200);
   });
 
@@ -164,7 +175,7 @@ describe('facility rule test', async () => {
       )
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
-      .send(rule)
+      .send({ descriptor: 'notice_required', ...rule })
       .expect(200);
   });
 
@@ -283,7 +294,7 @@ describe('facility rule test', async () => {
       .post(`/api/facility/${facilityId}/modifier/length_of_stay`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
-      .send(modifier)
+      .send({ descriptor: 'length_of_stay', ...modifier })
       .expect(200);
   });
 
@@ -325,7 +336,7 @@ describe('facility rule test', async () => {
       )
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
-      .send(modifier)
+      .send({ descriptor: 'length_of_stay', ...modifier })
       .expect(200);
   });
 
