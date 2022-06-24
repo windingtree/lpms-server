@@ -61,7 +61,9 @@ export class SearchService {
           throw ApiError.NotFound(`Unable to find "metadata" for space: ${v}`);
         } else {
           try {
-            const metadata = Space.fromBinary(space.payload);
+            const metadata = Space.fromBinary(
+              new Uint8Array(Object.values(space.payload))
+            );
             set.add({ metadata, id: v });
           } catch (e) {
             throw ApiError.BadRequest(`Corrupt "metadata" for space: ${v}`);
@@ -82,7 +84,7 @@ export class SearchService {
     if (!dates.length) return [];
 
     for (const i of spaces) {
-      const space = i.space as Space;
+      const space = i.metadata as Space;
 
       //check rules
       if (!(await this.checkRules(dates, i.id))) {

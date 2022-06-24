@@ -1,7 +1,7 @@
 import { utils, Wallet } from 'ethers';
 import { utils as vUtils, eip712 } from '@windingtree/videre-sdk';
 import { SignedMessage } from '@windingtree/videre-sdk/dist/cjs/utils';
-import { Facility, Item } from '../proto/facility';
+import { Facility, Item, Space } from '../proto/facility';
 import { ServiceProviderData } from '../proto/storage';
 import facilityRepository, {
   FacilityRepository
@@ -196,6 +196,35 @@ export class FacilityService {
     await this.repository.delFromIndex(facilityId, key, id);
     await this.repository.delItemKey(facilityId, key, id, 'metadata');
   }
+
+  public getAllFacilityItems = async (facilityId: string, itemKey: string) => {
+    const items = await this.getFacilityDbKeyValues(
+      facilityId,
+      itemKey as FacilitySubLevels
+    );
+
+    const set = new Set();
+
+    for (const i of items) {
+      if (this.decodeItem(i.item)) {
+        set.add(this.decodeItem(i.item));
+      }
+    }
+
+    return Array.from(set);
+  };
+
+  public decodeItem = (item: Item) => {
+    const { payload, ...generic } = item;
+    if (payload) {
+      return {
+        ...generic,
+        payload: Space.fromBinary(new Uint8Array(Object.values(payload)))
+      };
+    } else {
+      return null;
+    }
+  };
 }
 
 export default new FacilityService();

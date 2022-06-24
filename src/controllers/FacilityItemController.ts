@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import ApiError from '../exceptions/ApiError';
 import facilityService from '../services/FacilityService';
 import facilityRepository from '../repositories/FacilityRepository';
-import { Item } from '../proto/facility';
+import { Item, Space } from '../proto/facility';
 import { validationResult } from 'express-validator';
 import { FacilitySubLevels } from '../services/DBService';
 import stubService from '../services/StubService';
@@ -11,7 +11,8 @@ export class FacilityItemController {
   getAllItems = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { facilityId, itemKey } = req.params;
-      const items = await facilityService.getFacilityDbKeyValues(
+
+      const items = await facilityService.getAllFacilityItems(
         facilityId,
         itemKey as FacilitySubLevels
       );
@@ -40,7 +41,7 @@ export class FacilityItemController {
         throw ApiError.NotFound(`Unable to get facility: ${facilityId}`);
       }
 
-      return res.json(item);
+      return res.json(facilityService.decodeItem(item));
     } catch (e) {
       next(e);
     }
@@ -53,8 +54,7 @@ export class FacilityItemController {
         return next(ApiError.BadRequest('Validation error', errors.array()));
       }
       const { facilityId, itemKey, itemId } = req.params;
-      const metadata = req.body;
-
+      const { name, description, photos, type, payload } = req.body;
       if (
         await facilityRepository.getItemKey<Item>(
           facilityId,
@@ -67,6 +67,14 @@ export class FacilityItemController {
           `item: ${itemId} in facility: ${facilityId} already exist`
         );
       }
+
+      const metadata = {
+        name,
+        description,
+        photos,
+        type,
+        payload: Space.toBinary(payload)
+      };
 
       await facilityService.setItemDbKeys(
         facilityId,
@@ -89,7 +97,7 @@ export class FacilityItemController {
       }
 
       const { facilityId, itemKey, itemId } = req.params;
-      const metadata = req.body;
+      const { name, description, photos, type, payload } = req.body;
 
       if (
         !(await facilityRepository.getItemKey<Item>(
@@ -103,6 +111,14 @@ export class FacilityItemController {
           `item: ${itemId} in facility: ${facilityId} not exist`
         );
       }
+
+      const metadata = {
+        name,
+        description,
+        photos,
+        type,
+        payload: Space.toBinary(payload)
+      };
 
       await facilityService.setItemDbKeys(
         facilityId,
