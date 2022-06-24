@@ -12,25 +12,12 @@ import {
   NoticeRequiredRule
 } from '../src/proto/lpms';
 import { SpaceAvailabilityRepository } from '../src/repositories/SpaceAvailabilityRepository';
-import { ItemType } from '../src/proto/facility';
 
 describe('facility rule test', async () => {
   const appService = await new ServerService(3006);
   const requestWithSupertest = await supertest(appService.getApp);
 
-  const spaceRequestBody = {
-    descriptor: 'space',
-    type: ItemType.SPACE,
-    name: 'some name',
-    description: 'some description',
-    photos: [
-      {
-        uri: '/image1.jpg',
-        description: 'Chic guesthouse'
-      }
-    ],
-    payload: space
-  };
+  const spaceRequestBody = space;
 
   const facilityId =
     '0x1234567890123456789012345678901234567890123456789012345678901234';
@@ -73,7 +60,7 @@ describe('facility rule test', async () => {
       .post(`/api/facility/${facilityId}/spaces/${spaceId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
-      .send(spaceRequestBody)
+      .send({ descriptor: 'space', ...spaceRequestBody })
       .expect(200);
   });
 
@@ -95,9 +82,15 @@ describe('facility rule test', async () => {
       .set('Accept', 'application/json')
       .expect(200);
 
-    expect(
-      res.body.payload.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
-    ).to.be.equal(2);
+    const { payload } = res.body;
+
+    const numOfAdults =
+      payload.maxNumberOfAdultOccupantsOneof.oneofKind ===
+      'maxNumberOfAdultOccupants'
+        ? payload.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
+        : 0;
+
+    expect(numOfAdults).to.be.equal(2);
   });
 
   it('should throw error not found with random space id', async () => {
@@ -117,7 +110,7 @@ describe('facility rule test', async () => {
       .put(`/api/facility/${facilityId}/spaces/${spaceId}`)
       .set('Authorization', `Bearer ${accessToken}`)
       .set('Accept', 'application/json')
-      .send(updatedSpace)
+      .send({ descriptor: 'space', ...updatedSpace })
       .expect(200);
   });
 
@@ -128,9 +121,15 @@ describe('facility rule test', async () => {
       .set('Accept', 'application/json')
       .expect(200);
 
-    expect(
-      res.body.payload.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
-    ).to.be.equal(3);
+    const { payload } = res.body;
+
+    const numOfAdults =
+      payload.maxNumberOfAdultOccupantsOneof.oneofKind ===
+      'maxNumberOfAdultOccupants'
+        ? payload.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
+        : 0;
+
+    expect(numOfAdults).to.be.equal(3);
   });
 
   it('create facility rule', async () => {

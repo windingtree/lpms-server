@@ -7,6 +7,7 @@ import {
   SpaceTier
 } from '../src/proto/facility';
 import { ContactType } from '../src/proto/contact';
+import { Photo } from '../src/proto/photo';
 
 export const facility: Facility = {
   name: 'Awesome ski chalet',
@@ -76,12 +77,25 @@ export const facility: Facility = {
   }
 };
 
-export const space: Item = {
+interface SpaceInterface {
+  name: string;
+  description: string;
+  photos: Photo[];
+  type: ItemType;
+  payload: Space;
+}
+
+export const space: SpaceInterface = {
   name: 'Mountain view room',
   description: 'Panoramic views of Ushba',
-  photos: [],
+  photos: [
+    {
+      uri: '/image1.jpg',
+      description: 'Chic guesthouse'
+    }
+  ],
   type: ItemType.SPACE,
-  payload: Space.toBinary({
+  payload: {
     uris: [
       {
         uri: 'https://wonderland.somewhere/',
@@ -167,5 +181,5 @@ export const space: Item = {
         }
       }
     }
-  })
+  }
 };

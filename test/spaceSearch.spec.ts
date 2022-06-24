@@ -13,7 +13,7 @@ import { DayOfWeekLOSRule } from '../src/proto/lpms';
 import { FormattedDate } from '../src/services/DBService';
 import { convertDaysToSeconds } from '../src/utils';
 import { facility, space } from './common';
-import { Space } from '../src/proto/facility';
+import { Item, Space } from '../src/proto/facility';
 
 describe('search service test', async () => {
   const facilityId =
@@ -40,6 +40,15 @@ describe('search service test', async () => {
 
   before(async () => {
     await facilityRepo.setFacilityKey(facilityId, 'metadata', facility);
+    const { name, description, photos, type } = space;
+
+    const item: Item = {
+      name,
+      description,
+      photos,
+      type,
+      payload: Space.toBinary(space.payload)
+    };
 
     await facilityRepo.addToIndex(facilityId, 'spaces', spaceId);
     await facilityRepo.setItemKey(
@@ -47,10 +56,10 @@ describe('search service test', async () => {
       'items',
       spaceId,
       'metadata',
-      space
+      item
     );
 
-    const spaceMetadata = Space.fromBinary(space.payload as Uint8Array);
+    const spaceMetadata = space.payload;
 
     spaceMetadata.maxNumberOfAdultOccupantsOneof = {
       oneofKind: 'maxNumberOfAdultOccupants',
@@ -61,7 +70,13 @@ describe('search service test', async () => {
       maxNumberOfChildOccupants: 0
     };
 
-    space.payload = Space.toBinary(spaceMetadata);
+    const item2: Item = {
+      name,
+      description,
+      photos,
+      type,
+      payload: Space.toBinary(spaceMetadata)
+    };
 
     await facilityRepo.addToIndex(facilityId, 'spaces', spaceId2);
     await facilityRepo.setItemKey(
@@ -69,7 +84,7 @@ describe('search service test', async () => {
       'items',
       spaceId2,
       'metadata',
-      space
+      item2
     );
   });
 
