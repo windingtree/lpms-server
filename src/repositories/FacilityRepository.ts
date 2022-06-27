@@ -196,6 +196,8 @@ export class FacilityRepository {
       Space.fromBinary(value.payload as Uint8Array);
       // above hasn't thrown, let's add it to the index
       await this.addToIndex(facilityId, 'spaces', itemId);
+    } else {
+      await this.addToIndex(facilityId, 'items', itemId);
     }
 
     await this.dbService

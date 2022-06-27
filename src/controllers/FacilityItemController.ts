@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import ApiError from '../exceptions/ApiError';
 import facilityService from '../services/FacilityService';
 import facilityRepository from '../repositories/FacilityRepository';
-import { Item, Space } from '../proto/facility';
+import { Item, ItemType, Space } from '../proto/facility';
 import { validationResult } from 'express-validator';
 import { FacilitySubLevels } from '../services/DBService';
 import stubService from '../services/StubService';
@@ -68,13 +68,24 @@ export class FacilityItemController {
         );
       }
 
-      const metadata = {
-        name,
-        description,
-        photos,
-        type,
-        payload: Space.toBinary(payload)
-      };
+      let metadata;
+
+      if (type === ItemType.SPACE) {
+        metadata = {
+          name,
+          description,
+          photos,
+          type,
+          payload: Space.toBinary(payload)
+        };
+      } else {
+        metadata = {
+          name,
+          description,
+          photos,
+          type
+        };
+      }
 
       await facilityService.setItemDbKeys(
         facilityId,
