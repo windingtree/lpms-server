@@ -1,7 +1,6 @@
 import {
   Exception,
   Facility,
-  Item,
   ItemType,
   Space,
   SpaceTier
