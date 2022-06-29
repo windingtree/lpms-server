@@ -11,6 +11,7 @@ import { Ask } from '../proto/ask';
 import { SearchService } from './SearchService';
 import { QuoteService } from './QuoteService';
 import { ask as staysEIP712 } from '@windingtree/stays-models/dist/cjs/eip712';
+import bidRepository from '../repositories/BidRepository';
 
 export class AuctioneerService extends AbstractFacilityService {
   constructor() {
@@ -75,6 +76,20 @@ export class AuctioneerService extends AbstractFacilityService {
               );
 
               bidlines.push(bid);
+
+              try {
+                await bidRepository.setBid(
+                  facilityId,
+                  utils.keccak256(utils.toUtf8Bytes(JSON.stringify(bid))),
+                  {
+                    ask,
+                    bidLine: bid,
+                    spaceId: space
+                  }
+                );
+              } catch (e) {
+                log.red('Malformed DB transaction');
+              }
             }
 
             // assemble the final bid message to be used in response

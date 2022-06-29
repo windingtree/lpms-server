@@ -1,6 +1,6 @@
 import { AbstractSublevel } from 'abstract-level';
 import { Level } from 'level';
-import { Token, User } from '../types';
+import { BidLineAsk, Token, User } from '../types';
 import {
   Facility as FacilityMetadata,
   Item as ItemMetadata
@@ -148,6 +148,12 @@ export default class DBService {
 
   public getFacilityPiiDB(facilityId: string) {
     return this.getFacilityDB(facilityId).sublevel<string, Person>('pii', {
+      valueEncoding: 'json'
+    });
+  }
+
+  public getFacilityBidDB(facilityId: string) {
+    return this.getFacilityDB(facilityId).sublevel<string, BidLineAsk>('bid', {
       valueEncoding: 'json'
     });
   }

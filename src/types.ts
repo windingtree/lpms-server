@@ -1,4 +1,6 @@
 import { Request } from 'express';
+import { Ask } from './proto/ask';
+import { BidLine } from './proto/bidask';
 
 export interface User {
   id: number;
@@ -55,4 +57,10 @@ export interface walletAccount {
 
 export interface AuthRequest extends Request {
   user: UserDTO;
+}
+
+export interface BidLineAsk {
+  ask: Ask;
+  bidLine: BidLine;
+  spaceId: string;
 }
