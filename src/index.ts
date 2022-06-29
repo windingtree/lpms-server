@@ -8,6 +8,7 @@ import videreService from './services/VidereService';
 import pingPongService from './services/PingPongService';
 import auctioneerService from './services/AuctioneerService';
 import IpfsService from './services/IpfsService';
+import bidService from './services/BidService';
 
 process.on('unhandledRejection', async (error) => {
   console.log(error);
@@ -34,6 +35,7 @@ const main = async (): Promise<void> => {
   await videreService.addService(pingPongService);
   await videreService.addService(auctioneerService);
   await videreService.start();
+  bidService.poller(60);
 };
 
 export default main().catch(async (error) => {

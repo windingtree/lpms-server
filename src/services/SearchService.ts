@@ -9,11 +9,15 @@ import {
   ItemRuleRepository
 } from '../repositories/RuleRepository';
 import { DayOfWeekLOSRule, NoticeRequiredRule } from '../proto/lpms';
-import { FormattedDate, Rules, RulesItemKey } from './DBService';
-import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
-import { SpaceStubRepository } from '../repositories/SpaceStubRepository';
+import { Rules, RulesItemKey } from './DBService';
 import ApiError from '../exceptions/ApiError';
-import { convertDaysToSeconds } from '../utils';
+import {
+  checkAvailableDates,
+  convertDaysToSeconds,
+  getAskDates,
+  getFacilityCheckInTime,
+  getFacilityTimezone
+} from '../utils';
 
 export class SearchService {
   protected facilityRuleRepository: FacilityRuleRepository;
@@ -36,10 +40,7 @@ export class SearchService {
       'metadata'
     )) as Facility;
 
-    this.checkInTime =
-      this.facility.policies?.checkInTimeOneof.oneofKind === 'checkInTime'
-        ? this.facility.policies.checkInTimeOneof.checkInTime
-        : '1500'; //todo think about default checkin time
+    this.checkInTime = getFacilityCheckInTime(this.facility);
 
     const spaces = await facilityRepository.getFacilityKey(
       this.facilityId,
@@ -80,7 +81,12 @@ export class SearchService {
   private async findSpaces(spaces): Promise<string[]> {
     const needed = new Set<string>();
 
-    const dates = this.getAskDates();
+    const dates = getAskDates(
+      this.ask,
+      this.checkInTime,
+      getFacilityTimezone(this.facility)
+    );
+
     if (!dates.length) return [];
 
     for (const i of spaces) {
@@ -97,48 +103,12 @@ export class SearchService {
       }
 
       //check dates is available
-      if (await this.checkAvailableDates(i.id, dates)) {
+      if (await checkAvailableDates(this.facilityId, i.id, this.ask, dates)) {
         needed.add(i.id);
       }
     }
 
     return Array.from(needed);
-  }
-
-  private getAskDates(): DateTime[] {
-    if (!this.ask.checkIn || !this.ask.checkOut) {
-      throw ApiError.BadRequest('invalid dates in ask');
-    }
-
-    const checkIn = DateTime.fromFormat(this.checkInTime, 'hhmm', {
-      zone: this.facility.policies?.timezone
-    }).setZone('utc');
-
-    let from = DateTime.fromObject(
-      {
-        ...this.ask.checkIn,
-        hour: checkIn.hour,
-        minute: checkIn.minute
-      },
-      { zone: 'utc' }
-    );
-    const to = DateTime.fromObject(
-      {
-        ...this.ask.checkOut,
-        hour: checkIn.hour,
-        minute: checkIn.minute
-      },
-      { zone: 'utc' }
-    );
-
-    const dates: DateTime[] = [];
-
-    while (from <= to) {
-      dates.push(from);
-      from = from.plus({ days: 1 });
-    }
-
-    return dates;
   }
 
   private async checkRules(
@@ -242,55 +212,6 @@ export class SearchService {
     // const check2 = spaceGuestsCount - guestCount + childrenCount > 0
     //   ? (spaceGuestsCount + spaceChildrenCount) / (spaceGuestsCount - guestCount + childrenCount)
     //   : 0;
-
-    return true;
-  }
-
-  private async checkAvailableDates(spaceId, dates: DateTime[]) {
-    const availabilityRepository = new SpaceAvailabilityRepository(
-      this.facilityId,
-      spaceId
-    );
-
-    const spaceStubRepository = new SpaceStubRepository(
-      this.facilityId,
-      spaceId
-    );
-
-    const defaultAvailable = await availabilityRepository.getSpaceAvailability(
-      'default'
-    );
-
-    for (const date of dates) {
-      try {
-        const formattedDate = date.toFormat('yyyy-MM-dd') as FormattedDate;
-
-        let available = await availabilityRepository.getSpaceAvailability(
-          formattedDate
-        );
-
-        if (!available) {
-          available = defaultAvailable;
-        }
-
-        if (!available) {
-          return false;
-        }
-
-        const numBooked = await spaceStubRepository.getNumBookedByDate(
-          `${formattedDate}-num_booked`
-        );
-
-        if (available.numSpaces - numBooked < this.ask.numSpacesReq) {
-          return false;
-        }
-      } catch (e) {
-        if (e.status !== 404) {
-          throw e;
-        }
-        //room is available on this date
-      }
-    }
 
     return true;
   }
