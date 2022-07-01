@@ -91,9 +91,7 @@ export class StubService {
     if (!bid || !bid.ask) {
       //todo call done method from smart-contract and revert transaction
 
-      log.red(
-        'between the request and the booking someone has already booked the last space'
-      );
+      log.red('bid not exist');
 
       return;
     }
