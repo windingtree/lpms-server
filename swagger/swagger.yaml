@@ -1511,9 +1511,9 @@ paths:
   /user:
     delete:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       summary: delete user (only for manager role)
-      tags: [ Auth service ]
+      tags: [Auth service]
       requestBody:
         required: true
         content:
