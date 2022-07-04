@@ -80,7 +80,7 @@ export class AuctioneerService extends AbstractFacilityService {
               try {
                 await bidRepository.setBid(
                   facilityId,
-                  utils.keccak256(utils.toUtf8Bytes(JSON.stringify(bid))),
+                  utils.keccak256(bid.signature),
                   {
                     ask,
                     bidLine: bid,

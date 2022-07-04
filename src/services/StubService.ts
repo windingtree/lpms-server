@@ -81,6 +81,13 @@ export class StubService {
     const facilityStubRepository = new StubRepository(facilityId);
     const stub = await facilityStubRepository.getStub(stubId);
 
+    const facilityIds = await facilityRepository.getAllFacilityIds();
+
+    if (!facilityIds.includes(facilityId)) {
+      //facility not exist
+      return;
+    }
+
     const bid = await bidRepository.getBid(facilityId, bidHash);
     if (stub) {
       log.red('Stub already exist');
