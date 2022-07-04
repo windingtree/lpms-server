@@ -58,7 +58,7 @@ export class UserRepository {
   }
 
   public async deleteUser(userId: string, login: string): Promise<void> {
-    await this.db.del(String(userId));
+    await this.userDB.del(String(userId));
     await this.loginDB.del(login);
   }
 
