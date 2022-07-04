@@ -1357,6 +1357,9 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - login
+                - password
               properties:
                 login:
                   type: string
@@ -1406,6 +1409,10 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - login
+                - password
+                - roles
               properties:
                 login:
                   type: string
@@ -1443,6 +1450,9 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - userId
+                - password
               properties:
                 userId:
                   type: number
@@ -1474,6 +1484,9 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - userId
+                - roles
               properties:
                 userId:
                   type: number
@@ -1484,6 +1497,35 @@ paths:
                     type: string
                     enum: [manager, staff]
                   description: roles (staff, manager)
+      responses:
+        200:
+          description: It's ok
+        400:
+          description: Handled Error
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        500:
+          description: Some server error
+  /user:
+    delete:
+      security:
+        - bearerAuth: [ ]
+      summary: delete user (only for manager role)
+      tags: [ Auth service ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+              properties:
+                userId:
+                  type: number
+                  description: user's id
       responses:
         200:
           description: It's ok

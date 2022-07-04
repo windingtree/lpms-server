@@ -55,6 +55,14 @@ router.put(
   userController.updateUserRoles
 );
 
+router.delete(
+  '/user',
+  authMiddleware,
+  roleMiddleware([AppRole.MANAGER]),
+  check('userId').isNumeric(),
+  userController.deleteUser
+);
+
 router.post('/user/refresh', userController.refresh);
 
 router.post('/user/logout', authMiddleware, userController.logout);

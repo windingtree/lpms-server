@@ -147,6 +147,23 @@ export class UserController {
       next(e);
     }
   }
+
+  public async deleteUser(req: AuthRequest, res: Response, next: NextFunction) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return next(ApiError.BadRequest('Validation error', errors.array()));
+    }
+
+    try {
+      const userId: number = req.body.userId;
+
+      await userService.deleteUser(userId);
+
+      return res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export default new UserController();
