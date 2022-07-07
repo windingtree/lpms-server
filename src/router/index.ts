@@ -10,6 +10,7 @@ import rulesRoutes from './rules';
 import facilityRoutes from './facility';
 import itemRoutes from './items';
 import stubsRoutes from './stubs';
+import termRoutes from './terms';
 
 const routes: RouterInitializer[] = [
   usersRoutes,
@@ -20,7 +21,8 @@ const routes: RouterInitializer[] = [
   rulesRoutes,
   facilityRoutes,
   itemRoutes,
-  stubsRoutes
+  stubsRoutes,
+  termRoutes
 ];
 
 const router = Router();
