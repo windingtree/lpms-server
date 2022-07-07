@@ -37,7 +37,7 @@ export default (router: Router): void => {
   );
 
   router.delete(
-    '/item/:facilityId/:itemKey/:itemId',
+    '/item/:facilityId/:itemId',
     authMiddleware,
     roleMiddleware([AppRole.MANAGER]),
     facilityItemController.delItem

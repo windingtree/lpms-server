@@ -34,7 +34,6 @@ export type ModifiersValues =
 export type ModifiersKey = 'day_of_week' | 'occupancy' | 'length_of_stay';
 export type FacilityKey = 'metadata';
 export type FacilitySubLevels = 'stubs' | 'items';
-export type FacilityIndexKey = FacilitySubLevels | 'spaces';
 export type FacilityValues = FacilityMetadata | string[];
 export type FormattedDate = `${number}-${number}-${number}`;
 export type DefaultOrDateItemKey = 'default' | FormattedDate;
@@ -116,7 +115,7 @@ export default class DBService {
 
   public getFacilityItemDB(
     facilityId: string,
-    itemType: FacilityIndexKey,
+    itemType: FacilitySubLevels,
     itemId: string
   ) {
     const key = `${itemType}_${itemId}`;
@@ -174,7 +173,7 @@ export default class DBService {
 
   public getItemModifiersDB(
     facilityId: string,
-    indexKey: FacilityIndexKey,
+    indexKey: FacilitySubLevels,
     itemId: string
   ) {
     return this.getFacilityItemDB(facilityId, indexKey, itemId).sublevel<
@@ -185,7 +184,7 @@ export default class DBService {
 
   public getItemRulesDB(
     facilityId: string,
-    indexKey: FacilityIndexKey,
+    indexKey: FacilitySubLevels,
     itemId: string
   ) {
     return this.getFacilityItemDB(facilityId, indexKey, itemId).sublevel<
@@ -196,7 +195,7 @@ export default class DBService {
 
   public getItemRatesDB(
     facilityId: string,
-    indexKey: FacilityIndexKey,
+    indexKey: FacilitySubLevels,
     spaceId: string
   ) {
     return this.getFacilityItemDB(facilityId, indexKey, spaceId).sublevel<

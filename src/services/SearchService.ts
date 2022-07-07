@@ -44,7 +44,7 @@ export class SearchService {
 
     const spaces = await facilityRepository.getFacilityKey(
       this.facilityId,
-      'spaces'
+      'items'
     );
 
     if (Array.isArray(spaces)) {

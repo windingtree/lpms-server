@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import { Router, Request } from 'express';
 import { Ask } from './proto/ask';
 import { BidLine } from './proto/bidask';
 
@@ -64,3 +64,5 @@ export interface BidLineAsk {
   bidLine: BidLine;
   spaceId: string;
 }
+
+export type RouterInitializer = (router: Router) => void;

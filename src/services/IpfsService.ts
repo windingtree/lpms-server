@@ -27,6 +27,7 @@ export default class IpfsService {
   }
 
   public async start(): Promise<void> {
+    log.green(`IPFS server starting...`);
     this.ipfs = await create({ config: {} });
     const version = await this.ipfs.version();
     log.green(`IPFS Version: ${version.version}`);

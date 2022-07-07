@@ -40,7 +40,7 @@ export class StubService {
     return await StubService.getStubsByIds(facilityId, ids);
   }
 
-  public async getSpaceStubsByDate(
+  public async getItemStubsByDate(
     facilityId: string,
     itemId: string,
     date: FormattedDate
@@ -53,7 +53,7 @@ export class StubService {
   }
 
   private static async getStubsByIds(
-    facilityId,
+    facilityId: string,
     ids: string[]
   ): Promise<StubStorage[]> {
     const facilityStubRepository = new StubRepository(facilityId);
