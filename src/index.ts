@@ -27,8 +27,6 @@ const main = async (): Promise<void> => {
     await MetricsService.startMetricsServer();
   }
 
-  await server.start();
-
   await wakuService.start();
   await ipfsService.start();
 
@@ -36,6 +34,8 @@ const main = async (): Promise<void> => {
   await videreService.addService(auctioneerService);
   await videreService.start();
   bidService.poller(60);
+
+  await server.start();
 };
 
 export default main().catch(async (error) => {
