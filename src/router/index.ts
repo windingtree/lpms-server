@@ -12,6 +12,7 @@ import walletController from '../controllers/WalletController';
 import facilityItemController from '../controllers/FacilityItemController';
 import { validateBytes32StringRule } from '../rules/Bytes32StringRules';
 import { descriptorMiddleware } from '../middlewares/ValidationMiddleware';
+import termRoutes from './term';
 
 const router = Router();
 const upload = multer({ dest: os.tmpdir() });
@@ -318,5 +319,7 @@ router.get(
   facilityItemController.delItem
 );
 //stubs
+
+termRoutes(router);
 
 export default router;

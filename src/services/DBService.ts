@@ -1,6 +1,6 @@
 import { AbstractSublevel } from 'abstract-level';
 import { Level } from 'level';
-import { BidLineAsk, Token, User } from '../types';
+import { BidLineAsk, Term, Token, User } from '../types';
 import {
   Facility as FacilityMetadata,
   Item as ItemMetadata
@@ -33,7 +33,7 @@ export type ModifiersValues =
   | LOSRateModifier;
 export type ModifiersKey = 'day_of_week' | 'occupancy' | 'length_of_stay';
 export type FacilityKey = 'metadata';
-export type FacilitySubLevels = 'stubs' | 'items';
+export type FacilitySubLevels = 'stubs' | 'items' | 'terms';
 export type FacilityIndexKey = FacilitySubLevels | 'spaces';
 export type FacilityValues = FacilityMetadata | string[];
 export type FormattedDate = `${number}-${number}-${number}`;
@@ -158,6 +158,12 @@ export default class DBService {
     });
   }
 
+  public getFacilityTermsDB(facilityId: string) {
+    return this.getFacilityDB(facilityId).sublevel<string, Term>('terms', {
+      valueEncoding: 'json'
+    });
+  }
+
   public getSpaceAvailabilityDB(facilityId: string, itemId: string) {
     return this.getFacilityItemDB(facilityId, 'items', itemId).sublevel<
       DefaultOrDateItemKey,
@@ -203,5 +209,16 @@ export default class DBService {
       DefaultOrDateItemKey,
       Rates
     >('rates', { valueEncoding: 'json' });
+  }
+
+  public getItemTermsDB(
+    facilityId: string,
+    indexKey: FacilityIndexKey,
+    spaceId: string
+  ) {
+    return this.getFacilityItemDB(facilityId, indexKey, spaceId).sublevel<
+      string,
+      string[]
+    >('terms', { valueEncoding: 'json' });
   }
 }

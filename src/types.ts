@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import { Ask } from './proto/ask';
-import { BidLine } from './proto/bidask';
+import { BidLine, BidTerm } from './proto/bidask';
 
 export interface User {
   id: number;
@@ -63,4 +63,10 @@ export interface BidLineAsk {
   ask: Ask;
   bidLine: BidLine;
   spaceId: string;
+}
+
+export interface Term {
+  name: string;
+  description: string;
+  bidTerm: BidTerm;
 }

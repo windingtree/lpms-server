@@ -10,7 +10,7 @@ import {
   LOSRateModifier,
   OccupancyRateModifier
 } from '../src/proto/lpms';
-import { ItemRateRepository } from '../src/repositories/ItemRateRepository';
+import { RateRepository } from '../src/repositories/RateRepository';
 import {
   FacilityModifierRepository,
   ItemModifierRepository
@@ -138,12 +138,12 @@ describe('QuoteService', () => {
 
   before(async () => {
     repos = {
-      rates: new ItemRateRepository(facilityId, spaceId),
+      rates: new RateRepository(facilityId, spaceId),
       modifiers: new ItemModifierRepository(facilityId, spaceId),
       facilityModifiers: new FacilityModifierRepository(facilityId)
     };
     reposClear = {
-      rates: new ItemRateRepository(facilityId + '1', spaceId + '1'),
+      rates: new RateRepository(facilityId + '1', spaceId + '1'),
       modifiers: new ItemModifierRepository(facilityId + '1', spaceId + '1'),
       facilityModifiers: new FacilityModifierRepository(facilityId + '1')
     };
