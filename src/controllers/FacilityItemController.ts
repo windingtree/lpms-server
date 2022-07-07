@@ -10,11 +10,11 @@ import stubService from '../services/StubService';
 export class FacilityItemController {
   getAllItems = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { facilityId, itemKey } = req.params;
+      const { facilityId } = req.params;
 
       const items = await facilityService.getAllFacilityItems(
         facilityId,
-        itemKey as FacilitySubLevels
+        'items'
       );
 
       return res.json(items);
@@ -25,20 +25,19 @@ export class FacilityItemController {
 
   getOneItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-      const { facilityId, itemKey, itemId } = req.params;
+      const { facilityId, itemId } = req.params;
+
       const item = await facilityRepository.getItemKey<Item>(
         facilityId,
-        itemKey as FacilitySubLevels,
+        'items',
         itemId,
         'metadata'
       );
 
       if (!item) {
-        throw ApiError.NotFound(`Unable to get facility: ${facilityId}`);
+        throw ApiError.NotFound(
+          `Unable to get the item ${itemId} facility ${facilityId}`
+        );
       }
 
       return res.json(facilityService.decodeItem(item));
@@ -49,22 +48,19 @@ export class FacilityItemController {
 
   createItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-      const { facilityId, itemKey, itemId } = req.params;
+      const { facilityId, itemId } = req.params;
       const { name, description, photos, type, payload } = req.body;
+
       if (
         await facilityRepository.getItemKey<Item>(
           facilityId,
-          itemKey as FacilitySubLevels,
+          'items',
           itemId,
           'metadata'
         )
       ) {
         throw ApiError.BadRequest(
-          `item: ${itemId} in facility: ${facilityId} already exist`
+          `The item: ${itemId} in facility ${facilityId} already exist`
         );
       }
 
@@ -87,12 +83,9 @@ export class FacilityItemController {
         };
       }
 
-      await facilityService.setItemDbKeys(
-        facilityId,
-        itemKey as FacilitySubLevels,
-        itemId,
-        [['metadata', metadata]]
-      );
+      await facilityService.setItemDbKeys(facilityId, 'items', itemId, [
+        ['metadata', metadata]
+      ]);
 
       return res.json({ success: true });
     } catch (e) {
@@ -102,24 +95,19 @@ export class FacilityItemController {
 
   updateItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-
-      const { facilityId, itemKey, itemId } = req.params;
+      const { facilityId, itemId } = req.params;
       const { name, description, photos, type, payload } = req.body;
 
       if (
         !(await facilityRepository.getItemKey<Item>(
           facilityId,
-          itemKey as FacilitySubLevels,
+          'items',
           itemId,
           'metadata'
         ))
       ) {
         throw ApiError.BadRequest(
-          `item: ${itemId} in facility: ${facilityId} not exist`
+          `The item ${itemId} in facility ${facilityId} not exist`
         );
       }
 
@@ -131,12 +119,9 @@ export class FacilityItemController {
         payload: Space.toBinary(payload)
       };
 
-      await facilityService.setItemDbKeys(
-        facilityId,
-        itemKey as FacilitySubLevels,
-        itemId,
-        [['metadata', metadata]]
-      );
+      await facilityService.setItemDbKeys(facilityId, 'items', itemId, [
+        ['metadata', metadata]
+      ]);
 
       return res.json({ success: true });
     } catch (e) {
@@ -146,31 +131,22 @@ export class FacilityItemController {
 
   delItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-
-      const { facilityId, itemKey, itemId } = req.params;
+      const { facilityId, itemId } = req.params;
 
       if (
         !(await facilityRepository.getItemKey<Item>(
           facilityId,
-          itemKey as FacilitySubLevels,
+          'items',
           itemId,
           'metadata'
         ))
       ) {
         throw ApiError.BadRequest(
-          `item: ${itemId} in facility: ${facilityId} not exist`
+          `The item ${itemId} in facility ${facilityId} not exist`
         );
       }
 
-      await facilityService.delItemMetadata(
-        facilityId,
-        itemKey as FacilitySubLevels,
-        itemId
-      );
+      await facilityService.delItemMetadata(facilityId, 'items', itemId);
 
       return res.json({ success: true });
     } catch (e) {
@@ -180,11 +156,6 @@ export class FacilityItemController {
 
   async getStubsByDate(req: Request, res: Response, next: NextFunction) {
     try {
-      const errors = validationResult(req);
-
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, itemId } = req.params;
       const { date } = req.body;
 

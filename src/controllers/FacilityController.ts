@@ -1,4 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
+import { Facility } from '../proto/facility';
 import {
   FormattedDate,
   ModifiersKey,
@@ -8,20 +9,18 @@ import {
 } from '../services/DBService';
 import { DateTime } from 'luxon';
 import ApiError from '../exceptions/ApiError';
-import { SpaceAvailabilityRepository } from '../repositories/SpaceAvailabilityRepository';
+import { ItemAvailabilityRepository } from '../repositories/ItemAvailabilityRepository';
 import {
   FacilityModifierRepository,
   ItemModifierRepository
 } from '../repositories/ModifierRepository';
-import videreService from '../services/VidereService';
-import facilityService from '../services/FacilityService';
 import facilityRepository from '../repositories/FacilityRepository';
-import { Facility } from '../proto/facility';
-import { validationResult } from 'express-validator';
 import {
   FacilityRuleRepository,
   ItemRuleRepository
 } from '../repositories/RuleRepository';
+import videreService from '../services/VidereService';
+import facilityService from '../services/FacilityService';
 import stubService from '../services/StubService';
 
 export class FacilityController {
@@ -37,10 +36,6 @@ export class FacilityController {
 
   get = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId } = req.params;
       const facility = await facilityRepository.getFacilityKey(
         facilityId,
@@ -48,7 +43,7 @@ export class FacilityController {
       );
 
       if (!facility) {
-        throw ApiError.NotFound(`Unable to get facility: ${facilityId}`);
+        throw ApiError.NotFound(`Unable to get facility ${facilityId}`);
       }
 
       return res.json(facility);
@@ -59,10 +54,6 @@ export class FacilityController {
 
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId } = req.params;
       const { metadata } = req.body;
 
@@ -72,7 +63,6 @@ export class FacilityController {
       );
 
       await facilityService.saveFacilityMetadata(facilityId, metadata, items);
-
       await facilityService.setFacilityDbKeys(facilityId, [
         ['metadata', metadata as Facility]
       ]);
@@ -85,14 +75,10 @@ export class FacilityController {
 
   delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId } = req.params;
 
       if (!(await facilityRepository.getFacilityKey(facilityId, 'metadata'))) {
-        throw ApiError.BadRequest(`facility: ${facilityId} not exist`);
+        throw ApiError.BadRequest(`The facility ${facilityId} not exist`);
       }
 
       const stubs = await facilityService.getFacilityDbKeyValues(
@@ -117,27 +103,23 @@ export class FacilityController {
     }
   };
 
-  // Returns availability of the space
-  getSpaceAvailability = async (
+  // Returns availability of the item
+  getItemAvailability = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-      const { facilityId, spaceId, date } = req.params;
+      const { facilityId, itemId, date } = req.params;
 
-      const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
-      const availability = await repository.getSpaceAvailability(
+      const repository = new ItemAvailabilityRepository(facilityId, itemId);
+      const availability = await repository.getAvailability(
         date as FormattedDate
       );
 
       if (!availability) {
         throw ApiError.NotFound(
-          `Unable to get availability of space: ${spaceId} of the facility: ${facilityId}`
+          `Unable to get availability of the item ${itemId} of the facility: ${facilityId}`
         );
       }
 
@@ -148,24 +130,20 @@ export class FacilityController {
   };
 
   // Adds availability of the space by date
-  createSpaceAvailability = async (
+  createItemAvailability = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-      const { facilityId, spaceId, date } = req.params;
+      const { facilityId, itemId, date } = req.params;
       const { numSpaces } = req.body;
 
       if (!DateTime.fromSQL(date).isValid) {
         throw ApiError.BadRequest('Invalid availability date format');
       }
 
-      const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
+      const repository = new ItemAvailabilityRepository(facilityId, itemId);
       await repository.setAvailabilityByDate(date as FormattedDate, {
         numSpaces: Number(numSpaces)
       });
@@ -177,20 +155,16 @@ export class FacilityController {
   };
 
   // Adds/updates `default` availability of the space
-  createDefaultSpaceAvailability = async (
+  createDefaultItemAvailability = async (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-      const { facilityId, spaceId } = req.params;
+      const { facilityId, itemId } = req.params;
       const { numSpaces } = req.body;
 
-      const repository = new SpaceAvailabilityRepository(facilityId, spaceId);
+      const repository = new ItemAvailabilityRepository(facilityId, itemId);
       await repository.setAvailabilityDefault({ numSpaces: Number(numSpaces) });
 
       return res.json({ success: true });
@@ -206,10 +180,6 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, modifierKey } = req.params;
 
       const repository = new FacilityModifierRepository(facilityId);
@@ -219,7 +189,7 @@ export class FacilityController {
 
       if (!modifier) {
         throw ApiError.NotFound(
-          `Unable to get "${modifierKey}" of the facility: ${facilityId}`
+          `Unable to get ${modifierKey} of the facility ${facilityId}`
         );
       }
 
@@ -236,14 +206,9 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
-      const { facilityId, itemKey, itemId, modifierKey } = req.params;
+      const { facilityId, itemId, modifierKey } = req.params;
 
       const repository = new ItemModifierRepository(facilityId, itemId);
-
       let modifier = await repository.getModifier(modifierKey as ModifiersKey);
 
       if (!modifier) {
@@ -256,7 +221,7 @@ export class FacilityController {
 
       if (!modifier) {
         throw ApiError.NotFound(
-          `Unable to get "${modifierKey}" of the "${itemKey}": ${itemId} of the facility: ${facilityId}`
+          `Unable to get ${modifierKey} of the item ${itemId} of the facility ${facilityId}`
         );
       }
 
@@ -273,10 +238,6 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, modifierKey } = req.params;
       const modifier = req.body;
 
@@ -299,15 +260,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, itemId, modifierKey } = req.params;
       const modifier = req.body;
 
       const repository = new ItemModifierRepository(facilityId, itemId);
-
       await repository.setModifier(
         modifierKey as ModifiersKey,
         modifier as ModifiersValues
@@ -326,10 +282,6 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, modifierKey } = req.params;
 
       const repository = new FacilityModifierRepository(facilityId);
@@ -348,14 +300,9 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, itemId, modifierKey } = req.params;
 
       const repository = new ItemModifierRepository(facilityId, itemId);
-
       await repository.delModifier(modifierKey as ModifiersKey);
 
       res.json({ success: true });
@@ -371,10 +318,6 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, ruleKey } = req.params;
 
       const repository = new FacilityRuleRepository(facilityId);
@@ -382,7 +325,7 @@ export class FacilityController {
 
       if (!rule) {
         throw ApiError.NotFound(
-          `Unable to get "${ruleKey}" of the facility: ${facilityId}`
+          `Unable to get ${ruleKey} of the facility ${facilityId}`
         );
       }
 
@@ -395,19 +338,14 @@ export class FacilityController {
   // Returns rule of the item
   getRuleOfItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, itemId, ruleKey } = req.params;
 
       const repository = new ItemRuleRepository(facilityId, itemId);
-
       const rule = await repository.getRule(ruleKey as RulesItemKey);
 
       if (!rule) {
         throw ApiError.NotFound(
-          `Unable to get "${ruleKey}": ${itemId} of the facility: ${facilityId}`
+          `Unable to get ${ruleKey} of the item ${itemId} of the facility ${facilityId}`
         );
       }
 
@@ -424,15 +362,10 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, ruleKey } = req.params;
       const rule = req.body;
 
       const repository = new FacilityRuleRepository(facilityId);
-
       await repository.setRule(ruleKey as RulesItemKey, rule as Rules);
 
       res.json({ success: true });
@@ -444,15 +377,10 @@ export class FacilityController {
   // Creates a rule for the item
   createItemRule = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, itemId, ruleKey } = req.params;
       const rule = req.body;
 
       const repository = new ItemRuleRepository(facilityId, itemId);
-
       await repository.setRule(ruleKey as RulesItemKey, rule as Rules);
 
       res.json({ success: true });
@@ -468,10 +396,6 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, ruleKey } = req.params;
 
       const repository = new FacilityRuleRepository(facilityId);
@@ -486,14 +410,9 @@ export class FacilityController {
   // Removes rule of the item
   delRuleOfItem = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, itemId, ruleKey } = req.params;
 
       const repository = new ItemRuleRepository(facilityId, itemId);
-
       await repository.delRule(ruleKey as RulesItemKey);
 
       res.json({ success: true });
@@ -509,10 +428,6 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId } = req.params;
 
       await videreService.startFacility(facilityId);
@@ -530,10 +445,6 @@ export class FacilityController {
     next: NextFunction
   ) => {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId } = req.params;
 
       await videreService.stopFacility(facilityId);
@@ -546,13 +457,7 @@ export class FacilityController {
 
   async getAllFacilityStubs(req: Request, res: Response, next: NextFunction) {
     try {
-      const errors = validationResult(req);
-
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId } = req.params;
-
       const index = req.query.index || 0;
       const perPage = req.query.perPage || 10;
 
@@ -574,11 +479,6 @@ export class FacilityController {
     next: NextFunction
   ) {
     try {
-      const errors = validationResult(req);
-
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Validation error', errors.array()));
-      }
       const { facilityId, date } = req.params;
 
       const stubs = await stubService.getFacilityStubsByDate(

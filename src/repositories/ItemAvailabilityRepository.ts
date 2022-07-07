@@ -7,7 +7,7 @@ import { Item as ItemMetadata } from '../proto/facility';
 import { AbstractLevel, AbstractSublevel } from 'abstract-level';
 import { Availability } from '../proto/lpms';
 
-export class SpaceAvailabilityRepository {
+export class ItemAvailabilityRepository {
   private dbService: DBService;
   private db: AbstractSublevel<
     AbstractLevel<LevelDefaultTyping, string, ItemMetadata>,
@@ -16,14 +16,14 @@ export class SpaceAvailabilityRepository {
     Availability
   >;
 
-  constructor(facilityId: string, spaceId: string) {
+  constructor(facilityId: string, itemId: string) {
     this.dbService = DBService.getInstance();
-    this.db = this.dbService.getSpaceAvailabilityDB(facilityId, spaceId);
+    this.db = this.dbService.getItemAvailabilityDB(facilityId, itemId);
   }
 
   // --- availability getters / setters
 
-  public async getSpaceAvailability(
+  public async getAvailability(
     key: DefaultOrDateItemKey
   ): Promise<Availability | null> {
     try {
