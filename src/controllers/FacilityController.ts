@@ -55,17 +55,13 @@ export class FacilityController {
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { facilityId } = req.params;
-      const { metadata } = req.body;
+      const metadata = req.body;
 
-      const items = await facilityService.getFacilityDbKeyValues(
-        facilityId,
-        'items'
-      );
-
-      await facilityService.saveFacilityMetadata(facilityId, metadata, items);
       await facilityService.setFacilityDbKeys(facilityId, [
         ['metadata', metadata as Facility]
       ]);
+
+      await facilityService.saveFacilityMetadata(facilityId);
 
       return res.json({ success: true });
     } catch (e) {

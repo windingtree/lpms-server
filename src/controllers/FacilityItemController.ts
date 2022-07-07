@@ -2,9 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import ApiError from '../exceptions/ApiError';
 import facilityService from '../services/FacilityService';
 import facilityRepository from '../repositories/FacilityRepository';
-import { Item, ItemType, Space } from '../proto/facility';
-import { validationResult } from 'express-validator';
-import { FacilitySubLevels } from '../services/DBService';
+import { Facility, Item, ItemType, Space } from '../proto/facility';
 import stubService from '../services/StubService';
 
 export class FacilityItemController {
@@ -64,7 +62,7 @@ export class FacilityItemController {
         );
       }
 
-      let metadata;
+      let metadata: Item;
 
       if (type === ItemType.SPACE) {
         metadata = {
@@ -86,6 +84,8 @@ export class FacilityItemController {
       await facilityService.setItemDbKeys(facilityId, 'items', itemId, [
         ['metadata', metadata]
       ]);
+
+      await facilityService.saveFacilityMetadata(facilityId);
 
       return res.json({ success: true });
     } catch (e) {
@@ -123,6 +123,8 @@ export class FacilityItemController {
         ['metadata', metadata]
       ]);
 
+      await facilityService.saveFacilityMetadata(facilityId);
+
       return res.json({ success: true });
     } catch (e) {
       next(e);
@@ -148,6 +150,33 @@ export class FacilityItemController {
 
       await facilityService.delItemMetadata(facilityId, 'items', itemId);
 
+      await facilityService.saveFacilityMetadata(facilityId);
+
+      return res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  };
+
+  delStub = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { facilityId, itemId, date } = req.params;
+
+      if (
+        !(await facilityRepository.getItemKey<Item>(
+          facilityId,
+          'stubs',
+          itemId,
+          'metadata'
+        ))
+      ) {
+        throw ApiError.BadRequest(
+          `The stub ${itemId} in facility ${facilityId} not exist`
+        );
+      }
+
+      await facilityService.delItemMetadata(facilityId, 'items', itemId);
+
       return res.json({ success: true });
     } catch (e) {
       next(e);
@@ -159,7 +188,7 @@ export class FacilityItemController {
       const { facilityId, itemId } = req.params;
       const { date } = req.body;
 
-      const stubs = await stubService.getSpaceStubsByDate(
+      const stubs = await stubService.getItemStubsByDate(
         facilityId,
         itemId,
         date

@@ -1,7 +1,6 @@
 import DBService, {
   FacilityKey,
   FacilitySubLevels,
-  FacilityIndexKey,
   FacilityValues
 } from '../services/DBService';
 import { Level } from 'level';
@@ -96,7 +95,7 @@ export class FacilityRepository {
 
   public async setFacilityKey(
     facilityId: string,
-    key: FacilityKey | FacilityIndexKey,
+    key: FacilityKey | FacilitySubLevels,
     value: FacilityValues
   ): Promise<void> {
     await this.dbService.getFacilityDB(facilityId).put(key, value);
@@ -104,7 +103,7 @@ export class FacilityRepository {
 
   public async getFacilityKey<T extends FacilityValues>(
     facilityId: string,
-    key: FacilityKey | FacilityIndexKey
+    key: FacilityKey | FacilitySubLevels
   ): Promise<T | null> {
     try {
       return (await this.dbService.getFacilityDB(facilityId).get(key)) as T;
@@ -118,7 +117,7 @@ export class FacilityRepository {
 
   public async delFacilityKey(
     facilityId: string,
-    key: FacilityKey | FacilityIndexKey
+    key: FacilityKey | FacilitySubLevels
   ): Promise<void> {
     await this.dbService.getFacilityDB(facilityId).del(key);
   }
@@ -131,7 +130,7 @@ export class FacilityRepository {
 
   public async getAllItemIds(
     facilityId: string,
-    idx: FacilityIndexKey
+    idx: FacilitySubLevels
   ): Promise<string[]> {
     try {
       return await this.dbService
@@ -149,7 +148,7 @@ export class FacilityRepository {
 
   public async addToIndex(
     facilityId: string,
-    idx: FacilityIndexKey,
+    idx: FacilitySubLevels,
     itemId: string
   ): Promise<void> {
     const itemIds = await this.getAllItemIds(facilityId, idx);
@@ -166,7 +165,7 @@ export class FacilityRepository {
 
   public async delFromIndex(
     facilityId: string,
-    idx: FacilityIndexKey,
+    idx: FacilitySubLevels,
     itemId: string
   ): Promise<void> {
     const itemIds = await this.getAllItemIds(facilityId, idx);
@@ -188,18 +187,7 @@ export class FacilityRepository {
     key: string,
     value: Item
   ): Promise<void> {
-    // If a space:
-    // 1. Verify that the `payload` is correctly encoded
-    // 2. Add to the `spaces` index
-    if (value.type === ItemType.SPACE) {
-      // the following will throw if Space is not formatted correctly
-      Space.fromBinary(value.payload as Uint8Array);
-      // above hasn't thrown, let's add it to the index
-      await this.addToIndex(facilityId, 'spaces', itemId);
-    } else {
-      await this.addToIndex(facilityId, 'items', itemId);
-    }
-
+    await this.addToIndex(facilityId, 'items', itemId);
     await this.dbService
       .getFacilityItemDB(facilityId, idx, itemId)
       .put(key, value);
@@ -229,19 +217,7 @@ export class FacilityRepository {
     itemId: string,
     key: string
   ): Promise<void> {
-    // If a space:
-    // 1. Delete from the `spaces` index.
-    if (idx === 'items') {
-      const item: Item | null = await this.getItemKey(
-        facilityId,
-        idx,
-        itemId,
-        key
-      );
-      if (item && item.type === ItemType.SPACE) {
-        await this.delFromIndex(facilityId, 'spaces', itemId);
-      }
-    }
+    await this.delFromIndex(facilityId, 'items', itemId);
     await this.dbService.getFacilityItemDB(facilityId, idx, itemId).del(key);
   }
 }

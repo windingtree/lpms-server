@@ -15,6 +15,7 @@ import {
   provider,
   getServiceProviderContract
 } from '../config';
+import ApiError from '../exceptions/ApiError';
 
 export type FacilityWithId = {
   id: string;
@@ -52,15 +53,24 @@ export class FacilityService {
     return ServiceProviderData.toBinary(signedMessage);
   };
 
-  public saveFacilityMetadata = async (
-    facilityId: string,
-    facility: Facility,
-    items?: ItemWithId[]
-  ): Promise<void> => {
+  public saveFacilityMetadata = async (facilityId: string): Promise<void> => {
+    const facilityMetadata = await facilityRepository.getFacilityKey<Facility>(
+      facilityId,
+      'metadata'
+    );
+
+    if (!facilityMetadata) {
+      throw ApiError.NotFound(`The facility ${facilityId} does not exists`);
+    }
+
+    const items = await this.getFacilityDbKeyValues(facilityId, 'items');
+
+    // @todo Get terms from DB
+
     // Build raw service provider metadata
     const serviceProviderData: ServiceProviderData = {
       serviceProvider: utils.arrayify(facilityId),
-      payload: Facility.toBinary(facility),
+      payload: Facility.toBinary(facilityMetadata),
       items: [
         ...(items
           ? items.map((i) => ({
@@ -113,6 +123,7 @@ export class FacilityService {
         metadataUri
       );
       await tx.wait();
+      console.log('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
     }
   };
 
