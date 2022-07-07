@@ -12,10 +12,10 @@ components:
   schemas:
     Bytes32HashedId:
       type: string
-      pattern: "^0x[a-fA-F0-9]{64}$"
+      pattern: '^0x[a-fA-F0-9]{64}$'
     SqlDate:
       type: string
-      pattern: "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'
     AvailabilityDefaultKey:
       type: string
       enum: ['default']
@@ -1352,6 +1352,28 @@ components:
           description: 'SPACE = 0, OTHER = 1'
         payload:
           $ref: '#/components/schemas/Space'
+    Term:
+      type: object
+      required:
+        - term
+        - impl
+      properties:
+        term:
+          type: string
+        impl:
+          type: string
+        payload:
+          type: object
+          required:
+            - name
+            - description
+          properties:
+            name:
+              type: string
+            description:
+              type: string
+            photo:
+              $ref: '#/components/schemas/Photo'
 
 servers:
   - url: http://localhost:5000/api
@@ -2864,3 +2886,273 @@ paths:
         500:
           description: Some server error
   #end stubs
+
+  #terms
+  /term/{facilityId}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: all facility terms
+      tags: [Facility service, terms]
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Term'
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
+
+  /term/{facilityId}/{termId}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: facility term by id
+      tags: [Facility service, stub]
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: termId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Term'
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
+    post:
+      security:
+        - bearerAuth: []
+      summary: create facility term
+      tags: [Facility service, stub]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Term'
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: termId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
+    delete:
+      security:
+        - bearerAuth: []
+      summary: create facility term
+      tags: [Facility service, stub]
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: termId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
+
+  /term/{facilityId}/item/{itemId}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: facility term by id
+      tags: [Facility service, stub]
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: itemId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Term'
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
+
+  /term/{facilityId}/item/{itemId}/{termId}:
+    post:
+      security:
+        - bearerAuth: []
+      summary: create facility term
+      tags: [Facility service, stub]
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: itemId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: termId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
+    delete:
+      security:
+        - bearerAuth: []
+      summary: create facility term
+      tags: [Facility service, stub]
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: itemId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: termId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
+
+  #end terms

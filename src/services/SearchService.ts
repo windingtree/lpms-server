@@ -115,14 +115,11 @@ export class SearchService {
     dates: DateTime[],
     spaceId: string
   ): Promise<boolean> {
-    const spaceRuleRepository = new ItemRuleRepository(
-      this.facilityId,
-      spaceId
-    );
+    const itemRuleRepository = new ItemRuleRepository(this.facilityId, spaceId);
 
     const noticeRequirementRule = await this.getRule<NoticeRequiredRule>(
       'notice_required',
-      spaceRuleRepository
+      itemRuleRepository
     );
 
     const checkIn = dates[0];
@@ -142,7 +139,7 @@ export class SearchService {
     const formattedCheckInDay = checkIn.toFormat('ccc').toLowerCase();
     const lOSRule = await this.getRule<DayOfWeekLOSRule>(
       'length_of_stay',
-      spaceRuleRepository,
+      itemRuleRepository,
       formattedCheckInDay
     );
 
@@ -169,10 +166,10 @@ export class SearchService {
 
   private async getRule<T extends Rules>(
     ruleName: RulesItemKey,
-    spaceRuleRepository: ItemRuleRepository,
+    itemRuleRepository: ItemRuleRepository,
     weekDay: null | string = null
   ): Promise<T | null> {
-    let rule = await spaceRuleRepository.getRule<T>(ruleName);
+    let rule = await itemRuleRepository.getRule<T>(ruleName);
 
     if (!rule || (weekDay && !(weekDay in rule))) {
       rule = await this.facilityRuleRepository.getRule<T>(ruleName);

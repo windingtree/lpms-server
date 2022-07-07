@@ -3,7 +3,7 @@ import { utils } from 'ethers';
 import supertest from 'supertest';
 import ServerService from '../src/services/ServerService';
 import userService from '../src/services/UserService';
-import { AppRole } from '../src/types';
+import { AppRole, Term } from '../src/types';
 import userRepository from '../src/repositories/UserRepository';
 import {
   Availability,
@@ -12,6 +12,8 @@ import {
   NoticeRequiredRule
 } from '../src/proto/lpms';
 import { ItemAvailabilityRepository } from '../src/repositories/ItemAvailabilityRepository';
+import { removeTestDB } from './common';
+import facilityRepository from '../src/repositories/FacilityRepository';
 
 describe('API tests', async () => {
   const appService = new ServerService(3006);
@@ -21,6 +23,7 @@ describe('API tests', async () => {
   const spaceId = utils.keccak256(utils.toUtf8Bytes('test_space'));
   const managerLogin = 'test_manager_super_long_login';
   const managerPass = '123456qwerty';
+  const termId = utils.keccak256(utils.toUtf8Bytes('test_term'));
   let accessToken: string;
 
   before(async () => {
@@ -29,12 +32,15 @@ describe('API tests', async () => {
       .post('/api/user/login')
       .send({ login: managerLogin, password: managerPass })
       .set('Accept', 'application/json');
+    await facilityRepository.addToIndex(facilityId, 'items', spaceId);
     accessToken = loginRes.body.accessToken;
   });
 
   after(async () => {
     const id = await userRepository.getUserIdByLogin(managerLogin);
     await userService.deleteUser(Number(id));
+    await facilityRepository.delFromIndex(facilityId, 'items', spaceId);
+    removeTestDB();
   });
 
   describe('Auth', () => {
@@ -397,6 +403,110 @@ describe('API tests', async () => {
           .set('Authorization', `Bearer ${accessToken}`)
           .set('Accept', 'application/json')
           .expect(200);
+      });
+    });
+
+    describe('Terms', async () => {
+      it('create facility term', async () => {
+        const term: Term = {
+          term: termId,
+          impl: 'contract address here',
+          payload: {
+            name: 'Some name of term',
+            description: 'Some desc of term'
+          }
+        };
+
+        await requestWithSupertest
+          .post(`/api/term/${facilityId}/${termId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .send(term)
+          .expect(200);
+      });
+
+      it('get facility terms', async () => {
+        const res = await requestWithSupertest
+          .get(`/api/term/${facilityId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(200);
+
+        expect(res.body).to.be.a('array');
+        expect(res.body.length).to.not.equal(0);
+      });
+
+      it('create item term', async () => {
+        await requestWithSupertest
+          .post(`/api/term/${facilityId}/item/${spaceId}/${termId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(200);
+      });
+
+      it('get item terms', async () => {
+        const res = await requestWithSupertest
+          .get(`/api/term/${facilityId}/item/${spaceId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(200);
+
+        expect(res.body).to.be.a('array');
+        expect(res.body.length).to.not.equal(0);
+      });
+
+      it('get term by id', async () => {
+        const res = await requestWithSupertest
+          .get(`/api/term/${facilityId}/${termId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(200);
+
+        expect(res.body).to.be.a('object');
+        expect(res.body.payload.name).to.equal('Some name of term');
+      });
+
+      it('should throw error when del term by id because term exist in item', async () => {
+        await requestWithSupertest
+          .delete(`/api/term/${facilityId}/${termId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(400);
+      });
+
+      it('del term index from space', async () => {
+        await requestWithSupertest
+          .delete(`/api/term/${facilityId}/item/${spaceId}/${termId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(200);
+      });
+
+      it('del facility term', async () => {
+        await requestWithSupertest
+          .delete(`/api/term/${facilityId}/${termId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(200);
+      });
+
+      it('should throw not exist error', async () => {
+        await requestWithSupertest
+          .get(`/api/term/${facilityId}/${termId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(404);
+      });
+
+      it('should be empty get item terms', async () => {
+        const res = await requestWithSupertest
+          .get(`/api/term/${facilityId}/item/${spaceId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(200);
+
+        expect(res.body).to.be.a('array');
+        expect(res.body.length).to.be.equal(0);
       });
     });
   });

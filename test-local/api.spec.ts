@@ -4,7 +4,7 @@ import supertest, { SuperTest, Test } from 'supertest';
 import ServerService from '../src/services/ServerService';
 import IpfsService from '../src/services/IpfsService';
 import { setupFacility, setupAuth, snapshot, revert } from './setup';
-import { facility, space } from '../test/common';
+import { facility, space, removeTestDB } from '../test/common';
 
 describe('Local tests', () => {
   let ipfsService: IpfsService;
@@ -36,6 +36,7 @@ describe('Local tests', () => {
     await ipfsService.stop();
     await appService.stop();
     await revert(snapshotId);
+    removeTestDB();
   });
 
   describe('Facility', () => {

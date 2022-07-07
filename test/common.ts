@@ -7,6 +7,7 @@ import {
 } from '../src/proto/facility';
 import { ContactType } from '../src/proto/contact';
 import { Photo } from '../src/proto/photo';
+import fs from 'fs';
 
 export const facility: Facility = {
   name: 'Awesome ski chalet',
@@ -181,4 +182,8 @@ export const space: SpaceInterface = {
       }
     }
   }
+};
+
+export const removeTestDB = (): void => {
+  fs.rmSync('database_test', { recursive: true, force: true });
 };
