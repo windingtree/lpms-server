@@ -12,7 +12,7 @@ import { SearchService } from '../src/services/SearchService';
 import { DayOfWeekLOSRule } from '../src/proto/lpms';
 import { FormattedDate } from '../src/services/DBService';
 import { convertDaysToSeconds } from '../src/utils';
-import { facility, space } from './common';
+import { facility, removeTestDB, space } from './common';
 import { Item, Space } from '../src/proto/facility';
 
 describe('search service test', async () => {
@@ -118,6 +118,25 @@ describe('search service test', async () => {
       `${formattedDate}-num_booked`,
       0
     );
+  });
+
+  after(async () => {
+    await facilityRepo.delFacilityKey(facilityId, 'metadata');
+    await facilityRepo.delFromIndex(facilityId, 'items', spaceId);
+    await facilityRepo.delFromIndex(facilityId, 'items', spaceId2);
+    await facilityRepo.delItemKey(facilityId, 'items', spaceId, 'metadata');
+    await facilityRepo.delItemKey(facilityId, 'items', spaceId2, 'metadata');
+
+    await itemAvailabilityRepository.delAvailability('default');
+    await itemAvailabilityRepository2.delAvailability('default');
+
+    await facilityRuleRepository.delRule('notice_required');
+    await facilityRuleRepository.delRule('length_of_stay');
+    await spaceRuleRepository.delRule('notice_required');
+    await spaceRuleRepository.delRule('length_of_stay');
+
+    await spaceStubRepository.delNumBookedByDate(`${formattedDate}-num_booked`);
+    removeTestDB();
   });
 
   function getAsk(): Ask {
@@ -242,23 +261,5 @@ describe('search service test', async () => {
 
     expect(result).to.be.an('array');
     expect(result.length).to.be.equal(1);
-  });
-
-  it('delete all data', async () => {
-    await facilityRepo.delFacilityKey(facilityId, 'metadata');
-    await facilityRepo.delFromIndex(facilityId, 'items', spaceId);
-    await facilityRepo.delFromIndex(facilityId, 'items', spaceId2);
-    await facilityRepo.delItemKey(facilityId, 'items', spaceId, 'metadata');
-    await facilityRepo.delItemKey(facilityId, 'items', spaceId2, 'metadata');
-
-    await itemAvailabilityRepository.delAvailability('default');
-    await itemAvailabilityRepository2.delAvailability('default');
-
-    await facilityRuleRepository.delRule('notice_required');
-    await facilityRuleRepository.delRule('length_of_stay');
-    await spaceRuleRepository.delRule('notice_required');
-    await spaceRuleRepository.delRule('length_of_stay');
-
-    await spaceStubRepository.delNumBookedByDate(`${formattedDate}-num_booked`);
   });
 });

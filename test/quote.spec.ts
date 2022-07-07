@@ -5,22 +5,22 @@ import { FormattedDate } from '../src/services/DBService';
 import { Ask } from '../src/proto/ask';
 import { Date } from '../src/proto/date';
 import {
-  Rates,
   DayOfWeekRateModifier,
   LOSRateModifier,
-  OccupancyRateModifier
+  OccupancyRateModifier,
+  Rates
 } from '../src/proto/lpms';
-import { ItemRateRepository } from '../src/repositories/ItemRateRepository';
+import { RateRepository } from '../src/repositories/RateRepository';
 import {
   FacilityModifierRepository,
   ItemModifierRepository
 } from '../src/repositories/ModifierRepository';
-
 import quoteService, {
   QuoteRepositories,
   QuoteService
 } from '../src/services/QuoteService';
 import { BigNumber, BigNumberish } from 'ethers';
+import { removeTestDB } from './common';
 
 const expect = chai.expect;
 
@@ -138,12 +138,12 @@ describe('QuoteService', () => {
 
   before(async () => {
     repos = {
-      rates: new ItemRateRepository(facilityId, spaceId),
+      rates: new RateRepository(facilityId, spaceId),
       modifiers: new ItemModifierRepository(facilityId, spaceId),
       facilityModifiers: new FacilityModifierRepository(facilityId)
     };
     reposClear = {
-      rates: new ItemRateRepository(facilityId + '1', spaceId + '1'),
+      rates: new RateRepository(facilityId + '1', spaceId + '1'),
       modifiers: new ItemModifierRepository(facilityId + '1', spaceId + '1'),
       facilityModifiers: new FacilityModifierRepository(facilityId + '1')
     };
@@ -153,6 +153,8 @@ describe('QuoteService', () => {
     await repos.modifiers.setModifier('length_of_stay', losModifierRatioGt);
     await repos.modifiers.setModifier('occupancy', occupancyModifierRatio);
   });
+
+  after(removeTestDB);
 
   describe('Static members', () => {
     describe('#getBaseRate', () => {

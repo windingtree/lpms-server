@@ -10,14 +10,14 @@ import {
   LOSRateModifier,
   OccupancyRateModifier
 } from '../proto/lpms';
-import { ItemRateRepository } from '../repositories/ItemRateRepository';
+import { RateRepository } from '../repositories/RateRepository';
 import {
   FacilityModifierRepository,
   ItemModifierRepository
 } from '../repositories/ModifierRepository';
 
 export interface QuoteRepositories {
-  rates: ItemRateRepository;
+  rates: RateRepository;
   modifiers: ItemModifierRepository;
   facilityModifiers: FacilityModifierRepository;
 }
@@ -210,7 +210,7 @@ export class QuoteService {
     }
 
     const repositories: QuoteRepositories = {
-      rates: new ItemRateRepository(facilityId, spaceId),
+      rates: new RateRepository(facilityId, spaceId),
       modifiers: new ItemModifierRepository(facilityId, spaceId),
       facilityModifiers: new FacilityModifierRepository(facilityId)
     };
