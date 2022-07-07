@@ -158,7 +158,7 @@ export default class DBService {
     });
   }
 
-  public getSpaceAvailabilityDB(facilityId: string, itemId: string) {
+  public getItemAvailabilityDB(facilityId: string, itemId: string) {
     return this.getFacilityItemDB(facilityId, 'items', itemId).sublevel<
       DefaultOrDateItemKey,
       Availability

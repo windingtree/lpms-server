@@ -15,7 +15,7 @@ import { Ask } from './proto/ask';
 import ApiError from './exceptions/ApiError';
 import { DateTime } from 'luxon';
 import { Facility } from './proto/facility';
-import { SpaceAvailabilityRepository } from './repositories/SpaceAvailabilityRepository';
+import { ItemAvailabilityRepository } from './repositories/ItemAvailabilityRepository';
 import { SpaceStubRepository } from './repositories/SpaceStubRepository';
 import { FormattedDate } from './services/DBService';
 
@@ -187,14 +187,14 @@ export const checkAvailableDates = async (
   ask: Ask,
   dates: DateTime[]
 ) => {
-  const availabilityRepository = new SpaceAvailabilityRepository(
+  const availabilityRepository = new ItemAvailabilityRepository(
     facilityId,
     spaceId
   );
 
   const spaceStubRepository = new SpaceStubRepository(facilityId, spaceId);
 
-  const defaultAvailable = await availabilityRepository.getSpaceAvailability(
+  const defaultAvailable = await availabilityRepository.getAvailability(
     'default'
   );
 
@@ -202,7 +202,7 @@ export const checkAvailableDates = async (
     try {
       const formattedDate = date.toFormat('yyyy-MM-dd') as FormattedDate;
 
-      let available = await availabilityRepository.getSpaceAvailability(
+      let available = await availabilityRepository.getAvailability(
         formattedDate
       );
 

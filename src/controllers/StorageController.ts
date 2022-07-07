@@ -45,79 +45,79 @@ export class StorageController {
     }
   };
 
-  uploadMetadata = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const multerFile = req.file as Express.Multer.File;
+  // uploadMetadata = async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const multerFile = req.file as Express.Multer.File;
 
-      if (!multerFile) {
-        return next(new Error('File not uploaded'));
-      }
+  //     if (!multerFile) {
+  //       return next(new Error('File not uploaded'));
+  //     }
 
-      let fileBuffer = await readFile(multerFile.path);
+  //     let fileBuffer = await readFile(multerFile.path);
 
-      try {
-        fileBuffer = brotliDecompressSync(fileBuffer);
-      } catch (_) {
-        // data is not compressed
-      }
+  //     try {
+  //       fileBuffer = brotliDecompressSync(fileBuffer);
+  //     } catch (_) {
+  //       // data is not compressed
+  //     }
 
-      const serviceProviderData = ServiceProviderData.fromBinary(fileBuffer);
-      const serviceProviderId = utils.hexlify(
-        serviceProviderData.serviceProvider
-      );
+  //     const serviceProviderData = ServiceProviderData.fromBinary(fileBuffer);
+  //     const serviceProviderId = utils.hexlify(
+  //       serviceProviderData.serviceProvider
+  //     );
 
-      // Extract and save/update facility from metadata
-      await facilityService.setFacilityDbKeys(serviceProviderId, [
-        [
-          'metadata',
-          Facility.fromBinary(serviceProviderData.payload) as Facility
-        ]
-      ]);
+  //     // Extract and save/update facility from metadata
+  //     await facilityService.setFacilityDbKeys(serviceProviderId, [
+  //       [
+  //         'metadata',
+  //         Facility.fromBinary(serviceProviderData.payload) as Facility
+  //       ]
+  //     ]);
 
-      // Extract spaces from metadata
-      const items: Record<string, [string, ItemMetadata][]> = {};
+  //     // Extract spaces from metadata
+  //     const items: Record<string, [string, ItemMetadata][]> = {};
 
-      for (const item of serviceProviderData.items) {
-        const itemId = utils.hexlify(item.item);
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { type, payload, ...generic } = Item.fromBinary(item.payload);
+  //     for (const item of serviceProviderData.items) {
+  //       const itemId = utils.hexlify(item.item);
+  //       // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  //       const { type, payload, ...generic } = Item.fromBinary(item.payload);
 
-        items[itemId] = [['metadata', generic as Item]];
-      }
+  //       items[itemId] = [['metadata', generic as Item]];
+  //     }
 
-      // Add/update items to DB
-      await Promise.all(
-        Object.entries(items).map(([itemId, entries]) =>
-          facilityService.setItemDbKeys(
-            serviceProviderId,
-            'items',
-            itemId,
-            entries
-          )
-        )
-      );
+  //     // Add/update items to DB
+  //     await Promise.all(
+  //       Object.entries(items).map(([itemId, entries]) =>
+  //         facilityService.setItemDbKeys(
+  //           serviceProviderId,
+  //           'items',
+  //           itemId,
+  //           entries
+  //         )
+  //       )
+  //     );
 
-      const signer = await walletService.getWalletByIndex(
-        walletAccountsIndexes.API
-      );
+  //     const signer = await walletService.getWalletByIndex(
+  //       walletAccountsIndexes.API
+  //     );
 
-      const signedMetadata = await this.signMetadata(
-        serviceProviderData as ServiceProviderData & SignedMessage,
-        signer
-      );
+  //     const signedMetadata = await this.signMetadata(
+  //       serviceProviderData as ServiceProviderData & SignedMessage,
+  //       signer
+  //     );
 
-      const storage = IpfsService.getInstance();
-      const file = IpfsService.getFileFromBuffer(
-        signedMetadata,
-        multerFile.originalname
-      );
-      const result = await storage.deployFilesToIpfs([file]);
+  //     const storage = IpfsService.getInstance();
+  //     const file = IpfsService.getFileFromBuffer(
+  //       signedMetadata,
+  //       multerFile.originalname
+  //     );
+  //     const result = await storage.deployFilesToIpfs([file]);
 
-      return res.json(result);
-    } catch (e) {
-      next(e);
-    }
-  };
+  //     return res.json(result);
+  //   } catch (e) {
+  //     next(e);
+  //   }
+  // };
 }
 
 export default new StorageController();
