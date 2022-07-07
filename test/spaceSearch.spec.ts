@@ -3,7 +3,7 @@ import {
   ItemRuleRepository
 } from '../src/repositories/RuleRepository';
 import { FacilityRepository } from '../src/repositories/FacilityRepository';
-import { SpaceAvailabilityRepository } from '../src/repositories/SpaceAvailabilityRepository';
+import { ItemAvailabilityRepository } from '../src/repositories/ItemAvailabilityRepository';
 import { SpaceStubRepository } from '../src/repositories/SpaceStubRepository';
 import { Ask } from '../src/proto/ask';
 import { DateTime } from 'luxon';
@@ -25,11 +25,11 @@ describe('search service test', async () => {
   const facilityRepo = new FacilityRepository();
   const facilityRuleRepository = new FacilityRuleRepository(facilityId);
   const spaceRuleRepository = new ItemRuleRepository(facilityId, spaceId);
-  const spaceAvailabilityRepository = new SpaceAvailabilityRepository(
+  const itemAvailabilityRepository = new ItemAvailabilityRepository(
     facilityId,
     spaceId
   );
-  const spaceAvailabilityRepository2 = new SpaceAvailabilityRepository(
+  const itemAvailabilityRepository2 = new ItemAvailabilityRepository(
     facilityId,
     spaceId2
   );
@@ -89,10 +89,10 @@ describe('search service test', async () => {
   });
 
   beforeEach(async () => {
-    await spaceAvailabilityRepository.setAvailabilityDefault({
+    await itemAvailabilityRepository.setAvailabilityDefault({
       numSpaces: 10
     });
-    await spaceAvailabilityRepository2.setAvailabilityDefault({
+    await itemAvailabilityRepository2.setAvailabilityDefault({
       numSpaces: 10
     });
 
@@ -251,8 +251,8 @@ describe('search service test', async () => {
     await facilityRepo.delItemKey(facilityId, 'items', spaceId, 'metadata');
     await facilityRepo.delItemKey(facilityId, 'items', spaceId2, 'metadata');
 
-    await spaceAvailabilityRepository.delAvailability('default');
-    await spaceAvailabilityRepository2.delAvailability('default');
+    await itemAvailabilityRepository.delAvailability('default');
+    await itemAvailabilityRepository2.delAvailability('default');
 
     await facilityRuleRepository.delRule('notice_required');
     await facilityRuleRepository.delRule('length_of_stay');
