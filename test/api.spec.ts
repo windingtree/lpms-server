@@ -1,10 +1,10 @@
 import { expect } from 'chai';
+import { utils } from 'ethers';
 import supertest from 'supertest';
 import ServerService from '../src/services/ServerService';
 import userService from '../src/services/UserService';
 import { AppRole } from '../src/types';
 import userRepository from '../src/repositories/UserRepository';
-import { space } from './common';
 import {
   Availability,
   Condition,
@@ -17,12 +17,8 @@ describe('API tests', async () => {
   const appService = new ServerService(3006);
   const requestWithSupertest = supertest(appService.getApp);
 
-  const spaceRequestBody = space;
-
-  const facilityId =
-    '0x1234567890123456789012345678901234567890123456789012345678901234';
-  const spaceId =
-    '0x9234567890123456789012345678901234567890123456789012345678901239';
+  const facilityId = utils.keccak256(utils.toUtf8Bytes('test_facility'));
+  const spaceId = utils.keccak256(utils.toUtf8Bytes('test_space'));
   const managerLogin = 'test_manager_super_long_login';
   const managerPass = '123456qwerty';
   let accessToken: string;
@@ -71,7 +67,7 @@ describe('API tests', async () => {
     });
   });
 
-  describe.skip('Facilities', () => {
+  describe('Facilities', () => {
     it('should throw error not found with random facility id', async () => {
       await requestWithSupertest
         .get(
@@ -83,91 +79,15 @@ describe('API tests', async () => {
     });
   });
 
-  describe.skip('Spaces', () => {
-    it('create space', async () => {
-      await requestWithSupertest
-        .post(`/api/facility/${facilityId}/spaces/${spaceId}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('Accept', 'application/json')
-        .send({ descriptor: 'space', ...spaceRequestBody })
-        .expect(200);
-    });
-
-    it('get spaces', async () => {
-      const res = await requestWithSupertest
-        .get(`/api/facility/${facilityId}/spaces`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('Accept', 'application/json')
-        .send(spaceRequestBody)
-        .expect(200);
-
-      expect(res.body.length).to.not.equal(0);
-    });
-
-    it('get space', async () => {
-      const res = await requestWithSupertest
-        .get(`/api/facility/${facilityId}/spaces/${spaceId}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('Accept', 'application/json')
-        .expect(200);
-
-      const { payload } = res.body;
-
-      const numOfAdults =
-        payload.maxNumberOfAdultOccupantsOneof.oneofKind ===
-        'maxNumberOfAdultOccupants'
-          ? payload.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
-          : 0;
-
-      expect(numOfAdults).to.be.equal(2);
-    });
-
+  describe('Items', () => {
     it('should throw error not found with random space id', async () => {
       await requestWithSupertest
         .get(
-          `/api/facility/${facilityId}/spaces/0x1234567890123456789012345678901234567890123456789012345678901222`
+          `/api/item/${facilityId}/0x1234567890123456789012345678901234567890123456789012345678901222`
         )
         .set('Authorization', `Bearer ${accessToken}`)
         .set('Accept', 'application/json')
         .expect(404);
-    });
-
-    it('update space', async () => {
-      const updatedSpace = JSON.parse(JSON.stringify(spaceRequestBody)); //clone
-      updatedSpace.payload.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants = 3;
-      await requestWithSupertest
-        .put(`/api/facility/${facilityId}/spaces/${spaceId}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('Accept', 'application/json')
-        .send({ descriptor: 'space', ...updatedSpace })
-        .expect(200);
-    });
-
-    it('check update space', async () => {
-      const res = await requestWithSupertest
-        .get(`/api/facility/${facilityId}/spaces/${spaceId}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('Accept', 'application/json')
-        .expect(200);
-
-      const { payload } = res.body;
-
-      const numOfAdults =
-        payload.maxNumberOfAdultOccupantsOneof.oneofKind ===
-        'maxNumberOfAdultOccupants'
-          ? payload.maxNumberOfAdultOccupantsOneof.maxNumberOfAdultOccupants
-          : 0;
-
-      expect(numOfAdults).to.be.equal(3);
-    });
-
-    it('remove space', async () => {
-      await requestWithSupertest
-        .delete(`/api/facility/${facilityId}/spaces/${spaceId}`)
-        .set('Authorization', `Bearer ${accessToken}`)
-        .set('Accept', 'application/json')
-        .send(spaceRequestBody)
-        .expect(200);
     });
   });
 

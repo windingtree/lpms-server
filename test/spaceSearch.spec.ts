@@ -50,7 +50,7 @@ describe('search service test', async () => {
       payload: Space.toBinary(space.payload)
     };
 
-    await facilityRepo.addToIndex(facilityId, 'spaces', spaceId);
+    await facilityRepo.addToIndex(facilityId, 'items', spaceId);
     await facilityRepo.setItemKey(
       facilityId,
       'items',
@@ -78,7 +78,7 @@ describe('search service test', async () => {
       payload: Space.toBinary(spaceMetadata)
     };
 
-    await facilityRepo.addToIndex(facilityId, 'spaces', spaceId2);
+    await facilityRepo.addToIndex(facilityId, 'items', spaceId2);
     await facilityRepo.setItemKey(
       facilityId,
       'items',
@@ -246,8 +246,8 @@ describe('search service test', async () => {
 
   it('delete all data', async () => {
     await facilityRepo.delFacilityKey(facilityId, 'metadata');
-    await facilityRepo.delFromIndex(facilityId, 'spaces', spaceId);
-    await facilityRepo.delFromIndex(facilityId, 'spaces', spaceId2);
+    await facilityRepo.delFromIndex(facilityId, 'items', spaceId);
+    await facilityRepo.delFromIndex(facilityId, 'items', spaceId2);
     await facilityRepo.delItemKey(facilityId, 'items', spaceId, 'metadata');
     await facilityRepo.delItemKey(facilityId, 'items', spaceId2, 'metadata');
 
