@@ -62,11 +62,21 @@ export default class DBService {
       );
     }
     DBService._instance = this;
-    this.db = new Level<string, string>('./database', {
-      valueEncoding: 'json',
-      createIfMissing: true,
-      errorIfExists: false
-    });
+
+    if (process.env.NODE_IS_TEST === 'true') {
+      this.db = new Level<string, string>('./database_test', {
+        valueEncoding: 'json',
+        createIfMissing: true,
+        errorIfExists: false
+      });
+    } else {
+      this.db = new Level<string, string>('./database', {
+        valueEncoding: 'json',
+        createIfMissing: true,
+        errorIfExists: false
+      });
+    }
+
     this.userDB = this.db.sublevel<string, User>('User', {
       valueEncoding: 'json'
     });
