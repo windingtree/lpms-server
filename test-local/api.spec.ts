@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import { utils } from 'ethers';
 import supertest, { SuperTest, Test } from 'supertest';
+import bootstrapService from '../src/services/BootstrapService';
 import ServerService from '../src/services/ServerService';
 import IpfsService from '../src/services/IpfsService';
 import { setupFacility, setupAuth, snapshot, revert } from './setup';
@@ -20,6 +21,7 @@ describe('Local tests', () => {
     snapshotId = await snapshot();
     facilityId = await setupFacility();
     appService = new ServerService(3006);
+    await bootstrapService.bootstrap();
     ipfsService = IpfsService.getInstance();
     await ipfsService.start();
     await appService.start();
