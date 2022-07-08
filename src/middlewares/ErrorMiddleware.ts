@@ -25,7 +25,7 @@ export default (
     });
   }
   if (debugEnabled) {
-    LogService.red(`Fatal error: ${err.message}`);
+    LogService.obj(err);
   }
 
   MetricsService.fatalErrorCounter.inc();
