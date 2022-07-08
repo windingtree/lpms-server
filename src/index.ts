@@ -13,6 +13,7 @@ import bidService from './services/BidService';
 process.on('unhandledRejection', async (error) => {
   console.log(error);
   await DBService.getInstance().close();
+  await IpfsService.getInstance().stop();
   process.exit(1);
 });
 
