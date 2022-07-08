@@ -1,3 +1,4 @@
+import { inspect } from 'node:util';
 import kleur from 'kleur';
 
 export default class LogService {
@@ -13,5 +14,14 @@ export default class LogService {
 
   static green(text: string | number): void {
     console.log(kleur.green(text));
+  }
+
+  static obj(obj: unknown): void {
+    console.log(
+      inspect(obj, {
+        depth: Infinity,
+        colors: true
+      })
+    );
   }
 }
