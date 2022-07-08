@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import ApiError from '../exceptions/ApiError';
 import facilityService from '../services/FacilityService';
 import facilityRepository from '../repositories/FacilityRepository';
-import { Facility, Item, ItemType, Space } from '../proto/facility';
+import { Item, ItemType, Space } from '../proto/facility';
 import stubService from '../services/StubService';
 
 export class FacilityItemController {
@@ -10,7 +10,7 @@ export class FacilityItemController {
     try {
       const { facilityId } = req.params;
 
-      const items = await facilityService.getAllFacilityItems(
+      const items = await facilityService.getFacilityDbKeyValues(
         facilityId,
         'items'
       );
@@ -38,7 +38,7 @@ export class FacilityItemController {
         );
       }
 
-      return res.json(facilityService.decodeItem(item));
+      return res.json(item);
     } catch (e) {
       next(e);
     }
@@ -62,24 +62,13 @@ export class FacilityItemController {
         );
       }
 
-      let metadata: Item;
-
-      if (type === ItemType.SPACE) {
-        metadata = {
-          name,
-          description,
-          photos,
-          type,
-          payload: Space.toBinary(payload)
-        };
-      } else {
-        metadata = {
-          name,
-          description,
-          photos,
-          type
-        };
-      }
+      const metadata: Item = {
+        name,
+        description,
+        photos,
+        type,
+        ...(type === ItemType.SPACE ? { payload } : {})
+      };
 
       await facilityService.setItemDbKeys(facilityId, 'items', itemId, [
         ['metadata', metadata]
@@ -116,7 +105,7 @@ export class FacilityItemController {
         description,
         photos,
         type,
-        payload: Space.toBinary(payload)
+        ...(type === ItemType.SPACE ? { payload } : {})
       };
 
       await facilityService.setItemDbKeys(facilityId, 'items', itemId, [
