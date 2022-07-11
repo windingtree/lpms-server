@@ -46,7 +46,7 @@
     "@protobuf-ts/plugin": "^2.7.0",
     "@types/yamljs": "^0.2.31",
     "@web-std/file": "^3.0.2",
-    "@windingtree/stays-models": "^2.1.1",
+    "@windingtree/stays-models": "^2.3.0",
     "@windingtree/videre-sdk": "^0.7.2",
     "axios": "^0.27.2",
     "bcrypt": "^5.0.1",

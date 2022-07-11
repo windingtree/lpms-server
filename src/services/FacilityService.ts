@@ -1,5 +1,5 @@
 import { utils, Wallet } from 'ethers';
-import { utils as vUtils, eip712 } from '@windingtree/videre-sdk';
+import { eip712, utils as vUtils } from '@windingtree/videre-sdk';
 import { SignedMessage } from '@windingtree/videre-sdk/dist/cjs/utils';
 import { Facility, Item, Space } from '../proto/facility';
 import { ServiceItemData, ServiceProviderData } from '../proto/storage';
@@ -12,10 +12,12 @@ import IpfsService from '../services/IpfsService';
 import { walletAccountsIndexes } from '../types';
 import {
   getLineRegistryDataDomain,
-  provider,
-  getServiceProviderContract
+  getServiceProviderContract,
+  provider
 } from '../config';
 import ApiError from '../exceptions/ApiError';
+import termService from './TermService';
+import { Term } from '../proto/term';
 
 export type FacilityWithId = {
   id: string;
@@ -64,8 +66,7 @@ export class FacilityService {
     }
 
     const items = await this.getFacilityDbKeyValues(facilityId, 'items');
-
-    // @todo Get terms from DB
+    const terms = await termService.getAllFacilityTerms(facilityId);
 
     // Build raw service provider metadata
     const serviceProviderData: ServiceProviderData = {
@@ -86,7 +87,17 @@ export class FacilityService {
             })
           : [])
       ],
-      terms: []
+      terms: [
+        ...(terms
+          ? terms.map((t) => {
+              return {
+                term: utils.arrayify(t.term),
+                impl: t.impl,
+                payload: Term.toBinary(t.payload)
+              };
+            })
+          : [])
+      ]
     };
 
     const signer = await walletService.getWalletByIndex(

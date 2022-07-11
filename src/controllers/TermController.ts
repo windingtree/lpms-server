@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import termRepository from '../repositories/TermRepository';
 import termService from '../services/TermService';
 import ApiError from '../exceptions/ApiError';
+import facilityService from '../services/FacilityService';
 
 export class TermController {
   public async getAllTerms(req: Request, res: Response, next: NextFunction) {
@@ -37,6 +38,7 @@ export class TermController {
       const { facilityId, termId } = req.params;
 
       await termService.setTerm(facilityId, termId, req.body);
+      await facilityService.saveFacilityMetadata(facilityId);
 
       return res.json({ success: true });
     } catch (e) {
@@ -53,6 +55,7 @@ export class TermController {
       }
 
       await termService.delTerm(facilityId, termId);
+      await facilityService.saveFacilityMetadata(facilityId);
 
       return res.json({ success: true });
     } catch (e) {

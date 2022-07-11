@@ -1,7 +1,7 @@
 import { Request, Router } from 'express';
 import { Ask } from './proto/ask';
 import { BidLine } from './proto/bidask';
-import { Photo } from './proto/photo';
+import { Term } from './proto/term';
 
 export interface User {
   id: number;
@@ -68,12 +68,8 @@ export interface BidLineAsk {
 
 export type RouterInitializer = (router: Router) => void;
 
-export interface Term {
+export interface TermDBValue {
   term: string; //termId
   impl: string; //term contract address
-  payload: {
-    name: string;
-    description: string;
-    photo?: Photo;
-  };
+  payload: Term;
 }

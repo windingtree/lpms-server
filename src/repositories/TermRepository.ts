@@ -1,5 +1,5 @@
 import DBService, { FacilitySubLevels } from '../services/DBService';
-import { Term } from '../types';
+import { TermDBValue } from '../types';
 
 export class TermRepository {
   //todo make term rates repo
@@ -59,7 +59,7 @@ export class TermRepository {
     return null;
   }
 
-  public async setTerm(facilityId: string, termId: string, term: Term) {
+  public async setTerm(facilityId: string, termId: string, term: TermDBValue) {
     return await this.dbService
       .getFacilityTermsDB(facilityId)
       .put(termId, term);
