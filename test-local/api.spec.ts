@@ -18,10 +18,10 @@ describe('Local tests', () => {
   const facilityRequestBody = facility;
 
   before(async () => {
+    await bootstrapService.bootstrap();
     snapshotId = await snapshot();
     facilityId = await setupFacility();
     appService = new ServerService(3006);
-    await bootstrapService.bootstrap();
     ipfsService = IpfsService.getInstance();
     await ipfsService.start();
     await appService.start();

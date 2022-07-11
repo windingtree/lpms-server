@@ -27,7 +27,7 @@
     "lint": "npx eslint . --ext .ts",
     "lint:fix": "npx eslint . --ext .ts --fix && npx prettier --write .",
     "test": "NODE_ENV=development NODE_IS_TEST=true npx mocha -r ts-node/register test/**/*.spec.ts",
-    "test:local": "NODE_ENV=development npx mocha -r ts-node/register --timeout 70000 test-local/**/*.spec.ts",
+    "test:local": "NODE_ENV=development NODE_IS_TEST=true npx mocha -r ts-node/register --timeout 70000 test-local/**/*.spec.ts",
     "clean": "rm -rf dist",
     "coverage": "c8 --all --exclude typechain* --exclude coverage --exclude dist --exclude src/proto* --exclude test npm test && c8 report --all --exclude typechain* --exclude coverage --exclude dist --exclude test --exclude src/proto* -r html",
     "build": "yarn clean && yarn tsc -p tsconfig-build.json",
