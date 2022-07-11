@@ -19,7 +19,7 @@ components:
     AvailabilityDefaultKey:
       type: string
       enum: ['default']
-    AvailabilityKey:
+    DefaultOrDateKey:
       oneOf:
         - $ref: '#/components/schemas/SqlDate'
         - $ref: '#/components/schemas/AvailabilityDefaultKey'
@@ -1656,7 +1656,7 @@ paths:
           description: Availability date formatted as SQL date - "yyyy-MM-dd"
           required: true
           schema:
-            $ref: '#/components/schemas/AvailabilityKey'
+            $ref: '#/components/schemas/DefaultOrDateKey'
       responses:
         200:
           description: OK
@@ -1710,7 +1710,7 @@ paths:
           description: Availability date formatted as SQL date - "yyyy-MM-dd"
           required: true
           schema:
-            $ref: '#/components/schemas/AvailabilityKey'
+            $ref: '#/components/schemas/DefaultOrDateKey'
       responses:
         200:
           description: OK
@@ -3156,3 +3156,115 @@ paths:
           description: Some server error
 
   #end terms
+
+  #rates
+  /rate/{facilityId}/{itemType}/{itemId}/{key}:
+    get:
+      security:
+        - bearerAuth: []
+      summary: create facility term
+      tags: [Facility service, stub]
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: itemType
+          description: The facility id
+          required: true
+          schema:
+            type: string
+            enum: ['terms', 'items']
+        - in: path
+          name: itemId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: key
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/DefaultOrDateKey'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cost:
+                    type: number
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
+    post:
+      security:
+        - bearerAuth: []
+      summary: create facility term
+      tags: [Facility service, stub]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                cost:
+                  type: number
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: itemType
+          description: The facility id
+          required: true
+          schema:
+            type: string
+            enum: ['terms', 'items']
+        - in: path
+          name: itemId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: key
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/DefaultOrDateKey'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
+
+  #end rates

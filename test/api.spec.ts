@@ -9,7 +9,8 @@ import {
   Availability,
   Condition,
   LOSRateModifier,
-  NoticeRequiredRule
+  NoticeRequiredRule,
+  Rates
 } from '../src/proto/lpms';
 import { ItemAvailabilityRepository } from '../src/repositories/ItemAvailabilityRepository';
 import { removeTestDB } from './common';
@@ -507,6 +508,68 @@ describe('API tests', async () => {
 
         expect(res.body).to.be.a('array');
         expect(res.body.length).to.be.equal(0);
+      });
+    });
+
+    describe('Rates', async () => {
+      it('should be throw err if rate not exist', async () => {
+        await requestWithSupertest
+          .get(`/api/rate/${facilityId}/items/${spaceId}/default`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(404);
+      });
+
+      it('set default rate', async () => {
+        const rate: Rates = {
+          cost: 100
+        };
+        await requestWithSupertest
+          .post(`/api/rate/${facilityId}/items/${spaceId}/default`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .send(rate)
+          .expect(200);
+      });
+
+      it('get default rate', async () => {
+        const res = await requestWithSupertest
+          .get(`/api/rate/${facilityId}/items/${spaceId}/default`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(200);
+
+        expect(res.body.cost).to.be.equal(100);
+      });
+
+      it('should throw err when key is unavailable', async () => {
+        await requestWithSupertest
+          .get(`/api/rate/${facilityId}/items/${spaceId}/some-value`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(400);
+      });
+
+      it('set date rate', async () => {
+        const rate: Rates = {
+          cost: 200
+        };
+        await requestWithSupertest
+          .post(`/api/rate/${facilityId}/items/${spaceId}/2022-01-01`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .send(rate)
+          .expect(200);
+      });
+
+      it('get date rate', async () => {
+        const res = await requestWithSupertest
+          .get(`/api/rate/${facilityId}/items/${spaceId}/2022-01-01`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(200);
+
+        expect(res.body.cost).to.be.equal(200);
       });
     });
   });
