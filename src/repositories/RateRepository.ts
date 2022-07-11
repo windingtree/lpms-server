@@ -9,7 +9,7 @@ import { AbstractSublevel } from 'abstract-level';
 import { Rates } from '../proto/lpms';
 import { Item as ItemMetadata } from '../proto/facility';
 
-type DBType = 'items' | 'terms';
+export type DBType = 'items' | 'terms';
 type DB = AbstractSublevel<
   AbstractSublevel<
     AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,

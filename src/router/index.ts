@@ -11,6 +11,7 @@ import facilityRoutes from './facility';
 import itemRoutes from './items';
 import stubsRoutes from './stubs';
 import termRoutes from './terms';
+import ratesRoutes from './rates';
 
 const routes: RouterInitializer[] = [
   usersRoutes,
@@ -22,7 +23,8 @@ const routes: RouterInitializer[] = [
   facilityRoutes,
   itemRoutes,
   stubsRoutes,
-  termRoutes
+  termRoutes,
+  ratesRoutes
 ];
 
 const router = Router();
