@@ -4,7 +4,7 @@ import DBService, {
   FacilityValues
 } from '../services/DBService';
 import { Level } from 'level';
-import { Item, ItemType, Space } from '../proto/facility';
+import { Item } from '../proto/facility';
 
 export class FacilityRepository {
   private dbService: DBService;
