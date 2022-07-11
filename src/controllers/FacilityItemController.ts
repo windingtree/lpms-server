@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import ApiError from '../exceptions/ApiError';
 import facilityService from '../services/FacilityService';
 import facilityRepository from '../repositories/FacilityRepository';
-import { Item, ItemType, Space } from '../proto/facility';
+import { Item, ItemType } from '../proto/facility';
 import stubService from '../services/StubService';
 
 export class FacilityItemController {
@@ -140,31 +140,6 @@ export class FacilityItemController {
       await facilityService.delItemMetadata(facilityId, 'items', itemId);
 
       await facilityService.saveFacilityMetadata(facilityId);
-
-      return res.json({ success: true });
-    } catch (e) {
-      next(e);
-    }
-  };
-
-  delStub = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { facilityId, itemId, date } = req.params;
-
-      if (
-        !(await facilityRepository.getItemKey<Item>(
-          facilityId,
-          'stubs',
-          itemId,
-          'metadata'
-        ))
-      ) {
-        throw ApiError.BadRequest(
-          `The stub ${itemId} in facility ${facilityId} not exist`
-        );
-      }
-
-      await facilityService.delItemMetadata(facilityId, 'items', itemId);
 
       return res.json({ success: true });
     } catch (e) {

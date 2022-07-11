@@ -21,16 +21,4 @@ export default (router: Router): void => {
     authMiddleware,
     facilityItemController.getStubsByDate
   );
-
-  // router.delete(
-  //   '/stub/:facilityId/:date',
-  //   authMiddleware,
-  //   facilityController.delStub
-  // );
-
-  // router.delete(
-  //   '/stub/:facilityId/:itemId/:date',
-  //   authMiddleware,
-  //   facilityItemController.delStub
-  // );
 };
