@@ -4,8 +4,9 @@ import supertest, { SuperTest, Test } from 'supertest';
 import bootstrapService from '../src/services/BootstrapService';
 import ServerService from '../src/services/ServerService';
 import IpfsService from '../src/services/IpfsService';
-import { setupFacility, setupAuth, snapshot, revert } from './setup';
-import { facility, space, removeTestDB } from '../test/common';
+import { revert, setupAuth, setupFacility, snapshot } from './setup';
+import { facility, removeTestDB, space } from '../test/common';
+import { TermDBValue } from '../src/types';
 
 describe('Local tests', () => {
   let ipfsService: IpfsService;
@@ -157,6 +158,114 @@ describe('Local tests', () => {
         .set('Accept', 'application/json')
         .send(spaceRequestBody)
         .expect(200);
+    });
+  });
+
+  describe('Terms', async () => {
+    const spaceId = utils.keccak256(utils.toUtf8Bytes('test_space'));
+    const termId = utils.keccak256(utils.toUtf8Bytes('test_term'));
+
+    it('create facility term', async () => {
+      const term: TermDBValue = {
+        term: termId,
+        impl: '0xE7de8c7F3F9B24F9b8b519035eC53887BE3f5443',
+        payload: {
+          name: 'Some name of term',
+          description: 'Some desc of term',
+          photos: [{ description: 'some desc', uri: 'some uri' }]
+        }
+      };
+
+      await requestWithSupertest
+        .post(`/api/term/${facilityId}/${termId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Accept', 'application/json')
+        .send(term)
+        .expect(200);
+    });
+
+    it('get facility terms', async () => {
+      const res = await requestWithSupertest
+        .get(`/api/term/${facilityId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Accept', 'application/json')
+        .expect(200);
+
+      expect(res.body).to.be.a('array');
+      expect(res.body.length).to.not.equal(0);
+    });
+
+    it('create item term', async () => {
+      await requestWithSupertest
+        .post(`/api/term/${facilityId}/item/${spaceId}/${termId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Accept', 'application/json')
+        .expect(200);
+    });
+
+    it('get item terms', async () => {
+      const res = await requestWithSupertest
+        .get(`/api/term/${facilityId}/item/${spaceId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Accept', 'application/json')
+        .expect(200);
+
+      expect(res.body).to.be.a('array');
+      expect(res.body.length).to.not.equal(0);
+    });
+
+    it('get term by id', async () => {
+      const res = await requestWithSupertest
+        .get(`/api/term/${facilityId}/${termId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Accept', 'application/json')
+        .expect(200);
+
+      expect(res.body).to.be.a('object');
+      expect(res.body.payload.name).to.equal('Some name of term');
+    });
+
+    it('should throw error when del term by id because term exist in item', async () => {
+      await requestWithSupertest
+        .delete(`/api/term/${facilityId}/${termId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Accept', 'application/json')
+        .expect(400);
+    });
+
+    it('del term index from space', async () => {
+      await requestWithSupertest
+        .delete(`/api/term/${facilityId}/item/${spaceId}/${termId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Accept', 'application/json')
+        .expect(200);
+    });
+
+    it('del facility term', async () => {
+      await requestWithSupertest
+        .delete(`/api/term/${facilityId}/${termId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Accept', 'application/json')
+        .expect(200);
+    });
+
+    it('should throw not exist error', async () => {
+      await requestWithSupertest
+        .get(`/api/term/${facilityId}/${termId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Accept', 'application/json')
+        .expect(404);
+    });
+
+    it('should be empty get item terms', async () => {
+      const res = await requestWithSupertest
+        .get(`/api/term/${facilityId}/item/${spaceId}`)
+        .set('Authorization', `Bearer ${accessToken}`)
+        .set('Accept', 'application/json')
+        .expect(200);
+
+      expect(res.body).to.be.a('array');
+      expect(res.body.length).to.be.equal(0);
     });
   });
 });

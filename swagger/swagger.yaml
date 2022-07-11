@@ -1357,6 +1357,7 @@ components:
       required:
         - term
         - impl
+        - payload
       properties:
         term:
           type: string
@@ -1367,13 +1368,16 @@ components:
           required:
             - name
             - description
+            - photos
           properties:
             name:
               type: string
             description:
               type: string
-            photo:
-              $ref: '#/components/schemas/Photo'
+            photos:
+              type: array
+              items:
+                $ref: '#/components/schemas/Photo'
 
 servers:
   - url: http://localhost:5000/api

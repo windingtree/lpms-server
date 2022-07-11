@@ -1,6 +1,6 @@
 import { AbstractSublevel } from 'abstract-level';
 import { Level } from 'level';
-import { BidLineAsk, Term, Token, User } from '../types';
+import { BidLineAsk, TermDBValue, Token, User } from '../types';
 import {
   Facility as FacilityMetadata,
   Item as ItemMetadata
@@ -168,9 +168,12 @@ export default class DBService {
   }
 
   public getFacilityTermsDB(facilityId: string) {
-    return this.getFacilityDB(facilityId).sublevel<string, Term>('terms', {
-      valueEncoding: 'json'
-    });
+    return this.getFacilityDB(facilityId).sublevel<string, TermDBValue>(
+      'terms',
+      {
+        valueEncoding: 'json'
+      }
+    );
   }
 
   public getItemAvailabilityDB(facilityId: string, itemId: string) {
