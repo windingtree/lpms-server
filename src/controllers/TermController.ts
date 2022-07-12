@@ -123,6 +123,16 @@ export class TermController {
       const { facilityId, itemId } = req.params;
       const { ids } = req.body;
 
+      const termIds = await termRepository.getAllTermIds(facilityId);
+
+      for (const id of ids) {
+        if (!termIds.includes(id)) {
+          throw ApiError.NotFound(
+            `Term ${id} not found in facility ${facilityId}`
+          );
+        }
+      }
+
       await mandatoryRepository.addIds(facilityId, itemId, 'terms', ids);
 
       return res.json({ success: true });

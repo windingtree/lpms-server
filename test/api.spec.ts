@@ -16,6 +16,7 @@ import { ItemAvailabilityRepository } from '../src/repositories/ItemAvailability
 import { removeTestDB } from './common';
 import facilityRepository from '../src/repositories/FacilityRepository';
 import mandatoryRepository from '../src/repositories/MandatoryRepository';
+import termRepository from '../src/repositories/TermRepository';
 
 describe('API tests', async () => {
   const appService = new ServerService(3006);
@@ -473,6 +474,21 @@ describe('API tests', async () => {
       const termId = utils.keccak256(utils.toUtf8Bytes('test_term'));
       const termId2 = utils.keccak256(utils.toUtf8Bytes('test_term2'));
       const termId3 = utils.keccak256(utils.toUtf8Bytes('test_term3'));
+
+      it('should throw err when create not exist id to mandatory terms to space', async () => {
+        await requestWithSupertest
+          .post(`/api/term/${facilityId}/${spaceId}/mandatory`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .send({ ids: [termId, termId2] })
+          .expect(404);
+      });
+
+      it('create ids', async () => {
+        await termRepository.addTermToIndex(facilityId, termId);
+        await termRepository.addTermToIndex(facilityId, termId2);
+        await termRepository.addTermToIndex(facilityId, termId3);
+      });
 
       it('create mandatory terms to space', async () => {
         await requestWithSupertest
