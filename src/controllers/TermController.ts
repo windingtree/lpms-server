@@ -3,6 +3,7 @@ import termRepository from '../repositories/TermRepository';
 import termService from '../services/TermService';
 import ApiError from '../exceptions/ApiError';
 import facilityService from '../services/FacilityService';
+import mandatoryRepository from '../repositories/MandatoryRepository';
 
 export class TermController {
   public async getAllTerms(req: Request, res: Response, next: NextFunction) {
@@ -110,6 +111,32 @@ export class TermController {
         itemId,
         termId
       );
+
+      return res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async setMandatory(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { facilityId, itemId } = req.params;
+      const { ids } = req.body;
+
+      await mandatoryRepository.addIds(facilityId, itemId, 'terms', ids);
+
+      return res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async delMandatory(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { facilityId, itemId } = req.params;
+      const { ids } = req.body;
+
+      await mandatoryRepository.delIds(facilityId, itemId, 'terms', ids);
 
       return res.json({ success: true });
     } catch (e) {

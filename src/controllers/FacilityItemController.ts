@@ -4,6 +4,7 @@ import facilityService from '../services/FacilityService';
 import facilityRepository from '../repositories/FacilityRepository';
 import { Item, ItemType } from '../proto/facility';
 import stubService from '../services/StubService';
+import mandatoryRepository from '../repositories/MandatoryRepository';
 
 export class FacilityItemController {
   getAllItems = async (req: Request, res: Response, next: NextFunction) => {
@@ -159,6 +160,32 @@ export class FacilityItemController {
       );
 
       return res.json(stubs);
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async setMandatory(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { facilityId, itemId } = req.params;
+      const { ids } = req.body;
+
+      await mandatoryRepository.addIds(facilityId, itemId, 'items', ids);
+
+      return res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async delMandatory(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { facilityId, itemId } = req.params;
+      const { ids } = req.body;
+
+      await mandatoryRepository.delIds(facilityId, itemId, 'items', ids);
+
+      return res.json({ success: true });
     } catch (e) {
       next(e);
     }
