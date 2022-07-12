@@ -42,4 +42,18 @@ export default (router: Router): void => {
     roleMiddleware([AppRole.MANAGER]),
     facilityItemController.delItem
   );
+
+  router.post(
+    '/item/:facilityId/:itemId/mandatory',
+    authMiddleware,
+    roleMiddleware([AppRole.MANAGER]),
+    facilityItemController.setMandatory
+  );
+
+  router.delete(
+    '/item/:facilityId/:itemId/mandatory',
+    authMiddleware,
+    roleMiddleware([AppRole.MANAGER]),
+    facilityItemController.delMandatory
+  );
 };

@@ -15,6 +15,7 @@ import {
 import { ItemAvailabilityRepository } from '../src/repositories/ItemAvailabilityRepository';
 import { removeTestDB } from './common';
 import facilityRepository from '../src/repositories/FacilityRepository';
+import mandatoryRepository from '../src/repositories/MandatoryRepository';
 
 describe('API tests', async () => {
   const appService = new ServerService(3006);
@@ -465,6 +466,94 @@ describe('API tests', async () => {
           .expect(200);
 
         expect(res.body.cost).to.be.equal(200);
+      });
+    });
+
+    describe('Mandatory', async () => {
+      const termId = utils.keccak256(utils.toUtf8Bytes('test_term'));
+      const termId2 = utils.keccak256(utils.toUtf8Bytes('test_term2'));
+      const termId3 = utils.keccak256(utils.toUtf8Bytes('test_term3'));
+
+      it('create mandatory terms to space', async () => {
+        await requestWithSupertest
+          .post(`/api/term/${facilityId}/${spaceId}/mandatory`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .send({ ids: [termId, termId2] })
+          .expect(200);
+      });
+
+      it('check repo', async () => {
+        const ids = await mandatoryRepository.getItemMandatoryIds(
+          facilityId,
+          spaceId,
+          'terms'
+        );
+
+        expect(ids).to.be.an('array');
+        expect(ids.length).to.be.equal(2);
+      });
+
+      it('create mandatory additional term to space', async () => {
+        await requestWithSupertest
+          .post(`/api/term/${facilityId}/${spaceId}/mandatory`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .send({ ids: [termId3] })
+          .expect(200);
+      });
+
+      it('check repo', async () => {
+        const ids = await mandatoryRepository.getItemMandatoryIds(
+          facilityId,
+          spaceId,
+          'terms'
+        );
+
+        expect(ids).to.be.an('array');
+        expect(ids.length).to.be.equal(3);
+      });
+
+      it('del mandatory term from space', async () => {
+        await requestWithSupertest
+          .delete(`/api/term/${facilityId}/${spaceId}/mandatory`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .send({ ids: [termId] })
+          .expect(200);
+      });
+
+      it('check del repo', async () => {
+        const ids = await mandatoryRepository.getItemMandatoryIds(
+          facilityId,
+          spaceId,
+          'terms'
+        );
+
+        expect(ids).to.be.an('array');
+        expect(ids.includes(termId2)).to.be.equal(true);
+        expect(ids.includes(termId3)).to.be.equal(true);
+        expect(ids.length).to.be.equal(2);
+      });
+
+      it('del all mandatory terms from space', async () => {
+        await requestWithSupertest
+          .delete(`/api/term/${facilityId}/${spaceId}/mandatory`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .send({ ids: [] })
+          .expect(200);
+      });
+
+      it('check del repo 2', async () => {
+        const ids = await mandatoryRepository.getItemMandatoryIds(
+          facilityId,
+          spaceId,
+          'terms'
+        );
+
+        expect(ids).to.be.an('array');
+        expect(ids.length).to.be.equal(0);
       });
     });
   });
