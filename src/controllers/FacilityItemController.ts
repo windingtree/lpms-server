@@ -170,6 +170,19 @@ export class FacilityItemController {
       const { facilityId, itemId } = req.params;
       const { ids } = req.body;
 
+      const itemIds = (await facilityRepository.getFacilityKey(
+        facilityId,
+        'items'
+      )) as string[];
+
+      for (const id of ids) {
+        if (!itemIds.includes(id)) {
+          throw ApiError.NotFound(
+            `Item ${id} not found in facility ${facilityId}`
+          );
+        }
+      }
+
       await mandatoryRepository.addIds(facilityId, itemId, 'items', ids);
 
       return res.json({ success: true });
