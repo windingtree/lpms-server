@@ -7,18 +7,18 @@ import ApiError from '../exceptions/ApiError';
 export class RateController {
   public async getRate(req: Request, res: Response, next: NextFunction) {
     try {
-      const { facilityId, itemType, itemId, key } = req.params;
+      const { facilityId, rateType, itemId, key } = req.params;
 
       const rateRepository = new RateRepository(facilityId, itemId);
 
       const rate = await rateRepository.getRate(
         key as DefaultOrDateItemKey,
-        itemType as DBType
+        rateType as DBType
       );
 
       if (!rate) {
         throw ApiError.NotFound(
-          `rate ${key} not exist in facility ${facilityId} ${itemType} ${itemId}`
+          `rate ${key} not exist in facility ${facilityId} ${rateType} ${itemId}`
         );
       }
 
@@ -30,7 +30,7 @@ export class RateController {
 
   public async setRate(req: Request, res: Response, next: NextFunction) {
     try {
-      const { facilityId, itemType, itemId, key } = req.params;
+      const { facilityId, rateType, itemId, key } = req.params;
       const { cost } = req.body;
       const rateRepository = new RateRepository(facilityId, itemId);
 
@@ -39,12 +39,12 @@ export class RateController {
       };
 
       if (key === 'default') {
-        await rateRepository.setRateDefault(rate, itemType as DBType);
+        await rateRepository.setRateDefault(rate, rateType as DBType);
       } else {
         await rateRepository.setRate(
           key as FormattedDate,
           rate,
-          itemType as DBType
+          rateType as DBType
         );
       }
 

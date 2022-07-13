@@ -3361,7 +3361,7 @@ paths:
   #end terms
 
   #rates
-  /rate/{facilityId}/{itemType}/{itemId}/{key}:
+  /rate/{facilityId}/{itemId}/{key}/{rateType}:
     get:
       security:
         - bearerAuth: []
@@ -3375,24 +3375,24 @@ paths:
           schema:
             $ref: '#/components/schemas/Bytes32HashedId'
         - in: path
-          name: itemType
-          description: The facility id
-          required: true
-          schema:
-            type: string
-            enum: ['terms', 'items']
-        - in: path
           name: itemId
-          description: The facility id
+          description: The item id
           required: true
           schema:
             $ref: '#/components/schemas/Bytes32HashedId'
         - in: path
           name: key
-          description: The facility id
+          description: The rate key
           required: true
           schema:
             $ref: '#/components/schemas/DefaultOrDateKey'
+        - in: path
+          name: rateType
+          description: The rate type
+          required: true
+          schema:
+            type: string
+            enum: ['terms', 'items']
       responses:
         200:
           description: OK
@@ -3433,24 +3433,24 @@ paths:
           schema:
             $ref: '#/components/schemas/Bytes32HashedId'
         - in: path
-          name: itemType
-          description: The facility id
-          required: true
-          schema:
-            type: string
-            enum: ['terms', 'items']
-        - in: path
           name: itemId
-          description: The facility id
+          description: The item id
           required: true
           schema:
             $ref: '#/components/schemas/Bytes32HashedId'
         - in: path
           name: key
-          description: The facility id
+          description: The item key
           required: true
           schema:
             $ref: '#/components/schemas/DefaultOrDateKey'
+        - in: path
+          name: rateType
+          description: The rate type
+          required: true
+          schema:
+            type: string
+            enum: ['terms', 'items']
       responses:
         200:
           description: OK
