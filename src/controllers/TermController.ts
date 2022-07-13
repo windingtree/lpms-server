@@ -4,6 +4,7 @@ import termService from '../services/TermService';
 import ApiError from '../exceptions/ApiError';
 import facilityService from '../services/FacilityService';
 import mandatoryRepository from '../repositories/MandatoryRepository';
+import { utils } from 'ethers';
 
 export class TermController {
   public async getAllTerms(req: Request, res: Response, next: NextFunction) {
@@ -179,7 +180,16 @@ export class TermController {
         );
       }
 
-      await termRepository.setTermParam(facilityId, itemId, termId, param);
+      const encodedParam = utils.keccak256(
+        utils.defaultAbiCoder.encode(param[0], param[1])
+      );
+
+      await termRepository.setTermParam(
+        facilityId,
+        itemId,
+        termId,
+        encodedParam
+      );
 
       return res.json({ success: true });
     } catch (e) {
