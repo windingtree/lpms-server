@@ -67,4 +67,18 @@ export default (router: Router): void => {
     roleMiddleware([AppRole.MANAGER]),
     termController.delMandatory
   );
+
+  router.post(
+    '/term/params/:facilityId/:itemId/:termId',
+    authMiddleware,
+    roleMiddleware([AppRole.MANAGER]),
+    termController.setParam
+  );
+
+  router.delete(
+    '/term/params/:facilityId/:itemId/:termId',
+    authMiddleware,
+    roleMiddleware([AppRole.MANAGER]),
+    termController.delParam
+  );
 };

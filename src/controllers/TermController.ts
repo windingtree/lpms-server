@@ -153,6 +153,51 @@ export class TermController {
       next(e);
     }
   }
+
+  public async setParam(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { facilityId, itemId, termId } = req.params;
+      const { param } = req.body;
+
+      const termIds = await termRepository.getAllTermIds(facilityId);
+
+      if (!termIds.includes(termId)) {
+        throw ApiError.NotFound(
+          `Term ${termId} not found in facility ${facilityId}`
+        );
+      }
+
+      const itemTermIds = await termRepository.getAllItemTermIndexes(
+        facilityId,
+        'items',
+        itemId
+      );
+
+      if (!itemTermIds.includes(termId)) {
+        throw ApiError.NotFound(
+          `Term ${termId} not found in facility ${facilityId} space ${itemId}`
+        );
+      }
+
+      await termRepository.setTermParam(facilityId, itemId, termId, param);
+
+      return res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  public async delParam(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { facilityId, itemId, termId } = req.params;
+
+      await termRepository.delTermParam(facilityId, itemId, termId);
+
+      return res.json({ success: true });
+    } catch (e) {
+      next(e);
+    }
+  }
 }
 
 export default new TermController();

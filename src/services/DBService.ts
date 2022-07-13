@@ -42,6 +42,7 @@ export type FacilityStubValues = string[] | StubStorage;
 export type SpaceStubKey = FormattedDate | `${FormattedDate}-num_booked`;
 export type SpaceStubValues = string[] | number;
 export type MandatoryDBKey = 'items' | 'terms';
+export type TermParam = string | number[][];
 
 export default class DBService {
   protected db: DBLevel;
@@ -171,6 +172,20 @@ export default class DBService {
   public getFacilityTermsDB(facilityId: string) {
     return this.getFacilityDB(facilityId).sublevel<string, TermDBValue>(
       'terms',
+      {
+        valueEncoding: 'json'
+      }
+    );
+  }
+
+  public getFacilityTermParamsDB(
+    facilityId: string,
+    itemId: string,
+    termId: string
+  ) {
+    const key = `${itemId}_${termId}`;
+    return this.getFacilityTermsDB(facilityId).sublevel<'param', TermParam>(
+      key,
       {
         valueEncoding: 'json'
       }
