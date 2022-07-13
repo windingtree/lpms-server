@@ -3395,6 +3395,8 @@ paths:
               properties:
                 param:
                   type: array
+                  maxItems: 2
+                  minItems: 2
                   items:
                     type: array
                     items:

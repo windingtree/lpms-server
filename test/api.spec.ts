@@ -601,7 +601,7 @@ describe('API tests', async () => {
           spaceId,
           termId
         );
-        expect(param).to.be.an('array');
+        expect(param).to.be.an('string');
       });
 
       it('check term param del', async () => {
