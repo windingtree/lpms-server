@@ -411,7 +411,7 @@ describe('API tests', async () => {
     describe('Rates', async () => {
       it('should be throw err if rate not exist', async () => {
         await requestWithSupertest
-          .get(`/api/rate/${facilityId}/items/${spaceId}/default`)
+          .get(`/api/rate/${facilityId}/${spaceId}/default`)
           .set('Authorization', `Bearer ${accessToken}`)
           .set('Accept', 'application/json')
           .expect(404);
@@ -422,7 +422,7 @@ describe('API tests', async () => {
           cost: 100
         };
         await requestWithSupertest
-          .post(`/api/rate/${facilityId}/items/${spaceId}/default`)
+          .post(`/api/rate/${facilityId}/${spaceId}/default`)
           .set('Authorization', `Bearer ${accessToken}`)
           .set('Accept', 'application/json')
           .send(rate)
@@ -431,7 +431,7 @@ describe('API tests', async () => {
 
       it('get default rate', async () => {
         const res = await requestWithSupertest
-          .get(`/api/rate/${facilityId}/items/${spaceId}/default`)
+          .get(`/api/rate/${facilityId}/${spaceId}/default`)
           .set('Authorization', `Bearer ${accessToken}`)
           .set('Accept', 'application/json')
           .expect(200);
@@ -441,7 +441,7 @@ describe('API tests', async () => {
 
       it('should throw err when key is unavailable', async () => {
         await requestWithSupertest
-          .get(`/api/rate/${facilityId}/items/${spaceId}/some-value`)
+          .get(`/api/rate/${facilityId}/${spaceId}/some-value`)
           .set('Authorization', `Bearer ${accessToken}`)
           .set('Accept', 'application/json')
           .expect(400);
@@ -452,7 +452,7 @@ describe('API tests', async () => {
           cost: 200
         };
         await requestWithSupertest
-          .post(`/api/rate/${facilityId}/items/${spaceId}/2022-01-01`)
+          .post(`/api/rate/${facilityId}/${spaceId}/2022-01-01`)
           .set('Authorization', `Bearer ${accessToken}`)
           .set('Accept', 'application/json')
           .send(rate)
@@ -461,7 +461,7 @@ describe('API tests', async () => {
 
       it('get date rate', async () => {
         const res = await requestWithSupertest
-          .get(`/api/rate/${facilityId}/items/${spaceId}/2022-01-01`)
+          .get(`/api/rate/${facilityId}/${spaceId}/2022-01-01`)
           .set('Authorization', `Bearer ${accessToken}`)
           .set('Accept', 'application/json')
           .expect(200);
