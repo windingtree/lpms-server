@@ -572,5 +572,54 @@ describe('API tests', async () => {
         expect(ids.length).to.be.equal(0);
       });
     });
+
+    describe('Term params', () => {
+      const termId = utils.keccak256(utils.toUtf8Bytes('test_term'));
+
+      it('create ids', async () => {
+        await termRepository.addTermToIndex(facilityId, termId);
+        await termRepository.addTermToItemIndex(
+          facilityId,
+          'items',
+          spaceId,
+          termId
+        );
+      });
+
+      it('check term param add', async () => {
+        await requestWithSupertest
+          .post(`/api/term/params/${facilityId}/${spaceId}/${termId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .send({ param: [['uint256'], [1209600]] })
+          .expect(200);
+      });
+
+      it('check term param exist', async () => {
+        const param = await termRepository.getTermParam(
+          facilityId,
+          spaceId,
+          termId
+        );
+        expect(param).to.be.an('array');
+      });
+
+      it('check term param del', async () => {
+        await requestWithSupertest
+          .delete(`/api/term/params/${facilityId}/${spaceId}/${termId}`)
+          .set('Authorization', `Bearer ${accessToken}`)
+          .set('Accept', 'application/json')
+          .expect(200);
+      });
+
+      it('check term param exist', async () => {
+        const param = await termRepository.getTermParam(
+          facilityId,
+          spaceId,
+          termId
+        );
+        expect(param).to.be.null;
+      });
+    });
   });
 });

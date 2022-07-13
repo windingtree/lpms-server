@@ -3358,6 +3358,109 @@ paths:
           description: Not Found
         500:
           description: Some server error
+
+  /term/params/{facilityId}/{itemId}/{termId}:
+    post:
+      security:
+        - bearerAuth: [ ]
+      summary: add mandatory terms to space
+      tags: [ Facility service, terms ]
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: itemId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: termId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - param
+              properties:
+                param:
+                  type: array
+                  items:
+                    type: array
+                    items:
+                      oneOf:
+                        - type: string
+                        - type: number
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
+    delete:
+      security:
+        - bearerAuth: [ ]
+      summary: del mandatory terms from space
+      tags: [ Facility service, terms ]
+      parameters:
+        - in: path
+          name: facilityId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: itemId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+        - in: path
+          name: termId
+          description: The facility id
+          required: true
+          schema:
+            $ref: '#/components/schemas/Bytes32HashedId'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+        401:
+          description: User is not Auth
+        403:
+          description: Access denied
+        404:
+          description: Not Found
+        500:
+          description: Some server error
   #end terms
 
   #rates

@@ -1,4 +1,4 @@
-import DBService, { FacilitySubLevels } from '../services/DBService';
+import DBService, { FacilitySubLevels, TermParam } from '../services/DBService';
 import { TermDBValue } from '../types';
 
 export class TermRepository {
@@ -143,6 +143,58 @@ export class TermRepository {
   }
 
   //end item term management
+
+  //term params
+  public async getTermParam(
+    facilityId: string,
+    itemId: string,
+    termId: string
+  ): Promise<TermParam | null> {
+    const termParamDB = this.dbService.getFacilityTermParamsDB(
+      facilityId,
+      itemId,
+      termId
+    );
+
+    try {
+      return await termParamDB.get('param');
+    } catch (e) {
+      if (e.status !== 404) {
+        throw e;
+      }
+    }
+    return null;
+  }
+
+  public async setTermParam(
+    facilityId: string,
+    itemId: string,
+    termId: string,
+    param: TermParam
+  ): Promise<void> {
+    const termParamDB = this.dbService.getFacilityTermParamsDB(
+      facilityId,
+      itemId,
+      termId
+    );
+
+    return await termParamDB.put('param', param);
+  }
+
+  public async delTermParam(
+    facilityId: string,
+    itemId: string,
+    termId: string
+  ): Promise<void> {
+    const termParamDB = this.dbService.getFacilityTermParamsDB(
+      facilityId,
+      itemId,
+      termId
+    );
+    return await termParamDB.del('param');
+  }
+
+  //end term params
 }
 
 export default new TermRepository();
