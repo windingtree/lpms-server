@@ -4,7 +4,7 @@ import DBService, {
   FacilityValues
 } from '../services/DBService';
 import { Level } from 'level';
-import { Item } from '../proto/facility';
+import { ItemDBValue } from '../types';
 
 export class FacilityRepository {
   private dbService: DBService;
@@ -185,7 +185,7 @@ export class FacilityRepository {
     idx: FacilitySubLevels,
     itemId: string,
     key: string,
-    value: Item
+    value: ItemDBValue
   ): Promise<void> {
     await this.addToIndex(facilityId, 'items', itemId);
     await this.dbService
@@ -193,7 +193,7 @@ export class FacilityRepository {
       .put(key, value);
   }
 
-  public async getItemKey<T extends Item>(
+  public async getItemKey<T extends ItemDBValue>(
     facilityId: string,
     idx: FacilitySubLevels,
     itemId: string,

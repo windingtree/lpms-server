@@ -1,12 +1,12 @@
 import { AbstractSublevel } from 'abstract-level';
 import DBService, {
   DBLevel,
-  LevelDefaultTyping,
   FacilityValues,
+  LevelDefaultTyping,
   ModifiersKey,
   ModifiersValues
 } from '../services/DBService';
-import { Item as ItemMetadata } from '../proto/facility';
+import { ItemDBValue } from '../types';
 
 abstract class ModifierRepository {
   protected dbService: DBService = DBService.getInstance();
@@ -43,7 +43,7 @@ export class ItemModifierRepository extends ModifierRepository {
       AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
       LevelDefaultTyping,
       string,
-      ItemMetadata
+      ItemDBValue
     >,
     LevelDefaultTyping,
     ModifiersKey,

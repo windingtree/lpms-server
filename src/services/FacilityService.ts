@@ -1,7 +1,7 @@
-import { utils, Wallet } from 'ethers';
+import { BigNumber, utils, Wallet } from 'ethers';
 import { eip712, utils as vUtils } from '@windingtree/videre-sdk';
 import { SignedMessage } from '@windingtree/videre-sdk/dist/cjs/utils';
-import { Facility, Item, Space } from '../proto/facility';
+import { Facility, Item, ItemType, Space } from '../proto/facility';
 import { ServiceItemData, ServiceProviderData } from '../proto/storage';
 import facilityRepository, {
   FacilityRepository
@@ -9,15 +9,20 @@ import facilityRepository, {
 import { FacilityKey, FacilitySubLevels, FacilityValues } from './DBService';
 import walletService from '../services/WalletService';
 import IpfsService from '../services/IpfsService';
-import { walletAccountsIndexes } from '../types';
+import { ItemDBValue, walletAccountsIndexes } from '../types';
 import {
   getLineRegistryDataDomain,
   getServiceProviderContract,
+  getStaysDataDomain,
   provider
 } from '../config';
 import ApiError from '../exceptions/ApiError';
 import termService from './TermService';
 import { Term } from '../proto/term';
+import mandatoryRepository from '../repositories/MandatoryRepository';
+import { BidOptionItem } from '../proto/bidask';
+import quoteService, { QuoteService } from './QuoteService';
+import { Ask } from '../proto/ask';
 
 export type FacilityWithId = {
   id: string;
@@ -177,7 +182,7 @@ export class FacilityService {
     facilityId: string,
     itemType: FacilitySubLevels,
     itemId: string,
-    entries: [string, Item][]
+    entries: [string, ItemDBValue][]
   ): Promise<void> {
     await Promise.all(
       entries.map(([key, value]) =>
@@ -223,6 +228,109 @@ export class FacilityService {
   ): Promise<void> {
     await this.repository.delFromIndex(facilityId, key, id);
     await this.repository.delItemKey(facilityId, key, id, 'metadata');
+  }
+
+  public async getFacilityOtherItemsIds(facilityId: string) {
+    const allItems = await this.getFacilityDbKeyValues(facilityId, 'items');
+
+    return allItems.filter((i) => {
+      return i.item.type === ItemType.OTHER;
+    });
+  }
+
+  public async getFacilitySpaceIds(facilityId: string) {
+    const allItems = await this.getFacilityDbKeyValues(facilityId, 'items');
+
+    return allItems.filter((i) => {
+      return i.item.type === ItemType.SPACE;
+    });
+  }
+
+  public async getFacilityOptionalOtherItems(
+    facilityId: string,
+    spaceId: string
+  ): Promise<ItemWithId[]> {
+    const allItems = await this.getFacilityOtherItemsIds(facilityId);
+    const mandatoryIds = await mandatoryRepository.getItemMandatoryIds(
+      facilityId,
+      spaceId,
+      'items'
+    );
+
+    return allItems.filter((x) => !mandatoryIds.includes(x.id));
+  }
+
+  public async getFacilityBidOptionalItems(
+    facilityId: string,
+    spaceId: string,
+    ask,
+    wallet: Wallet,
+    gem: string
+  ): Promise<BidOptionItem[]> {
+    const itemsWithIds = await this.getFacilityOptionalOtherItems(
+      facilityId,
+      spaceId
+    );
+
+    const bidOptionItems = new Set<BidOptionItem>();
+
+    for (const itemWithId of itemsWithIds) {
+      const quote = await quoteService.quote(
+        facilityId,
+        itemWithId.id,
+        ask,
+        'items'
+      );
+      if (itemWithId) {
+        bidOptionItems.add({
+          item: Item.toBinary(itemWithId.item),
+          cost: [
+            {
+              gem,
+              wad: quote.mul(BigNumber.from('10').pow('18')).toString()
+            }
+          ],
+          signature: utils.arrayify(
+            await wallet._signTypedData(
+              await getStaysDataDomain(),
+              eip712.bidask.BidOptionItem,
+              {
+                item: utils.keccak256(Item.toBinary(itemWithId.item)),
+                cost: [
+                  {
+                    gem,
+                    wad: quote.mul(BigNumber.from('10').pow('18')).toString()
+                  }
+                ]
+              }
+            )
+          )
+        });
+      }
+    }
+    return Array.from(bidOptionItems);
+  }
+
+  public async getMandatoryOtherItemsIdsWithTotalPrice(
+    facilityId: string,
+    spaceId: string,
+    ask: Ask
+  ): Promise<[BigNumber, string[]]> {
+    const quoteService = new QuoteService();
+    const mandatoryItems = await mandatoryRepository.getItemMandatoryIds(
+      facilityId,
+      spaceId,
+      'items'
+    );
+    let quote = BigNumber.from(0);
+
+    for (const mandatoryItem of mandatoryItems) {
+      quote = quote.add(
+        await quoteService.quote(facilityId, mandatoryItem, ask, 'items')
+      );
+    }
+
+    return [quote, mandatoryItems];
   }
 }
 

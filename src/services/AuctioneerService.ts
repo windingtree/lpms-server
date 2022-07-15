@@ -11,7 +11,9 @@ import { Ask } from '../proto/ask';
 import { SearchService } from './SearchService';
 import { QuoteService } from './QuoteService';
 import { ask as staysEIP712 } from '@windingtree/stays-models/dist/cjs/eip712';
-import bidRepository from '../repositories/BidRepository';
+import facilityService from './FacilityService';
+import termService from './TermService';
+import bidService from './BidService';
 
 export class AuctioneerService extends AbstractFacilityService {
   constructor() {
@@ -53,48 +55,93 @@ export class AuctioneerService extends AbstractFacilityService {
               ask
             );
 
+            const wallet = await WalletService.getWalletByIndex(
+              walletAccountsIndexes.BIDDER
+            );
+
+            const gem = constants.AddressZero;
+
             for (const space of spaces) {
               // TODO: currently assumes quote is xDAI
-              const quote = await new QuoteService().quote(
+              let quote = await new QuoteService().quote(
                 facilityId,
                 space,
-                ask
+                ask,
+                'items'
               );
 
+              const [mandatoryItemsPrice, mandatoryItemsIds] =
+                await facilityService.getMandatoryOtherItemsIdsWithTotalPrice(
+                  facilityId,
+                  space,
+                  ask
+                );
+              quote = quote.add(mandatoryItemsPrice);
+
+              const [mandatoryTermsPrice, mandatoryTerms] =
+                await termService.getMandatoryBidTermsWithTotalPrice(
+                  facilityId,
+                  space,
+                  ask
+                );
+              quote = quote.add(mandatoryTermsPrice);
+
+              const optionalItems =
+                await facilityService.getFacilityBidOptionalItems(
+                  facilityId,
+                  space,
+                  ask,
+                  wallet,
+                  gem
+                );
+
+              const optionalTerms = await termService.getOptionalBidTerms(
+                facilityId,
+                space,
+                ask,
+                wallet,
+                gem
+              );
+
+              const cost = quote.mul(BigNumber.from('10').pow('18'));
+
               const bid = await generateBidLine(
-                await WalletService.getWalletByIndex(
-                  walletAccountsIndexes.BIDDER
-                ),
+                wallet,
                 utils.hexlify(msg.salt),
                 facilityId,
                 params,
-                [space],
+                [space, ...mandatoryItemsIds],
                 5,
                 Math.floor(+new Date() / 1000) + 20 * 60,
-                constants.AddressZero,
-                quote.mul(BigNumber.from('10').pow('18'))
+                gem,
+                cost,
+                optionalItems,
+                mandatoryTerms,
+                optionalTerms
               );
 
               bidlines.push(bid);
 
               try {
-                await bidRepository.setBid(
+                await bidService.setBid(
                   facilityId,
-                  utils.keccak256(bid.signature),
-                  {
-                    ask,
-                    bidLine: bid,
-                    spaceId: space
-                  }
+                  space,
+                  mandatoryItemsIds,
+                  bid,
+                  ask,
+                  params,
+                  mandatoryTerms,
+                  gem,
+                  cost
                 );
               } catch (e) {
-                log.red('Malformed DB transaction');
+                log.red('Malformed DB transaction' + e);
               }
             }
 
             // assemble the final bid message to be used in response
             try {
-              this.waku.sendMessage(
+              await this.waku.sendMessage(
                 BidWrapper,
                 await vUtils.createSignedMessage<BidWrapper>(
                   await getStaysDataDomain(),
@@ -119,10 +166,10 @@ export class AuctioneerService extends AbstractFacilityService {
                 vUtils.generateTopic({ ...videreConfig, topic: 'bid' }, h3Index)
               );
             } catch (e) {
-              log.red('Malformed EIP-712 signing' + e);
+              log.red('Malformed EIP-712 signing ' + e);
             }
           } catch (e) {
-            log.red('Malformed Ask message' + e);
+            log.red('Malformed Ask message ' + e);
           }
         } else {
           log.red('Malformed AskWrapper message');
