@@ -162,7 +162,8 @@ describe('QuoteService', () => {
         expect(
           await QuoteService.getBaseRate(
             repos,
-            DateTime.fromObject(ask.checkIn as Date)
+            DateTime.fromObject(ask.checkIn as Date),
+            'items'
           )
         ).to.eq(BigNumber.from(normalRate.cost));
       });
@@ -171,9 +172,10 @@ describe('QuoteService', () => {
         await expect(
           QuoteService.getBaseRate(
             reposClear,
-            DateTime.fromObject(ask.checkIn as Date)
+            DateTime.fromObject(ask.checkIn as Date),
+            'items'
           )
-        ).to.be.rejectedWith('Unable to get base for the space');
+        ).to.be.rejectedWith('Unable to get base for the items');
       });
     });
 
@@ -318,7 +320,7 @@ describe('QuoteService', () => {
 
   describe('#quote', () => {
     it('should return quote', async () => {
-      const quote = await quoteService.quote(facilityId, spaceId, ask);
+      const quote = await quoteService.quote(facilityId, spaceId, ask, 'items');
       // Stupid Check
       expect(quote).to.eq(BigNumber.from(302));
     });

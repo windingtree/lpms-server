@@ -2249,10 +2249,10 @@
   dependencies:
     web-streams-polyfill "^3.1.1"
 
-"@windingtree/stays-models@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@windingtree/stays-models/-/stays-models-2.3.0.tgz#614bdca29c41bbecb3b4fd572ad7ae890644befb"
-  integrity sha512-bMPLpXyCwrNOM4ON23200Z2pchW3aeMyWO8ZblcevZP9CAGnptUzUyAczNHftEu26I9QxUeR6+psLwiccZ+AyQ==
+"@windingtree/stays-models@^2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@windingtree/stays-models/-/stays-models-2.3.1.tgz#f76683d1ab1f1fae0878c1bb46bed0054f79e395"
+  integrity sha512-RVODKtjEFWgnZTubr9hr74QmFBvbBv2FDFMLdVn6dkVKiuWOo8TZ4edwyYDRlsohVkegG9xVbvME7glfjV3QTw==
   dependencies:
     "@protobuf-ts/runtime" "^2.6.0"
     zlib "^1.0.5"
@@ -2264,10 +2264,10 @@
   dependencies:
     "@openzeppelin/contracts" "^4.5.0"
 
-"@windingtree/videre-sdk@^0.7.2":
-  version "0.7.2"
-  resolved "https://registry.yarnpkg.com/@windingtree/videre-sdk/-/videre-sdk-0.7.2.tgz#7843f834aee58d363082858753daff02964cb844"
-  integrity sha512-YSsE0WV4VY3Qw/lgRrnp6ZaRMTpz86yttviZ96eJOepJzkgcQFWBXLh2R7pX0YoWSUXf3pUoONkweWxnl5N/Tg==
+"@windingtree/videre-sdk@^0.7.4":
+  version "0.7.4"
+  resolved "https://registry.yarnpkg.com/@windingtree/videre-sdk/-/videre-sdk-0.7.4.tgz#c636e3107c924d92b4da6678a1c3387d37e1e20c"
+  integrity sha512-gCT0biWlknnB9vIQRtl8P1VqLhpzHjiOS3Qmfljy9gHYGAqTPSMD2WM4RxvsXQ3COhFMoU+BpV39Tl/dalx+xg==
   dependencies:
     "@protobuf-ts/runtime" "^2.5.0"
     ethers "^5.6.5"

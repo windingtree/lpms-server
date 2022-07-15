@@ -1,6 +1,6 @@
 import { BigNumber } from 'ethers';
 import { DateTime } from 'luxon';
-import { FormattedDate } from './DBService';
+import { FormattedDate, RateType } from './DBService';
 import { Ask } from '../proto/ask';
 import { Date } from '../proto/date';
 import {
@@ -26,18 +26,20 @@ export class QuoteService {
   // Get base rate for the space
   static getBaseRate = async (
     { rates }: QuoteRepositories,
-    day: DateTime
+    day: DateTime,
+    rateType: RateType
   ): Promise<BigNumber> => {
     let baseRate = await rates.getRate(
-      day.toFormat('yyyy-MM-dd') as FormattedDate
+      day.toFormat('yyyy-MM-dd') as FormattedDate,
+      rateType
     );
 
     if (!baseRate) {
-      baseRate = await rates.getRate('default');
+      baseRate = await rates.getRate('default', rateType);
     }
 
     if (!baseRate) {
-      throw new Error('Unable to get base for the space');
+      throw new Error(`Unable to get base for the ${rateType}`);
     }
 
     return BigNumber.from(baseRate.cost);
@@ -199,7 +201,8 @@ export class QuoteService {
   public quote = async (
     facilityId: string,
     spaceId: string,
-    ask: Ask
+    ask: Ask,
+    rateType: RateType
   ): Promise<BigNumber> => {
     if (!ask.checkIn) {
       throw new Error('Invalid checkIn date');
@@ -215,6 +218,18 @@ export class QuoteService {
       facilityModifiers: new FacilityModifierRepository(facilityId)
     };
     let total = BigNumber.from(0);
+
+    if (rateType === 'terms') {
+      const price = await QuoteService.getBaseRate(
+        repositories,
+        DateTime.fromObject(ask.checkIn as Date),
+        'terms'
+      );
+
+      total = total.add(price);
+
+      return total;
+    }
 
     // Iterate through days from ask.checkIn to ask.checkOut
     for await (const value of this.getQuoteIterator(repositories, ask)) {
@@ -245,7 +260,11 @@ export class QuoteService {
           });
 
           // Get the ‘base’ rate, in order of priority
-          let adjustedRate = await QuoteService.getBaseRate(repositories, day);
+          let adjustedRate = await QuoteService.getBaseRate(
+            repositories,
+            day,
+            'items'
+          );
 
           // Apply day_of_week modifier, in order of priority
           adjustedRate = await QuoteService.applyDayOfWeekModifier(

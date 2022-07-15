@@ -2,7 +2,7 @@ import { Ask } from '../proto/ask';
 import facilityRepository, {
   FacilityRepository
 } from '../repositories/FacilityRepository';
-import { Facility, Item, Space } from '../proto/facility';
+import { Facility, Space } from '../proto/facility';
 import { DateTime, Interval } from 'luxon';
 import {
   FacilityRuleRepository,
@@ -18,6 +18,8 @@ import {
   getFacilityCheckInTime,
   getFacilityTimezone
 } from '../utils';
+import { ItemDBValue } from '../types';
+import facilityService from './FacilityService';
 
 export class SearchService {
   protected facilityRuleRepository: FacilityRuleRepository;
@@ -42,19 +44,16 @@ export class SearchService {
 
     this.checkInTime = getFacilityCheckInTime(this.facility);
 
-    const spaces = await facilityRepository.getFacilityKey(
-      this.facilityId,
-      'items'
-    );
+    const spaces = await facilityService.getFacilitySpaceIds(this.facilityId);
 
     if (Array.isArray(spaces)) {
       const set = new Set<{ metadata: Space; id: string }>();
 
       for (const v of spaces) {
-        const space = await facilityRepository.getItemKey<Item>(
+        const space = await facilityRepository.getItemKey<ItemDBValue>(
           this.facilityId,
           'items',
-          v,
+          v.id,
           'metadata'
         );
 
@@ -62,10 +61,7 @@ export class SearchService {
           throw ApiError.NotFound(`Unable to find "metadata" for space: ${v}`);
         } else {
           try {
-            const metadata = Space.fromBinary(
-              new Uint8Array(Object.values(space.payload))
-            );
-            set.add({ metadata, id: v });
+            set.add({ metadata: space.payload, id: v.id });
           } catch (e) {
             throw ApiError.BadRequest(`Corrupt "metadata" for space: ${v}`);
           }
@@ -145,7 +141,7 @@ export class SearchService {
 
     const lOS = dates.length;
     let minLOS = 0;
-    let maxLOS = 0;
+    let maxLOS = 1000; //if not exist max stay = 1000days(abstract)
 
     if (lOSRule) {
       try {
@@ -155,7 +151,7 @@ export class SearchService {
       }
 
       try {
-        maxLOS = lOSRule[formattedCheckInDay]?.maxLengthOfStay || 0;
+        maxLOS = lOSRule[formattedCheckInDay]?.maxLengthOfStay || 1000;
       } catch (e) {
         //rule not exist
       }

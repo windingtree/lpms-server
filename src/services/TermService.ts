@@ -1,7 +1,15 @@
 import termRepository from '../repositories/TermRepository';
-import { TermDBValue } from '../types';
+import { TermDBValue, TermWithParam } from '../types';
 import { FacilitySubLevels } from './DBService';
 import facilityRepository from '../repositories/FacilityRepository';
+import mandatoryRepository from '../repositories/MandatoryRepository';
+import { BidOptionTerm, BidTerm } from '../proto/bidask';
+import { Term } from '../proto/term';
+import { BigNumber, utils, Wallet } from 'ethers';
+import { getStaysDataDomain } from '../config';
+import { eip712 } from '@windingtree/videre-sdk';
+import { Ask } from '../proto/ask';
+import quoteService, { QuoteService } from './QuoteService';
 
 export class TermService {
   public async getAllFacilityTerms(facilityId: string): Promise<TermDBValue[]> {
@@ -67,6 +75,133 @@ export class TermService {
     }
 
     return false;
+  }
+
+  public async getMandatoryItemTerms(
+    facilityId: string,
+    spaceId: string
+  ): Promise<TermWithParam[]> {
+    const ids = await mandatoryRepository.getItemMandatoryIds(
+      facilityId,
+      spaceId,
+      'terms'
+    );
+
+    return await TermService.getTermsWithParamsByIds(facilityId, spaceId, ids);
+  }
+
+  public async getNonMandatoryItemTermsIds(
+    facilityId: string,
+    spaceId: string
+  ): Promise<TermWithParam[]> {
+    const allIds = await termRepository.getAllTermIds(facilityId);
+    const mandatoryIds = await mandatoryRepository.getItemMandatoryIds(
+      facilityId,
+      spaceId,
+      'terms'
+    );
+
+    const ids = new Set([...allIds].filter((x) => !mandatoryIds.includes(x)));
+
+    return await TermService.getTermsWithParamsByIds(facilityId, spaceId, ids);
+  }
+
+  private static async getTermsWithParamsByIds(
+    facilityId,
+    spaceId,
+    ids
+  ): Promise<TermWithParam[]> {
+    const terms = new Set<TermWithParam>();
+    for (const id of ids) {
+      const term = await termRepository.getTerm(facilityId, id);
+      const param = await termRepository.getTermParam(facilityId, spaceId, id);
+      if (term && param) {
+        terms.add({ ...term, param });
+      }
+    }
+
+    return Array.from(terms);
+  }
+
+  public async getMandatoryBidTermsWithTotalPrice(
+    facilityId: string,
+    spaceId: string,
+    ask: Ask
+  ): Promise<[BigNumber, BidTerm[]]> {
+    const terms = await this.getMandatoryItemTerms(facilityId, spaceId);
+    const quoteService = new QuoteService();
+    let quote = BigNumber.from(0);
+    for (const term of terms) {
+      quote = quote.add(
+        await quoteService.quote(facilityId, term.term, ask, 'terms')
+      );
+    }
+
+    const bidTerms = Promise.all<BidTerm[]>(
+      terms.map((t) => {
+        return {
+          term: Term.toBinary(t.payload),
+          impl: t.impl,
+          txPayload: utils.arrayify(t.param)
+        };
+      })
+    );
+
+    return [quote, await bidTerms];
+  }
+
+  public async getOptionalBidTerms(
+    facilityId: string,
+    spaceId: string,
+    ask: Ask,
+    wallet: Wallet,
+    gem: string
+  ): Promise<BidOptionTerm[]> {
+    const terms = await this.getMandatoryItemTerms(facilityId, spaceId);
+
+    return Promise.all(
+      terms.map(async (t) => {
+        const quote = await quoteService.quote(
+          facilityId,
+          t.term,
+          ask,
+          'terms'
+        );
+
+        return {
+          term: {
+            term: Term.toBinary(t.payload),
+            impl: t.impl,
+            txPayload: utils.arrayify(t.param)
+          },
+          cost: [
+            {
+              gem: gem,
+              wad: quote.mul(BigNumber.from('10').pow('18')).toString()
+            }
+          ],
+          signature: utils.arrayify(
+            await wallet._signTypedData(
+              await getStaysDataDomain(),
+              eip712.bidask.BidOptionTerm,
+              {
+                term: {
+                  term: utils.keccak256(Term.toBinary(t.payload)),
+                  impl: t.impl,
+                  txPayload: utils.keccak256(t.param)
+                },
+                cost: [
+                  {
+                    gem: gem,
+                    wad: quote.mul(BigNumber.from('10').pow('18')).toString()
+                  }
+                ]
+              }
+            )
+          )
+        };
+      })
+    );
   }
 }
 

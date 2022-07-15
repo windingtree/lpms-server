@@ -3362,9 +3362,9 @@ paths:
   /term/params/{facilityId}/{itemId}/{termId}:
     post:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       summary: add mandatory terms to space
-      tags: [ Facility service, terms ]
+      tags: [Facility service, terms]
       parameters:
         - in: path
           name: facilityId
@@ -3423,9 +3423,9 @@ paths:
           description: Some server error
     delete:
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       summary: del mandatory terms from space
-      tags: [ Facility service, terms ]
+      tags: [Facility service, terms]
       parameters:
         - in: path
           name: facilityId

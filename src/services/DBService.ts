@@ -1,10 +1,7 @@
 import { AbstractSublevel } from 'abstract-level';
 import { Level } from 'level';
-import { BidLineAsk, TermDBValue, Token, User } from '../types';
-import {
-  Facility as FacilityMetadata,
-  Item as ItemMetadata
-} from '../proto/facility';
+import { BidLineAsk, ItemDBValue, TermDBValue, Token, User } from '../types';
+import { Facility as FacilityMetadata } from '../proto/facility';
 import {
   Availability,
   DayOfWeekLOSRule,
@@ -41,8 +38,7 @@ export type FacilityStubKey = string | FormattedDate;
 export type FacilityStubValues = string[] | StubStorage;
 export type SpaceStubKey = FormattedDate | `${FormattedDate}-num_booked`;
 export type SpaceStubValues = string[] | number;
-export type MandatoryDBKey = 'items' | 'terms';
-export type TermParam = string | number[][];
+export type RateType = 'items' | 'terms';
 
 export default class DBService {
   protected db: DBLevel;
@@ -131,7 +127,7 @@ export default class DBService {
     itemId: string
   ) {
     const key = `${itemType}_${itemId}`;
-    return this.getFacilityDB(facilityId).sublevel<string, ItemMetadata>(key, {
+    return this.getFacilityDB(facilityId).sublevel<string, ItemDBValue>(key, {
       valueEncoding: 'json'
     });
   }
@@ -184,12 +180,9 @@ export default class DBService {
     termId: string
   ) {
     const key = `${itemId}_${termId}`;
-    return this.getFacilityTermsDB(facilityId).sublevel<'param', TermParam>(
-      key,
-      {
-        valueEncoding: 'json'
-      }
-    );
+    return this.getFacilityTermsDB(facilityId).sublevel<'param', string>(key, {
+      valueEncoding: 'json'
+    });
   }
 
   public getItemAvailabilityDB(facilityId: string, itemId: string) {
@@ -252,7 +245,7 @@ export default class DBService {
 
   public getItemMandatoryDB(facilityId: string, itemId: string) {
     return this.getFacilityItemDB(facilityId, 'items', itemId).sublevel<
-      MandatoryDBKey,
+      RateType,
       string[]
     >('mandatory', { valueEncoding: 'json' });
   }

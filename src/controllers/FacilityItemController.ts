@@ -2,9 +2,10 @@ import type { NextFunction, Request, Response } from 'express';
 import ApiError from '../exceptions/ApiError';
 import facilityService from '../services/FacilityService';
 import facilityRepository from '../repositories/FacilityRepository';
-import { Item, ItemType } from '../proto/facility';
+import { ItemType } from '../proto/facility';
 import stubService from '../services/StubService';
 import mandatoryRepository from '../repositories/MandatoryRepository';
+import { ItemDBValue } from '../types';
 
 export class FacilityItemController {
   getAllItems = async (req: Request, res: Response, next: NextFunction) => {
@@ -26,7 +27,7 @@ export class FacilityItemController {
     try {
       const { facilityId, itemId } = req.params;
 
-      const item = await facilityRepository.getItemKey<Item>(
+      const item = await facilityRepository.getItemKey<ItemDBValue>(
         facilityId,
         'items',
         itemId,
@@ -51,7 +52,7 @@ export class FacilityItemController {
       const { name, description, photos, type, payload } = req.body;
 
       if (
-        await facilityRepository.getItemKey<Item>(
+        await facilityRepository.getItemKey<ItemDBValue>(
           facilityId,
           'items',
           itemId,
@@ -63,7 +64,7 @@ export class FacilityItemController {
         );
       }
 
-      const metadata: Item = {
+      const metadata: ItemDBValue = {
         name,
         description,
         photos,
@@ -89,7 +90,7 @@ export class FacilityItemController {
       const { name, description, photos, type, payload } = req.body;
 
       if (
-        !(await facilityRepository.getItemKey<Item>(
+        !(await facilityRepository.getItemKey<ItemDBValue>(
           facilityId,
           'items',
           itemId,
@@ -126,7 +127,7 @@ export class FacilityItemController {
       const { facilityId, itemId } = req.params;
 
       if (
-        !(await facilityRepository.getItemKey<Item>(
+        !(await facilityRepository.getItemKey<ItemDBValue>(
           facilityId,
           'items',
           itemId,

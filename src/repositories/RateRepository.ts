@@ -7,7 +7,7 @@ import DBService, {
 } from '../services/DBService';
 import { AbstractSublevel } from 'abstract-level';
 import { Rates } from '../proto/lpms';
-import { Item as ItemMetadata } from '../proto/facility';
+import { ItemDBValue } from '../types';
 
 export type DBType = 'items' | 'terms';
 type DB = AbstractSublevel<
@@ -15,7 +15,7 @@ type DB = AbstractSublevel<
     AbstractSublevel<DBLevel, LevelDefaultTyping, string, FacilityValues>,
     LevelDefaultTyping,
     string,
-    ItemMetadata
+    ItemDBValue
   >,
   LevelDefaultTyping,
   DefaultOrDateItemKey,

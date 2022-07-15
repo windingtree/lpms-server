@@ -1,11 +1,12 @@
-import DBService, { MandatoryDBKey } from '../services/DBService';
+import DBService, { RateType } from '../services/DBService';
 
 export class MandatoryRepository {
   private db = DBService.getInstance();
+
   public async getItemMandatoryIds(
     facilityId: string,
     spaceId: string,
-    type: MandatoryDBKey
+    type: RateType
   ) {
     const mandatoryDB = this.db.getItemMandatoryDB(facilityId, spaceId);
 
@@ -22,7 +23,7 @@ export class MandatoryRepository {
   public async addIds(
     facilityId: string,
     spaceId: string,
-    type: MandatoryDBKey,
+    type: RateType,
     ids: string[]
   ): Promise<void> {
     const mandatoryDB = this.db.getItemMandatoryDB(facilityId, spaceId);
@@ -35,7 +36,7 @@ export class MandatoryRepository {
   public async delIds(
     facilityId: string,
     spaceId: string,
-    type: MandatoryDBKey,
+    type: RateType,
     ids: string[]
   ): Promise<void> {
     const mandatoryDB = this.db.getItemMandatoryDB(facilityId, spaceId);

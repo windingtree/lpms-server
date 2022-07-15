@@ -18,6 +18,8 @@ import { Facility } from './proto/facility';
 import { ItemAvailabilityRepository } from './repositories/ItemAvailabilityRepository';
 import { SpaceStubRepository } from './repositories/SpaceStubRepository';
 import { FormattedDate } from './services/DBService';
+import { BidOptionItem, BidOptionTerm, BidTerm } from './proto/bidask';
+import { keccak256 } from 'ethers/lib/utils';
 
 export function convertDaysToSeconds(days: number) {
   return days * 60 * 60 * 24;
@@ -72,19 +74,26 @@ export async function generateBidLine(
   salt: string,
   which: string,
   params: string,
-  spaceIds: string[],
+  itemIds: string[],
   limit: number,
   expiry: number,
   gem: string,
-  wad: BigNumber
+  wad: BigNumber,
+  optionalItems: BidOptionItem[],
+  mandatoryTerms: BidTerm[],
+  optionalTerms: BidOptionTerm[]
 ) {
-  const items = spaceIds.map((v) => utils.arrayify(v));
+  const items = itemIds.map((v) => utils.arrayify(v));
+
   return {
     limit: limit,
     expiry: expiry,
-    items: items,
-    terms: [],
-    options: undefined,
+    items,
+    terms: mandatoryTerms,
+    options: {
+      items: optionalItems,
+      terms: optionalTerms
+    },
     cost: [
       {
         gem: gem,
@@ -102,10 +111,10 @@ export async function generateBidLine(
           which: which,
           params: params,
           items: items,
-          terms: [],
+          terms: getSignBidTerms(mandatoryTerms),
           options: {
-            items: [],
-            terms: []
+            items: getSignBidOptionalItems(optionalItems),
+            terms: getSignBidOptionalTerms(optionalTerms)
           },
           cost: [
             {
@@ -118,6 +127,40 @@ export async function generateBidLine(
     )
   };
 }
+
+export const getSignBidTerms = (terms: BidTerm[]) => {
+  return terms.map((bidTerm) => {
+    return {
+      term: keccak256(bidTerm.term),
+      impl: bidTerm.impl,
+      txPayload: keccak256(bidTerm.txPayload)
+    };
+  });
+};
+
+export const getSignBidOptionalItems = (optionalItems: BidOptionItem[]) => {
+  return optionalItems.map((item) => {
+    return {
+      item: keccak256(item.item),
+      cost: item.cost
+    };
+  });
+};
+
+export const getSignBidOptionalTerms = (optionalTerms: BidOptionTerm[]) => {
+  return optionalTerms.map((optionalTerm) => {
+    if (optionalTerm.term) {
+      return {
+        term: {
+          term: keccak256(optionalTerm.term.term),
+          impl: optionalTerm.term.impl,
+          txPayload: keccak256(optionalTerm.term.txPayload)
+        },
+        cost: optionalTerm.cost
+      };
+    }
+  });
+};
 
 export const getServiceProviderId = (salt: string, address: string): string => {
   return utils.keccak256(

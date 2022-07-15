@@ -13,7 +13,7 @@ import { DayOfWeekLOSRule } from '../src/proto/lpms';
 import { FormattedDate } from '../src/services/DBService';
 import { convertDaysToSeconds } from '../src/utils';
 import { facility, removeTestDB, space } from './common';
-import { Item, Space } from '../src/proto/facility';
+import { ItemDBValue } from '../src/types';
 
 describe('search service test', async () => {
   const facilityId =
@@ -42,12 +42,12 @@ describe('search service test', async () => {
     await facilityRepo.setFacilityKey(facilityId, 'metadata', facility);
     const { name, description, photos, type } = space;
 
-    const item: Item = {
+    const item: ItemDBValue = {
       name,
       description,
       photos,
       type,
-      payload: Space.toBinary(space.payload)
+      payload: space.payload
     };
 
     await facilityRepo.addToIndex(facilityId, 'items', spaceId);
@@ -70,12 +70,12 @@ describe('search service test', async () => {
       maxNumberOfChildOccupants: 0
     };
 
-    const item2: Item = {
+    const item2: ItemDBValue = {
       name,
       description,
       photos,
       type,
-      payload: Space.toBinary(spaceMetadata)
+      payload: spaceMetadata
     };
 
     await facilityRepo.addToIndex(facilityId, 'items', spaceId2);

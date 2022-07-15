@@ -1,4 +1,4 @@
-import DBService, { FacilitySubLevels, TermParam } from '../services/DBService';
+import DBService, { FacilitySubLevels } from '../services/DBService';
 import { TermDBValue } from '../types';
 
 export class TermRepository {
@@ -149,7 +149,7 @@ export class TermRepository {
     facilityId: string,
     itemId: string,
     termId: string
-  ): Promise<TermParam | null> {
+  ): Promise<string | null> {
     const termParamDB = this.dbService.getFacilityTermParamsDB(
       facilityId,
       itemId,
@@ -170,7 +170,7 @@ export class TermRepository {
     facilityId: string,
     itemId: string,
     termId: string,
-    param: TermParam
+    param: string
   ): Promise<void> {
     const termParamDB = this.dbService.getFacilityTermParamsDB(
       facilityId,
