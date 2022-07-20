@@ -22,7 +22,7 @@ export default async (req, res, next) => {
       return next(ApiError.UnauthorizedError());
     }
 
-    const userExists = await userRepository.getUserIdByLogin(userData.login);
+    const userExists = await userRepository.getUserByLogin(userData.login);
 
     if (!userExists) {
       return next(ApiError.UnauthorizedError());

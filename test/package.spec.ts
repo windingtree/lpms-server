@@ -4,10 +4,8 @@ import ServerService from '../src/services/ServerService';
 import { AppRole } from '../src/types';
 import userService from '../src/services/UserService';
 import userRepository from '../src/repositories/UserRepository';
-import { removeTestDB } from './common';
 
 describe('test', async () => {
-  after(removeTestDB);
   const appService = await new ServerService(3005);
   const requestWithSupertest = await supertest(appService.getApp);
 

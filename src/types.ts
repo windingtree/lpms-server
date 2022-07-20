@@ -1,27 +1,20 @@
 import { Request, Router } from 'express';
-import { Ask } from './proto/ask';
-import { BidLine } from './proto/bidask';
-import { Term } from './proto/term';
-import { Photo } from './proto/photo';
-import { ItemType, Space } from './proto/facility';
+import { ObjectId } from 'mongodb'
 
 export interface User {
-  id: number;
   login: string;
   password: string;
   roles: AppRole[];
 }
 
-export interface UserDTO {
-  id: number;
-  login: string;
-  roles: AppRole[];
+export interface UserDbData extends User {
+  _id: ObjectId | null;
 }
 
-export enum ServiceRole {
-  ADMIN = 'admin',
-  BIDDER = 'bidder',
-  API = 'api'
+export interface UserDTO {
+  id: string;
+  login: string;
+  roles: AppRole[];
 }
 
 export enum AppRole {
@@ -30,7 +23,12 @@ export enum AppRole {
 }
 
 export interface Token {
+  userId: string;
   refresh: string;
+}
+
+export interface TokenDbData extends Token {
+  _id: ObjectId | null;
 }
 
 export interface Tokens {
@@ -38,53 +36,8 @@ export interface Tokens {
   refreshToken: string;
 }
 
-export const walletAccounts = [
-  ServiceRole.API,
-  ServiceRole.BIDDER,
-  AppRole.MANAGER,
-  AppRole.STAFF
-];
-
-export enum walletAccountsIndexes {
-  API = 0,
-  BIDDER = 1,
-  MANAGER = 2,
-  STAFF = 3
-}
-
-export interface walletAccount {
-  id: number;
-  address: string;
-  role: string;
-}
-
 export interface AuthRequest extends Request {
   user: UserDTO;
 }
 
-export interface BidLineAsk {
-  ask: Ask;
-  bidLine: BidLine;
-  spaceId: string;
-  items: string[];
-}
-
 export type RouterInitializer = (router: Router) => void;
-
-export interface TermDBValue {
-  term: string; //termId
-  impl: string; //term contract address
-  payload: Term;
-}
-
-export interface ItemDBValue {
-  name: string;
-  description: string;
-  photos: Photo[];
-  type: ItemType;
-  payload?: Space;
-}
-
-export interface TermWithParam extends TermDBValue {
-  param: string;
-}

@@ -1,34 +1,63 @@
-import DBService from '../services/DBService';
+import MongoDBService from '../services/MongoDBService';
+import { Collection, ObjectId } from 'mongodb';
+import { TokenDbData } from '../types';
+import { DBName } from '../config';
 
 export class TokenRepository {
-  private dbService: DBService;
-  private db;
+  private dbService: MongoDBService;
+  private collectionName = 'tokens';
 
   constructor() {
-    this.dbService = DBService.getInstance();
-    this.db = DBService.getInstance().getTokenDB();
+    this.dbService = MongoDBService.getInstance();
   }
 
-  public async getUserTokens(userId: number): Promise<string[]> {
-    try {
-      return await this.db.get(String(userId));
-    } catch (e) {
-      if (e.status !== 404) {
-        throw e;
-      }
+  protected async getCollection(): Promise<Collection<TokenDbData>> {
+    const dbClient = await this.dbService.getDbClient();
+    const database = dbClient.db(DBName);
+
+    return database.collection(this.collectionName);
+  }
+
+  public async getUserTokens(userId: string): Promise<TokenDbData[]> {
+    const result: TokenDbData[] = [];
+    const collection = await this.getCollection();
+    const query = { userId }
+    const cursor = await collection.find(query);
+
+    if ((await cursor.count()) === 0) {
+      return [];
     }
-    return [];
+
+    await cursor.forEach((item) => {
+      result.push(item);
+    });
+
+    return result;
   }
 
-  public async setUserTokens(
+  public async setUserToken(
     userId: string,
-    verifiedTokens: string[]
+    verifiedToken: string
   ): Promise<void> {
-    await this.db.put(userId, verifiedTokens);
+    const collection = await this.getCollection();
+
+    await collection.insertOne({
+      _id: null,
+      userId,
+      refresh: verifiedToken
+    });
   }
 
   public async delUserTokens(userId: string): Promise<void> {
-    await this.db.del(String(userId));
+    const collection = await this.getCollection();
+    const query = { userId };
+    await collection.deleteMany(query);
+  }
+
+  public async delTokens(ids: string[]): Promise<void> {
+    const collection = await this.getCollection();
+    const query = { _id: {$in : ids.map(id => new ObjectId(id))} };
+    await collection.deleteMany(query);
   }
 }
 

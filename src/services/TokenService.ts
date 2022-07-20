@@ -31,42 +31,39 @@ export class TokenService {
     };
   }
 
-  public async saveToken(refreshToken: string, userId: number) {
-    const tokens = await this.repository.getUserTokens(userId);
-    const verifiedTokens = this.getVerifiedUserTokens(tokens);
-
-    verifiedTokens.push(refreshToken);
-
-    return await this.repository.setUserTokens(String(userId), verifiedTokens);
+  public async saveToken(refreshToken: string, userId: string) { //todo lifetime of entity
+    await this.deleteOldRefreshTokens(userId);
+    return await this.repository.setUserToken(userId, refreshToken);
   }
 
-  public getVerifiedUserTokens(tokens: Array<string>): string[] {
-    const verifiedTokens: string[] = [];
+  public async deleteOldRefreshTokens(userId: string): Promise<void> {
+    const tokens = await this.repository.getUserTokens(userId);
+    const oldTokens: string[] = [];
 
     tokens.forEach((token) => {
       jwt.verify(token, refreshTokenKey, (err) => {
-        if (!err) {
-          verifiedTokens.push(token);
+        if (err && token._id) {
+          oldTokens.push(token._id.toString());
         }
       });
     });
 
-    return verifiedTokens;
+    await this.repository.delTokens(oldTokens);
   }
 
   public async revokeToken(token: string) {
     const data = jwt.verify(token, refreshTokenKey);
     const userId = data.id;
     const tokens = await this.repository.getUserTokens(userId);
-    const neededTokens = tokens.filter((i) => {
-      return i !== token;
-    });
+    const neededToken = tokens.find((t) => token === t.refresh);
 
-    return await this.repository.setUserTokens(String(userId), neededTokens);
+    if (neededToken && neededToken._id) {
+      return await this.repository.delTokens([neededToken._id.toString()]);
+    }
   }
 
-  public async revokeAllUserTokens(userId: number) {
-    return await this.repository.delUserTokens(String(userId));
+  public async revokeAllUserTokens(userId: string) {
+    return await this.repository.delUserTokens(userId);
   }
 
   public validateRefreshToken(refreshToken) {
@@ -90,7 +87,7 @@ export class TokenService {
       const data = jwt.verify(token, refreshTokenKey);
       const userId = data.id;
       const tokens = await this.repository.getUserTokens(userId);
-      return tokens.includes(token);
+      return Boolean(tokens.find((t) => token === t.refresh));
     } catch (e) {
       return false;
     }

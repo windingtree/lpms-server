@@ -1,69 +1,90 @@
-import { AppRole, User } from '../types';
-import DBService, { DBLevel, LevelDefaultTyping } from '../services/DBService';
-import { Level } from 'level';
-import { AbstractSublevel } from 'abstract-level';
+import { AppRole, User, UserDbData } from '../types';
+
+import MongoDBService from '../services/MongoDBService';
+import { Collection, ObjectId } from 'mongodb';
+import { DBName } from '../config';
+import ApiError from '../exceptions/ApiError';
 
 export class UserRepository {
-  private dbService: DBService;
-  private db: Level<string, string | string[]>;
-  private userDB: AbstractSublevel<DBLevel, LevelDefaultTyping, string, User>;
-  private loginDB: AbstractSublevel<
-    DBLevel,
-    LevelDefaultTyping,
-    string,
-    string
-  >;
+  private dbService: MongoDBService;
+  private collectionName = 'users';
 
   constructor() {
-    this.dbService = DBService.getInstance();
-    this.db = DBService.getInstance().getDB();
-    this.userDB = DBService.getInstance().getUserDB();
-    this.loginDB = this.dbService.getLoginDB();
+    this.dbService = MongoDBService.getInstance();
   }
 
-  public async getAllUsers(): Promise<User[]> {
-    return await this.userDB.values().all();
+  protected async getCollection(): Promise<Collection<UserDbData>> {
+    const dbClient = await this.dbService.getDbClient();
+    const database = dbClient.db(DBName);
+
+    return database.collection(this.collectionName);
   }
 
-  public async getUserIdByLogin(login: string): Promise<number | null> {
-    try {
-      const userId = await this.loginDB.get(login);
-      return Number(userId);
-    } catch (e) {
-      if (e.status === 404) {
-        return null;
-      }
-      throw e;
+  public async getAllUsers() {
+    const result: UserDbData[] = [];
+    const collection = await this.getCollection();
+    const cursor = await collection.find({});
+
+    if ((await cursor.count()) === 0) {
+      return [];
     }
+
+    await cursor.forEach((item) => {
+      result.push(item);
+    });
+
+    return result;
   }
 
-  public async getUserById(id: number): Promise<User> {
-    return await this.userDB.get(String(id));
+  public async getUserById(_id: string): Promise<UserDbData> {
+    const collection = await this.getCollection();
+    const query = { _id: new ObjectId(_id) };
+    const result = await collection.findOne(query);
+
+    if (!result) {
+      throw ApiError.NotFound('User not found');
+    }
+
+    return result;
+  }
+
+  public async getUserByLogin(login: string): Promise<UserDbData> {
+    const collection = await this.getCollection();
+    const query = { login };
+    const result = await collection.findOne(query);
+
+    if (!result) {
+      throw ApiError.NotFound('User not found');
+    }
+
+    return result;
   }
 
   public async createUser(
-    id: number,
     login: string,
     password: string,
     roles: AppRole[]
   ): Promise<void> {
-    await this.userDB.put(String(id), {
-      id,
+    const collection = await this.getCollection();
+
+    await collection.insertOne({
+      _id: null,
       login,
       password,
       roles
     });
-
-    await this.loginDB.put(login, String(id));
   }
 
-  public async deleteUser(userId: string, login: string): Promise<void> {
-    await this.userDB.del(String(userId));
-    await this.loginDB.del(login);
+  public async deleteUser(_id: string): Promise<void> {
+    const collection = await this.getCollection();
+    const query = { _id: new ObjectId(_id) };
+    await collection.deleteOne(query);
   }
 
-  public async updateUser(userId: string, user: User): Promise<void> {
-    await this.userDB.put(String(userId), user);
+  public async updateUser(_id: string, user: User): Promise<void> {
+    const collection = await this.getCollection();
+    const query = { _id: new ObjectId(_id) };
+    await collection.updateOne(query, user);
   }
 }
 
