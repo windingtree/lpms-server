@@ -27,8 +27,8 @@ describe('test', async () => {
   it('make manager', async () => {
     await userService.createUser(managerLogin, managerPass, [AppRole.MANAGER]);
 
-    const userId = await userRepository.getUserIdByLogin(managerLogin);
-    expect(userId).to.be.an('number');
+    const user = await userRepository.getUserByLogin(managerLogin);
+    expect(user._id?.toString()).to.be.an('string');
   });
 
   it('manager can login', async () => {
@@ -70,6 +70,21 @@ describe('test', async () => {
     accessToken = res.body.accessToken;
     expect(accessToken).to.be.an('string');
     expect(accessToken).to.not.equal(oldAccessToken);
+  });
+
+  it('should throw err when try refresh token with revoked token', async () => {
+    function sleep(ms) {
+      return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    //without sleep script is very fast and refreshed access token is equal with old
+    await sleep(1000);
+
+    await requestWithSupertest
+      .post('/api/user/refresh')
+      .set('Accept', 'application/json')
+      .set('Cookie', [`refreshToken=${refreshToken}`])
+      .expect(401);
   });
 
   it('create new user with refreshed access token', async () => {
@@ -189,18 +204,13 @@ describe('test', async () => {
       .post('/api/user/login')
       .send({ login: staffLogin, password: staffPass })
       .set('Accept', 'application/json')
-      .expect(400);
+      .expect(404);
   });
 
   it('delete users', async () => {
-    const id = await userRepository.getUserIdByLogin(managerLogin);
-    const anotherUser = await userRepository.getUserIdByLogin(
-      anotherUserForTest
-    );
-    await userService.deleteUser(Number(id));
-    await userService.deleteUser(Number(anotherUser));
-
-    const checkId = await userRepository.getUserIdByLogin(managerLogin);
-    expect(checkId).to.be.null;
+    const manager = await userRepository.getUserByLogin(managerLogin);
+    const anotherUser = await userRepository.getUserByLogin(anotherUserForTest);
+    await userService.deleteUser(manager._id?.toString() || '');
+    await userService.deleteUser(anotherUser._id?.toString() || '');
   });
 });

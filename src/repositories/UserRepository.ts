@@ -1,4 +1,4 @@
-import { AppRole, User, UserDbData } from '../types';
+import { AppRole, UserDbData } from '../types';
 
 import MongoDBService from '../services/MongoDBService';
 import { Collection, ObjectId } from 'mongodb';
@@ -81,10 +81,10 @@ export class UserRepository {
     await collection.deleteOne(query);
   }
 
-  public async updateUser(_id: string, user: User): Promise<void> {
+  public async updateUser(_id: string, update): Promise<void> {
     const collection = await this.getCollection();
     const query = { _id: new ObjectId(_id) };
-    await collection.updateOne(query, user);
+    await collection.updateOne(query, { $set: update });
   }
 }
 

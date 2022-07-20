@@ -2,7 +2,6 @@ import { AppRole, User, UserDbData, UserDTO } from '../types';
 import bcrypt from 'bcrypt';
 import tokenService, { TokenService } from './TokenService';
 import ApiError from '../exceptions/ApiError';
-import { defaultManagerLogin } from '../config';
 import { MetricsService } from './MetricsService';
 import userRepository, { UserRepository } from '../repositories/UserRepository';
 import mainRepository, { MainRepository } from '../repositories/MainRepository';
@@ -46,7 +45,7 @@ export class UserService {
 
   public getUserDTO(user: UserDbData): UserDTO {
     if (!user._id) {
-      throw ApiError.BadRequest('Incorrect userId')
+      throw ApiError.BadRequest('Incorrect userId');
     }
 
     return {
@@ -133,11 +132,10 @@ export class UserService {
     password: string
   ): Promise<void> {
     try {
-      const user = await this.repository.getUserById(userId);
       const rounds = 2;
-      user.password = await bcrypt.hash(String(password), rounds);
+      const newPassword = await bcrypt.hash(String(password), rounds);
 
-      await this.repository.updateUser(String(userId), user);
+      await this.repository.updateUser(userId, { password: newPassword });
     } catch (e) {
       if (e.status === 404) {
         throw ApiError.BadRequest('User not found');

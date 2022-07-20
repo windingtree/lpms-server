@@ -21,7 +21,7 @@ export class TokenRepository {
   public async getUserTokens(userId: string): Promise<TokenDbData[]> {
     const result: TokenDbData[] = [];
     const collection = await this.getCollection();
-    const query = { userId }
+    const query = { userId };
     const cursor = await collection.find(query);
 
     if ((await cursor.count()) === 0) {
@@ -44,7 +44,8 @@ export class TokenRepository {
     await collection.insertOne({
       _id: null,
       userId,
-      refresh: verifiedToken
+      refresh: verifiedToken,
+      createdAt: new Date()
     });
   }
 
@@ -56,7 +57,7 @@ export class TokenRepository {
 
   public async delTokens(ids: string[]): Promise<void> {
     const collection = await this.getCollection();
-    const query = { _id: {$in : ids.map(id => new ObjectId(id))} };
+    const query = { _id: { $in: ids.map((id) => new ObjectId(id)) } };
     await collection.deleteMany(query);
   }
 }

@@ -1,5 +1,5 @@
 import { Request, Router } from 'express';
-import { ObjectId } from 'mongodb'
+import { ObjectId } from 'mongodb';
 
 export interface User {
   login: string;
@@ -23,6 +23,7 @@ export enum AppRole {
 }
 
 export interface Token {
+  createdAt: Date;
   userId: string;
   refresh: string;
 }

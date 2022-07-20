@@ -31,24 +31,8 @@ export class TokenService {
     };
   }
 
-  public async saveToken(refreshToken: string, userId: string) { //todo lifetime of entity
-    await this.deleteOldRefreshTokens(userId);
+  public async saveToken(refreshToken: string, userId: string) {
     return await this.repository.setUserToken(userId, refreshToken);
-  }
-
-  public async deleteOldRefreshTokens(userId: string): Promise<void> {
-    const tokens = await this.repository.getUserTokens(userId);
-    const oldTokens: string[] = [];
-
-    tokens.forEach((token) => {
-      jwt.verify(token, refreshTokenKey, (err) => {
-        if (err && token._id) {
-          oldTokens.push(token._id.toString());
-        }
-      });
-    });
-
-    await this.repository.delTokens(oldTokens);
   }
 
   public async revokeToken(token: string) {
