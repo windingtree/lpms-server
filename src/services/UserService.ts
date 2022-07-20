@@ -4,17 +4,14 @@ import tokenService, { TokenService } from './TokenService';
 import ApiError from '../exceptions/ApiError';
 import { MetricsService } from './MetricsService';
 import userRepository, { UserRepository } from '../repositories/UserRepository';
-import mainRepository, { MainRepository } from '../repositories/MainRepository';
 
 export class UserService {
   private tokenService: TokenService;
   private repository: UserRepository;
-  private mainRepository: MainRepository;
 
   constructor() {
     this.tokenService = tokenService;
     this.repository = userRepository;
-    this.mainRepository = mainRepository;
   }
 
   public async getAllUsers() {
